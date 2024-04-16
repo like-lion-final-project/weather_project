@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class GetModelsResDto {
+    @JsonProperty("object")
     private  String object;
     private List<Data> data;
 

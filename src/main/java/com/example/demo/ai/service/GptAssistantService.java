@@ -3,19 +3,26 @@ package com.example.demo.ai.service;
 import com.example.demo.ai.dto.CreateAssistantResDto;
 import com.example.demo.ai.dto.GetAssistantResDto;
 import com.example.demo.ai.dto.CreateAssistantReqDto;
+import com.example.demo.ai.dto.GetModelsResDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * <p>Chat GPT Assistans와 통신하기 위한 서비스 입니다.</p>
  * */
+@Slf4j
 @Service
 public class GptAssistantService {
     private final RestClient restClient;
@@ -31,24 +38,39 @@ public class GptAssistantService {
 
 
     private static final String FATION_EXPERT_ASSISTANT_NAME = "Fashion Expert";
-    private String[] DEFAULT_MODEL_IDENTIFIER_LIST = {
-            "gpt-3.5-turbo-16k-0613",
-            "gpt-3.5-turbo-16k",
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-0613",
-            "gpt-3.5-turbo-0125",
-            "gpt-3.5-turbo"
-    };
+    private static final Set<String> DEFAULT_MODEL_IDENTIFIER_LIST = new HashSet<>(Arrays.asList(
+            "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-1106",
+            "gpt-3.5-turbo-0613", "gpt-3.5-turbo-0125", "gpt-3.5-turbo"
+    ));
 
 
-    public boolean getActiveModels(){
+
+    public Set<String> getActiveModels() {
         String url = "/v1/models";
+        String jsonResponse = restClient
+                .get()
+                .uri(url)
+                .retrieve()
+                .body(String.class);
 
-        return true;
+        try {
+            GetModelsResDto models = objectMapper.readValue(jsonResponse, GetModelsResDto.class);
+            Set<String> activeModels = new HashSet<>();
+            for (GetModelsResDto.Data model : models.getData()) {
+                activeModels.add(model.getId());
+            }
+
+            activeModels.retainAll(DEFAULT_MODEL_IDENTIFIER_LIST); // Correct use of retainAll
+            return activeModels; // Correct return
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage() + "에러 메시지");
+            throw new RuntimeException("JSON parsing error", e);
+        }
     }
 
-    public boolean isActiveTargetModel(String model){
-        return true;
+    public boolean isActiveTargetModel(String modelName) {
+        Set<String> activeModels = getActiveModels(); // Use the getActiveModels method
+        return activeModels.contains(modelName); // Check if the model is in the active models set
     }
 
 
@@ -58,14 +80,21 @@ public class GptAssistantService {
     @Transactional
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
         GetAssistantResDto assistantResDto = getAssistants();
-        boolean isExist = false;
-
+        boolean isExistAssistant = false;
 
         for (GetAssistantResDto.Data data : assistantResDto.getData()) {
-            isExist = data.getName().equals(FATION_EXPERT_ASSISTANT_NAME);
+            isExistAssistant = data.getName().equals(FATION_EXPERT_ASSISTANT_NAME);
         }
 
-        if(isExist){
+        // 존재하는 어시스턴트 인지 체크
+        if(isExistAssistant){
+            log.info("이미 생성된 어시스턴트 입니다.");
+            return null;
+        }
+
+        // 존재하는 모델인지 체크
+        if(!isActiveTargetModel(model)){
+            log.info("모델이 존재하지 않습니다.");
             return null;
         }
 
@@ -90,7 +119,7 @@ public class GptAssistantService {
         try {
             return objectMapper.readValue(jsonResponse.getBody(), CreateAssistantResDto.class);
         } catch (JsonProcessingException e) {
-            System.out.println(e + " : json 에러");
+            log.info("JSON 직렬화 에러");
             return null;
         }
 
