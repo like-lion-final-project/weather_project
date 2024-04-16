@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 public class NcpGeocodeService {
     private final NcpMapApiService ncpMapApiService;
 
-    public PointDto getGeocode() {
+    public PointDto getGeocode(
+            String query
+    ) {
         Map<String, Object> params = new HashMap<>();
-        params.put("query", "기흥구");         // 주소
+        params.put("query", query);         // 주소
         // params.put("coordinate", "55,127");  // 검색 중심 좌표
         params.put("page", 1);
         params.put("count", 1);

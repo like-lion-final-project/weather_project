@@ -30,7 +30,10 @@ public class WeatherController {
 
     // geocode
     @GetMapping("/geocode")
-    public PointDto pointRegion() {
-        return geocodeService.getGeocode();
+    public PointDto pointRegion(
+            @RequestParam("query")
+            String query
+    ) {
+        return geocodeService.getGeocode(query);
     }
 }
