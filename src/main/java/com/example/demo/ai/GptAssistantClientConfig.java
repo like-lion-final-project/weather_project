@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
-@Configuration
+@Configuration("GptAssistantClient")
 public class GptAssistantClientConfig {
     /**
      * OpenAI assistant api 헤더에 추가할 베타 표시.
@@ -23,7 +23,7 @@ public class GptAssistantClientConfig {
     @Value("${open-ai.api-key}")
     private String OPEN_AI_API_KEY = "";
 
-    @Bean
+    @Bean(name = "gptAssistantRestClient")
     public RestClient GptAssistantClient() {
         System.out.println(OPEN_AI_API_KEY + " :api 키");
         return RestClient.builder()

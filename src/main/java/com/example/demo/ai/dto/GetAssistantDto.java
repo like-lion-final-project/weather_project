@@ -1,56 +1,76 @@
 package com.example.demo.ai.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class GetAssistantDto {
-    String object;
-    Data data;
-    String firstId;
-    String lastId;
-    Boolean hasMore;
+
+    @JsonProperty("object")
+    private String object;
+
+    @JsonProperty("first_id")
+    private String firstId;
+
+    @JsonProperty("last_id")
+    private String lastId;
+
+    @JsonProperty("has_more")
+    private Boolean hasMore;
+
+    @JsonProperty("data")
+    private List<Data> data;
 
     @Getter
-    public class Data {
+    @Builder
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class Data {
+
         @JsonProperty("id")
-        String id;
+        private String id;
 
         @JsonProperty("object")
-        String object;
+        private String object;
 
         @JsonProperty("created_at")
-        String createdAt;
+        private Long createdAt;
 
         @JsonProperty("name")
-        String name;
+        private String name;
 
         @JsonProperty("description")
-        String description;
+        private String description;
 
         @JsonProperty("model")
-        String model;
+        private String model;
 
         @JsonProperty("instructions")
-        String instructions;
+        private String instructions;
 
         @JsonProperty("tools")
-        String tools;
+        private List<String> tools;
 
         @JsonProperty("top_p")
-        String topP;
+        private Double topP;
 
         @JsonProperty("temperature")
-        String temperature;
+        private Double temperature;
 
         @JsonProperty("file_ids")
-        String fileIds;
+        private List<String> fileIds;
 
         @JsonProperty("metadata")
-        String metadata;
+        private Object metadata;
 
         @JsonProperty("response_format")
-        String responseFormat;
+        private String responseFormat;
     }
 }

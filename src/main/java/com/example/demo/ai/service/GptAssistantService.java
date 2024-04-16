@@ -1,23 +1,30 @@
 package com.example.demo.ai.service;
 
-import lombok.AllArgsConstructor;
+import com.example.demo.ai.dto.GetAssistantDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
  * <p>Chat GPT Assistans와 통신하기 위한 서비스 입니다.</p>
  * */
 @Service
-@RequiredArgsConstructor
 public class GptAssistantService {
-    private final RestClient rest;
+    private final RestClient restClient;
+
+    @Autowired
+    public GptAssistantService(@Qualifier("gptAssistantRestClient") RestClient restClient) {
+        this.restClient = restClient;
+    }
+
+
+    ObjectMapper objectMapper = new ObjectMapper();
+
 
 
     private static final String FATION_EXPERT_ASSISTANT_NAME = "Fashion Expert";
@@ -31,20 +38,31 @@ public class GptAssistantService {
     };
 
 
+
+
     public void createAssistant(String assistantName, String model){
         // TODO: 어시스턴트 생성
         String url = "/v1/assistants";
 
     }
 
-    public Object getAssistants(){
+    public GetAssistantDto getAssistants() {
         // TODO: 어시스턴트 목록 조회
         String url = "v1/assistants";
-        return rest
+
+        String jsonResponse = restClient
                 .get()
                 .uri(url)
                 .retrieve()
                 .body(String.class);
+
+        try {
+            return objectMapper.readValue(jsonResponse, GetAssistantDto.class);
+        }catch (JsonProcessingException e) {
+            System.out.println(e.getMessage() + "에러 메시지");
+            throw new RuntimeException("json 가공 에러");
+        }
+
 
     }
 
