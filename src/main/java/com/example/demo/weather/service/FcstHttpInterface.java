@@ -1,4 +1,4 @@
-package com.example.demo.weather.api.service;
+package com.example.demo.weather.service;
 
 import java.util.Map;
 import org.springframework.web.bind.annotation.RequestParam;
