@@ -51,9 +51,23 @@ public class GptAssistantService {
         return true;
     }
 
+
+    /**
+     * <p>어시스턴트 생성 메서드</p>
+     * */
     @Transactional
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
+        GetAssistantResDto assistantResDto = getAssistants();
+        boolean isExist = false;
 
+
+        for (GetAssistantResDto.Data data : assistantResDto.getData()) {
+            isExist = data.getName().equals(FATION_EXPERT_ASSISTANT_NAME);
+        }
+
+        if(isExist){
+            return null;
+        }
 
         String url = "/v1/assistants";
         CreateAssistantReqDto dto = CreateAssistantReqDto.builder()
