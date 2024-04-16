@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class GetAssistantDto {
+public class GetAssistantResDto {
 
     @JsonProperty("object")
     private String object;

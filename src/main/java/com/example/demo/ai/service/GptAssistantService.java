@@ -1,11 +1,14 @@
 package com.example.demo.ai.service;
 
-import com.example.demo.ai.dto.GetAssistantDto;
+import com.example.demo.ai.dto.CreateAssistantResDto;
+import com.example.demo.ai.dto.GetAssistantResDto;
+import com.example.demo.ai.dto.CreateAssistantReqDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -28,7 +31,7 @@ public class GptAssistantService {
 
 
     private static final String FATION_EXPERT_ASSISTANT_NAME = "Fashion Expert";
-    private static final String[] MODEL_IDENTIFIER_LIST = {
+    private String[] DEFAULT_MODEL_IDENTIFIER_LIST = {
             "gpt-3.5-turbo-16k-0613",
             "gpt-3.5-turbo-16k",
             "gpt-3.5-turbo-1106",
@@ -38,16 +41,48 @@ public class GptAssistantService {
     };
 
 
+    public boolean getActiveModels(){
+        String url = "/v1/models";
+
+        return true;
+    }
+
+    public boolean isActiveTargetModel(String model){
+        return true;
+    }
+
+    @Transactional
+    public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
 
 
-    public void createAssistant(String assistantName, String model){
-        // TODO: 어시스턴트 생성
         String url = "/v1/assistants";
+        CreateAssistantReqDto dto = CreateAssistantReqDto.builder()
+                .instructions(instructions)
+                .name(name)
+                .model(model)
+                .build();
+
+        ResponseEntity<String> jsonResponse = restClient.post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toEntity(String.class);
+
+
+        if (!jsonResponse.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to create assistant with status: " + jsonResponse.getStatusCode());
+        }
+
+        try {
+            return objectMapper.readValue(jsonResponse.getBody(), CreateAssistantResDto.class);
+        } catch (JsonProcessingException e) {
+            System.out.println(e + " : json 에러");
+            return null;
+        }
 
     }
 
-    public GetAssistantDto getAssistants() {
-        // TODO: 어시스턴트 목록 조회
+    public GetAssistantResDto getAssistants() {
         String url = "v1/assistants";
 
         String jsonResponse = restClient
@@ -57,7 +92,7 @@ public class GptAssistantService {
                 .body(String.class);
 
         try {
-            return objectMapper.readValue(jsonResponse, GetAssistantDto.class);
+            return objectMapper.readValue(jsonResponse, GetAssistantResDto.class);
         }catch (JsonProcessingException e) {
             System.out.println(e.getMessage() + "에러 메시지");
             throw new RuntimeException("json 가공 에러");
