@@ -1,6 +1,6 @@
 package com.example.demo.ai.controller;
 
-import com.example.demo.ai.dto.CreateAssistantReqDto;
+import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.CreateAssistantResDto;
 import com.example.demo.ai.dto.GetAssistantResDto;
 import com.example.demo.ai.service.GptAssistantService;
@@ -26,15 +26,8 @@ public class GptAssistantTestController {
      * */
     @PostMapping("/ai/assistants")
     public CreateAssistantResDto createAssistant(
-            @RequestBody
-            CreateAssistantReqDto reqDto
     ){
-        String INSTRUCTIONS = "You are a fashion expert who knows well about temperature and clothes. Try to recommend people the right fashion for each temperature";
-        String NAME = "Fashion Expert";
-        String TARGET_MODEL = "gpt-3.5-turbo";
-
-        System.out.println(reqDto.getName() + " : name");
-        return gptAssistantService.createAssistant(INSTRUCTIONS,NAME,TARGET_MODEL);
+        return gptAssistantService.createAssistant(AppConstants.INSTRUCTIONS , AppConstants.NAME, AppConstants.MODEL);
     }
 
     /** 스레드 생성 */
@@ -44,5 +37,18 @@ public class GptAssistantTestController {
             Integer userId
     ){
         gptAssistantService.createThread(userId);
+    }
+
+    /**메시지 생성*/
+    @PostMapping("/ai/threads")
+    public void createMessage(
+            @RequestParam("c")
+            String c,
+            @RequestParam("a")
+            String age,
+            @RequestParam("g")
+            String gender
+    ){
+
     }
 }

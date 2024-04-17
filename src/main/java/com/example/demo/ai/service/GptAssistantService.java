@@ -1,5 +1,6 @@
 package com.example.demo.ai.service;
 
+import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.*;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
@@ -44,11 +45,7 @@ public class GptAssistantService {
     ObjectMapper objectMapper = new ObjectMapper();
 
 
-    private static final String FATION_EXPERT_ASSISTANT_NAME = "Fashion Expert";
-    private static final Set<String> DEFAULT_MODEL_IDENTIFIER_LIST = new HashSet<>(Arrays.asList(
-            "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-0613", "gpt-3.5-turbo-0125", "gpt-3.5-turbo"
-    ));
+
 
 
     /**
@@ -71,7 +68,7 @@ public class GptAssistantService {
                 activeModels.add(model.getId());
             }
 
-            activeModels.retainAll(DEFAULT_MODEL_IDENTIFIER_LIST);
+            activeModels.retainAll(AppConstants.DEFAULT_MODEL_IDENTIFIER_LIST);
             return activeModels;
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage() + "JSON parsing error");
@@ -101,7 +98,7 @@ public class GptAssistantService {
         boolean isExistAssistant = false;
 
         for (GetAssistantResDto.Data data : assistantResDto.getData()) {
-            isExistAssistant = data.getName().equals(FATION_EXPERT_ASSISTANT_NAME);
+            isExistAssistant = data.getName().equals(AppConstants.FATION_EXPERT_ASSISTANT_NAME);
         }
 
         // 존재하는 어시스턴트 인지 체크
@@ -183,7 +180,7 @@ public class GptAssistantService {
         // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
         String url = "/v1/threads";
 
-        Assistant assistant = assistantRepo.findAssistantByName(FATION_EXPERT_ASSISTANT_NAME).orElseThrow(
+        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME).orElseThrow(
                 () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
         );
 
