@@ -1,5 +1,7 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.fcst.FcstApiResponse;
+import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import java.util.Map;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
@@ -10,11 +12,17 @@ public interface VilageFcstApiService {
 
     // 초단기 예보 조회
     @GetExchange("/getUltraSrtFcst")
-    Object UltraSrtFcst(@RequestParam Map<String, Object> params);
+    FcstApiResponse UltraSrtFcst(
+            @RequestParam
+            Map<String, Object> params
+    );
 
     // 초단기 실황 조회
     @GetExchange("/getUltraSrtNcst")
-    Object UltraSrtNcst(@RequestParam Map<String, Object> params);
+    NcstApiResponse UltraSrtNcst(
+            @RequestParam
+            Map<String, Object> params
+    );
 
 }
 

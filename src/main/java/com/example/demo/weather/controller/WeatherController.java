@@ -1,7 +1,9 @@
 package com.example.demo.weather.controller;
 
 import com.example.demo.weather.dto.PointDto;
+import com.example.demo.weather.dto.fcst.FcstApiResponse;
 import com.example.demo.weather.dto.geolocation.GeoLocationNcpResponse;
+import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
 import com.example.demo.weather.service.NcpGeolocationService;
@@ -24,7 +26,7 @@ public class WeatherController {
      * 초단기 예보 조회 (시간대별 날씨)
      */
     @GetMapping("/by-hour")
-    public Object getUltraSrtFcst(
+    public FcstApiResponse getUltraSrtFcst(
             @RequestParam("nx")
             Integer nx,
             @RequestParam("ny")
@@ -37,7 +39,7 @@ public class WeatherController {
      * 초단기 실황 조회 (현시각 날씨)
      */
     @GetMapping("/by-current")
-    public Object getUltraSrtNcst(
+    public NcstApiResponse getUltraSrtNcst(
             @RequestParam("nx")
             Integer nx,
             @RequestParam("ny")

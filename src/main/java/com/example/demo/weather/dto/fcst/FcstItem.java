@@ -10,6 +10,6 @@ public class FcstItem {
     private String fcstDate;
     private String fcstTime;
     private String fcstValue;
-    private int nx;
-    private int ny;
+    private Integer nx;
+    private Integer ny;
 }

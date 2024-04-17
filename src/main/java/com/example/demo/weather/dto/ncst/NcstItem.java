@@ -7,7 +7,7 @@ public class NcstItem {
     private String baseDate;
     private String baseTime;
     private String category;
-    private int nx;
-    private int ny;
-    private String obsrValue;
+    private Integer nx;
+    private Integer ny;
+    private Double obsrValue;
 }

@@ -6,8 +6,5 @@ import lombok.Data;
 @Data
 public class FcstBody {
     private String dataType;
-    private List<FcstItem> items;
-    private int pageNo;
-    private int numOfRows;
-    private int totalCount;
+    private FcstItems items;
 }

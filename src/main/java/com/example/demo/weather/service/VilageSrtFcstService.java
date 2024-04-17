@@ -1,5 +1,7 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.fcst.FcstApiResponse;
+import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -19,7 +21,7 @@ public class VilageSrtFcstService {
     private String serviceKey;
 
     // 초단기 예보 (Short-Term Forecast)
-    public Object getUltraSrtFcst(
+    public FcstApiResponse getUltraSrtFcst(
             Integer nx,
             Integer ny
     ) {
@@ -34,9 +36,7 @@ public class VilageSrtFcstService {
         params.put("dataType", "JSON");
         params.put("base_date", dateTimeFormatter.format(currentTime));  // 발표 일자
         params.put("base_time", timeFormatter.format(currentTime));      // 발표 시각 (1시간전 기준)
-
         // TODO : 현재 시각을 매 시간 30분에 생성되는 Base_Time 으로 조정하는 계산 구현
-
         params.put("nx", nx);                                            // 예보지점 x좌표 값
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
@@ -45,7 +45,7 @@ public class VilageSrtFcstService {
 
 
     // 초단기 실황 (Short-Term Nowcast)
-    public Object getUltraSrtNcst(
+    public NcstApiResponse getUltraSrtNcst(
             Integer nx,
             Integer ny
     ) {
