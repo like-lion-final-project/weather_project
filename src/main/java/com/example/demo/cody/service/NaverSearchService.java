@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 @Service
 public class NaverSearchService {
-
     public List<ItemDto> fromJSONtoItems(String result) {
         JSONObject rjson = new JSONObject(result);
         System.out.println(rjson);
