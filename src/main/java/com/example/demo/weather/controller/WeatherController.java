@@ -20,18 +20,35 @@ public class WeatherController {
     private final NcpGeocodeService geocodeService;
     private final NcpGeolocationService geolocationService;
 
-    // (nx, ny) 위치의 날씨 조회 테스트 (시간 : 4/16 23:00)
-    @GetMapping
-    public Object weatherFcst(
+    /**
+     * 초단기 예보 조회 (시간대별 날씨)
+     */
+    @GetMapping("/by-hour")
+    public Object getUltraSrtFcst(
             @RequestParam("nx")
-            Double nx,
+            Integer nx,
             @RequestParam("ny")
-            Double ny
+            Integer ny
     ) {
-        return vilageSrtFcstService.getVilageFcst(nx, ny);
+        return vilageSrtFcstService.getUltraSrtFcst(nx, ny);
     }
 
-    // geocode
+    /**
+     * 초단기 실황 조회 (현시각 날씨)
+     */
+    @GetMapping("/by-current")
+    public Object getUltraSrtNcst(
+            @RequestParam("nx")
+            Integer nx,
+            @RequestParam("ny")
+            Integer ny
+    ) {
+        return vilageSrtFcstService.getUltraSrtNcst(nx, ny);
+    }
+
+    /**
+     * geocode
+     */
     @GetMapping("/geocode")
     public PointDto pointRegion(
             @RequestParam("query")
@@ -40,7 +57,9 @@ public class WeatherController {
         return geocodeService.getGeocode(query);
     }
 
-    // geolocation
+    /**
+     * geolocation
+     */
     @GetMapping("/geolocation")
     public GeoLocationNcpResponse geoLocation(
             @RequestParam("ip")

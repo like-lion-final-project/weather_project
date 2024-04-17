@@ -18,7 +18,7 @@ public class VilageFcstClientConfig {
     }
 
     @Bean
-    public VilageFcstApiService fcstHttpInterface() {
+    public VilageFcstApiService vilageFcstApiService() {
         return HttpServiceProxyFactory
                 .builderFor(RestClientAdapter.create(FsctRestClient()))
                 .build()

@@ -18,10 +18,10 @@ public class VilageSrtFcstService {
     @Value("${Fcst.serviceKey}")
     private String serviceKey;
 
-    // 단기 예보 조회
-    public Object getVilageFcst(
-            Double nx,
-            Double ny
+    // 초단기 예보
+    public Object getUltraSrtFcst(
+            Integer nx,
+            Integer ny
     ) {
         LocalDateTime currentTime = LocalDateTime.now().minusHours(1);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -29,17 +29,40 @@ public class VilageSrtFcstService {
 
         Map<String, Object> params = new HashMap<>();
         params.put("serviceKey", serviceKey);
-        params.put("numOfRows", 266);
+        params.put("numOfRows", 60);
         params.put("pageNo", 1);
         params.put("dataType", "JSON");
         params.put("base_date", dateTimeFormatter.format(currentTime));  // 발표 일자
-        params.put("base_time", timeFormatter.format(currentTime));      // 발표 시각 (1시간전)
-        params.put("nx", nx);                                            // 예보지점 x좌표값
-        params.put("ny", ny);                                            // 예보지점 y좌표값
-         log.info("발표 일자: {}", dateTimeFormatter.format(currentTime));
-         log.info("발표 시각: {}", timeFormatter.format(currentTime));
+        params.put("base_time", timeFormatter.format(currentTime));      // 발표 시각 (1시간전 기준)
 
-        return vilageFcstApiService.getVilageFcst(params);
+        // TODO : 현재 시각을 매 시간 30분에 생성되는 Base_Time 으로 조정하는 계산 구현
+
+        params.put("nx", nx);                                            // 예보지점 x좌표 값
+        params.put("ny", ny);                                            // 예보지점 y좌표 값
+
+        return vilageFcstApiService.UltraSrtFcst(params);
     }
 
+
+    // 초단기 실황
+    public Object getUltraSrtNcst(
+            Integer nx,
+            Integer ny
+    ) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("serviceKey", serviceKey);
+        params.put("numOfRows", 8);
+        params.put("pageNo", 1);
+        params.put("dataType", "JSON");
+        params.put("base_date", dateTimeFormatter.format(currentTime));  // 발표 일자
+        params.put("base_time", timeFormatter.format(currentTime));      // 발표 시각
+        params.put("nx", nx);                                            // 예보지점 x좌표 값
+        params.put("ny", ny);                                            // 예보지점 y좌표 값
+
+        return vilageFcstApiService.UltraSrtNcst(params);
+    }
 }
