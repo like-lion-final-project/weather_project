@@ -1,6 +1,6 @@
-package com.example.demo.weather.api.config;
+package com.example.demo.weather.config;
 
-import com.example.demo.weather.api.service.FcstHttpInterface;
+import com.example.demo.weather.service.FcstHttpInterface;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
