@@ -5,10 +5,7 @@ import com.example.demo.ai.dto.CreateAssistantResDto;
 import com.example.demo.ai.dto.GetAssistantResDto;
 import com.example.demo.ai.service.GptAssistantService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,5 +35,14 @@ public class GptAssistantTestController {
 
         System.out.println(reqDto.getName() + " : name");
         return gptAssistantService.createAssistant(INSTRUCTIONS,NAME,TARGET_MODEL);
+    }
+
+    /** 스레드 생성 */
+    @PostMapping("/ai/threads")
+    public void createThread(
+            @RequestParam("user_id")
+            Integer userId
+    ){
+        gptAssistantService.createThread(userId);
     }
 }

@@ -1,3 +1,12 @@
+Fcst:
+  serviceKey:
+naver:
+  ncp:
+    client-id:
+    client-secret:
+
+    api-access:
+    api-secret:
 open-ai:
   assistant-id:
   api-key:

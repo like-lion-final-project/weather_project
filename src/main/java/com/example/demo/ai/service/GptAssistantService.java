@@ -125,6 +125,9 @@ public class GptAssistantService {
 
     }
 
+    /**
+     * <p>어시스턴트 목록 조회 메서드</p>
+     * */
     public GetAssistantResDto getAssistants() {
         String url = "v1/assistants";
 
@@ -145,14 +148,28 @@ public class GptAssistantService {
     }
 
 
+    /**
+     * <p>어시스턴트 수정 메서드</p>
+     * */
     public void modifyAssistant(){
         // TODO: 어시스턴트 수정
         String url = "/v1/assistants";
     }
 
-    public void createThread(){
+    public void createThread(Integer userId){
         // TODO: 스레드 생성
-        String url = "/v1/assistants";
+        // TODO: 유저마다 하나의 스레드를 생성함
+        // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
+        String url = "/v1/threads";
+
+
+        String jsonResponse = restClient
+                .post()
+                .uri(url)
+                .retrieve()
+                .body(String.class);
+
+        System.out.println(jsonResponse + ":json response");
     }
 
     public void createMessage(String threadId){
