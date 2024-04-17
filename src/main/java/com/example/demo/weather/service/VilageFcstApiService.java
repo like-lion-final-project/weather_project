@@ -6,7 +6,7 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
 @HttpExchange("/1360000/VilageFcstInfoService_2.0/")
-public interface FcstHttpInterface {
+public interface VilageFcstApiService {
     // 단기 예보 조회
     @GetExchange("/getVilageFcst")
     Object getVilageFcst(@RequestParam Map<String, Object> params);

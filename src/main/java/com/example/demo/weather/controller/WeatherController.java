@@ -1,9 +1,8 @@
 package com.example.demo.weather.controller;
 
 import com.example.demo.weather.dto.PointDto;
-import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
 import com.example.demo.weather.dto.geolocation.GeoLocationNcpResponse;
-import com.example.demo.weather.service.FcstApiService;
+import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
 import com.example.demo.weather.service.NcpGeolocationService;
 import java.util.Map;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/weather")
 @RequiredArgsConstructor
 public class WeatherController {
-    private final FcstApiService fcstApiService;
+    private final VilageSrtFcstService vilageSrtFcstService;
     private final NcpGeocodeService geocodeService;
     private final NcpGeolocationService geolocationService;
 
@@ -25,11 +24,11 @@ public class WeatherController {
     @GetMapping
     public Object weatherFcst(
             @RequestParam("nx")
-            Integer nx,
+            Double nx,
             @RequestParam("ny")
-            Integer ny
+            Double ny
     ) {
-        return fcstApiService.getVilageFcst(nx, ny);
+        return vilageSrtFcstService.getVilageFcst(nx, ny);
     }
 
     // geocode
