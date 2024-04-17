@@ -1,9 +1,10 @@
 package com.example.demo.weather.controller;
 
 import com.example.demo.weather.dto.PointDto;
-import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
+import com.example.demo.weather.dto.fcst.FcstApiResponse;
 import com.example.demo.weather.dto.geolocation.GeoLocationNcpResponse;
-import com.example.demo.weather.service.FcstApiService;
+import com.example.demo.weather.dto.ncst.NcstApiResponse;
+import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
 import com.example.demo.weather.service.NcpGeolocationService;
 import java.util.Map;
@@ -17,22 +18,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/weather")
 @RequiredArgsConstructor
 public class WeatherController {
-    private final FcstApiService fcstApiService;
+    private final VilageSrtFcstService vilageSrtFcstService;
     private final NcpGeocodeService geocodeService;
     private final NcpGeolocationService geolocationService;
 
-    // (nx, ny) 위치의 날씨 조회 테스트 (시간 : 4/16 23:00)
-    @GetMapping
-    public Object weatherFcst(
+    /**
+     * 초단기 예보 조회 (시간대별 날씨)
+     */
+    @GetMapping("/by-hour")
+    public FcstApiResponse getUltraSrtFcst(
             @RequestParam("nx")
             Integer nx,
             @RequestParam("ny")
             Integer ny
     ) {
-        return fcstApiService.getVilageFcst(nx, ny);
+        return vilageSrtFcstService.getUltraSrtFcst(nx, ny);
     }
 
-    // geocode
+    /**
+     * 초단기 실황 조회 (현시각 날씨)
+     */
+    @GetMapping("/by-current")
+    public NcstApiResponse getUltraSrtNcst(
+            @RequestParam("nx")
+            Integer nx,
+            @RequestParam("ny")
+            Integer ny
+    ) {
+        return vilageSrtFcstService.getUltraSrtNcst(nx, ny);
+    }
+
+    /**
+     * geocode
+     */
     @GetMapping("/geocode")
     public PointDto pointRegion(
             @RequestParam("query")
@@ -41,7 +59,9 @@ public class WeatherController {
         return geocodeService.getGeocode(query);
     }
 
-    // geolocation
+    /**
+     * geolocation
+     */
     @GetMapping("/geolocation")
     public GeoLocationNcpResponse geoLocation(
             @RequestParam("ip")
