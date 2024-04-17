@@ -18,7 +18,7 @@ public class VilageSrtFcstService {
     @Value("${Fcst.serviceKey}")
     private String serviceKey;
 
-    // 초단기 예보
+    // 초단기 예보 (Short-Term Forecast)
     public Object getUltraSrtFcst(
             Integer nx,
             Integer ny
@@ -44,7 +44,7 @@ public class VilageSrtFcstService {
     }
 
 
-    // 초단기 실황
+    // 초단기 실황 (Short-Term Nowcast)
     public Object getUltraSrtNcst(
             Integer nx,
             Integer ny
