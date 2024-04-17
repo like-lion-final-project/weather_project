@@ -2,6 +2,12 @@ package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.*;
+import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
+import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
+import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.message.CreateMessageReqDto;
+import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.repo.AssistantRepo;
@@ -17,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -120,7 +125,8 @@ public class GptAssistantService {
                 .model(model)
                 .build();
 
-        ResponseEntity<String> jsonResponse = restClient.post()
+        ResponseEntity<String> jsonResponse = restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -180,7 +186,7 @@ public class GptAssistantService {
         // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
         String url = "/v1/threads";
 
-        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME).orElseThrow(
+        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" +AppConstants.VERSION).orElseThrow(
                 () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
         );
 
@@ -213,9 +219,30 @@ public class GptAssistantService {
         // TODO: 스레드 목록 조회
     }
 
-    public void createMessage(String threadId) {
+    public CreateMessageResDto createMessage(String threadId, String message) {
         // TODO: 스레드에 추가할 메시지 생성
-        String url = "/v1/assistants";
+
+        String url = "/v1/threads/" + threadId + "/messages";
+
+        CreateMessageReqDto messageReqDto = CreateMessageReqDto.builder()
+                .role("user")
+                .content(message)
+                .build();
+
+        ResponseEntity<String> jsonResponse = restClient
+                .post()
+                .uri(url)
+                .body(messageReqDto)
+                .retrieve()
+                .toEntity(String.class);
+
+        try{
+            return objectMapper.readValue(jsonResponse.getBody(), CreateMessageResDto.class);
+        }catch(JsonProcessingException e){
+            log.info("JSON 직렬화 에러");
+            return null;
+        }
+
     }
 
     public void runAssistant(String threadId, String assistantId) {

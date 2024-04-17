@@ -1,11 +1,15 @@
 package com.example.demo.ai.controller;
 
 import com.example.demo.ai.AppConstants;
-import com.example.demo.ai.dto.CreateAssistantResDto;
-import com.example.demo.ai.dto.GetAssistantResDto;
+import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
+import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.service.GptAssistantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.Path;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,28 +31,34 @@ public class GptAssistantTestController {
     @PostMapping("/ai/assistants")
     public CreateAssistantResDto createAssistant(
     ){
-        return gptAssistantService.createAssistant(AppConstants.INSTRUCTIONS , AppConstants.NAME, AppConstants.MODEL);
+    return gptAssistantService.createAssistant(AppConstants.INSTRUCTIONS , AppConstants.NAME + "_"+ AppConstants.VERSION, AppConstants.MODEL);
     }
 
     /** 스레드 생성 */
     @PostMapping("/ai/threads")
-    public void createThread(
+    public AssistantThread createThread(
             @RequestParam("user_id")
             Integer userId
     ){
-        gptAssistantService.createThread(userId);
+        return gptAssistantService.createThread(userId);
     }
 
     /**메시지 생성*/
-    @PostMapping("/ai/threads")
-    public void createMessage(
+    @PostMapping("/ai/threads/{threadId}/messages")
+    public CreateMessageResDto createMessage(
             @RequestParam("c")
             String c,
             @RequestParam("a")
             String age,
             @RequestParam("g")
-            String gender
+            String gender,
+            @PathVariable("threadId")
+            String threadId
     ){
+        // 메시지 포메팅
+//        String message = "C:25,A:27,G:M Please keep the response data format."
+        String message = "C:"+ c + ",A:" + age + ",G:" + gender + " Please keep the response data format.";
 
+        return gptAssistantService.createMessage(threadId,message);
     }
 }

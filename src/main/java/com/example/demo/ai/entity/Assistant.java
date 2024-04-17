@@ -13,6 +13,8 @@ public class Assistant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Column(columnDefinition = "TEXT")
     private String instructions;
     private String name;
     private String version;

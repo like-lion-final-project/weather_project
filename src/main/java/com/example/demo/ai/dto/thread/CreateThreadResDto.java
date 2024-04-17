@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto;
+package com.example.demo.ai.dto.thread;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
