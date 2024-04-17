@@ -4,6 +4,7 @@ import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.service.GptAssistantService;
 import lombok.RequiredArgsConstructor;
@@ -61,4 +62,16 @@ public class GptAssistantTestController {
 
         return gptAssistantService.createMessage(threadId,message);
     }
+
+    /**실행*/
+    @PostMapping("/ai/run")
+    public CreateRunResDto createRun(
+            @RequestParam("thread_id")
+            String threadId,
+            @RequestParam("assistant_id")
+            String assistantId
+    ){
+        return gptAssistantService.runAssistant(threadId,assistantId);
+    }
+
 }

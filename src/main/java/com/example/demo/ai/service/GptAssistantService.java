@@ -7,6 +7,8 @@ import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageReqDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.dto.run.CreateRunReqDto;
+import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
@@ -245,8 +247,24 @@ public class GptAssistantService {
 
     }
 
-    public void runAssistant(String threadId, String assistantId) {
-        // TODO: 어시스턴트에 요청
-        String url = "/v1/assistants";
+    public CreateRunResDto runAssistant(String threadId, String assistantId) {
+        CreateRunReqDto createRunReqDto = CreateRunReqDto.builder()
+                .assistantId(assistantId)
+                .build();
+        String url = "/v1/threads/" + threadId + "/runs";
+        ResponseEntity<String> jsonResponse = restClient
+                .post()
+                .uri(url)
+                .body(createRunReqDto)
+                .retrieve()
+                .toEntity(String.class);
+
+        try {
+            return objectMapper.readValue(jsonResponse.getBody(),CreateRunResDto.class);
+        }catch(JsonProcessingException e){
+            log.info(e + " :Json 에러");
+            return null;
+        }
+
     }
 }
