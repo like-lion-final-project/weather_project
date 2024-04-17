@@ -1,3 +1,6 @@
+open-ai:
+  assistant-id:
+  api-key:
 spring:
   config:
     activate:
@@ -9,9 +12,6 @@ spring:
     user:
       name: user
       password: password
-  open-ai:
-    assistant-id:
-    api-key:
   datasource:
     url: jdbc:mysql://localhost:3306/your-db-name
     username:
