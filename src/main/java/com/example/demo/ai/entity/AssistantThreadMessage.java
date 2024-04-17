@@ -36,6 +36,6 @@ public class AssistantThreadMessage {
     private String value;
     private String file_ids;
     private String annotataions;
-    private Object metadata;
+    private String metadata;
 
 }

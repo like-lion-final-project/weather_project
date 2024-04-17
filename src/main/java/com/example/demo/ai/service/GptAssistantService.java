@@ -51,6 +51,11 @@ public class GptAssistantService {
     ));
 
 
+    /**
+     * <p>현재 Chat GPT API 에서 사용 가능한 모델 정보를 반환하는 메서드</p>
+     * <p>DEFAULT_MODEL_IDENTIFIER_LIST 변수에 저장된 기본 값들과 응답 값을 비교해서 교집합 데이터만 반환함</p>
+     *
+     * */
     public Set<String> getActiveModels() {
         String url = "/v1/models";
         String jsonResponse = restClient
@@ -66,14 +71,18 @@ public class GptAssistantService {
                 activeModels.add(model.getId());
             }
 
-            activeModels.retainAll(DEFAULT_MODEL_IDENTIFIER_LIST); // Correct use of retainAll
-            return activeModels; // Correct return
+            activeModels.retainAll(DEFAULT_MODEL_IDENTIFIER_LIST);
+            return activeModels;
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage() + "에러 메시지");
+            System.out.println(e.getMessage() + "JSON parsing error");
             throw new RuntimeException("JSON parsing error", e);
         }
     }
 
+    /**
+     * <p>타겟 모델이 사용가능한 상태인지 체크하는 메서드</p>
+     * @param modelName 모델의 이름입니다. ex) gpt-3.5-turbor-0613
+     * */
     public boolean isActiveTargetModel(String modelName) {
         Set<String> activeModels = getActiveModels(); // Use the getActiveModels method
         return activeModels.contains(modelName); // Check if the model is in the active models set
@@ -82,6 +91,9 @@ public class GptAssistantService {
 
     /**
      * <p>어시스턴트 생성 메서드</p>
+     * @param instructions 어시스턴트 생성시 어떤 역할을 수행할지 자연어로 작성
+     * @param name 어시스턴트의 이름 입니다.
+     * @param model 어시스턴트의 기반 모델 ex) gpt-3.5
      */
     @Transactional
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
@@ -149,8 +161,6 @@ public class GptAssistantService {
             System.out.println(e.getMessage() + "에러 메시지");
             throw new RuntimeException("json 가공 에러");
         }
-
-
     }
 
 
@@ -162,6 +172,11 @@ public class GptAssistantService {
         String url = "/v1/assistants";
     }
 
+
+    /**
+     * <p>스레드 생성 메서드</p>
+     * @param userId User 엔티티에서 유저를 식별할 고유 값을 의미합니다. 현재 임시 값이며 User 엔티티 구조에 따라 변경 될 수 있습니다.
+     * */
     @Transactional
     public AssistantThread createThread(Integer userId) {
         // TODO: 유저마다 하나의 스레드를 생성함
@@ -177,13 +192,11 @@ public class GptAssistantService {
             // userRepo.findBy ...
         }
 
-        // 스레드 생성
         String jsonResponse = restClient
                 .post()
                 .uri(url)
                 .retrieve()
                 .body(String.class);
-
 
         try {
             CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
@@ -194,7 +207,6 @@ public class GptAssistantService {
             return assistantThreadRepo.save(assistantThreadEntity);
         } catch (JsonProcessingException e) {
             log.info(e + " :Json 에러");
-
         }
         System.out.println(jsonResponse + ":json response");
         return null;
