@@ -3,6 +3,7 @@ package com.example.demo.ai.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -11,25 +12,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetModelsResDto {
     @JsonProperty("object")
-    private  String object;
-    private List<Data> data;
+    public String object;
+    public ArrayList<Data> data;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @RequiredArgsConstructor
-    public class Data {
+    public static class Data {
 
         @JsonProperty("id")
-        private String id;
+        public String id;
 
         @JsonProperty("object")
-        private  String object;
+        public String object;
 
         @JsonProperty("created")
-        private  Long created;
+        public Long created;
 
         @JsonProperty("owned_by")
-        private  String ownedBy;
+        public String ownedBy;
     }
 }

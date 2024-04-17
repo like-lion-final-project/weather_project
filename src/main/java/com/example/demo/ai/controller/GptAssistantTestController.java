@@ -1,14 +1,16 @@
 package com.example.demo.ai.controller;
 
-import com.example.demo.ai.dto.CreateAssistantReqDto;
-import com.example.demo.ai.dto.CreateAssistantResDto;
-import com.example.demo.ai.dto.GetAssistantResDto;
+import com.example.demo.ai.AppConstants;
+import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
+import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.service.GptAssistantService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.Path;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,14 +31,47 @@ public class GptAssistantTestController {
      * */
     @PostMapping("/ai/assistants")
     public CreateAssistantResDto createAssistant(
-            @RequestBody
-            CreateAssistantReqDto reqDto
     ){
-        String INSTRUCTIONS = "You are a fashion expert who knows well about temperature and clothes. Try to recommend people the right fashion for each temperature";
-        String NAME = "Fashion Expert";
-        String TARGET_MODEL = "gpt-3.5-turbo";
-
-        System.out.println(reqDto.getName() + " : name");
-        return gptAssistantService.createAssistant(INSTRUCTIONS,NAME,TARGET_MODEL);
+    return gptAssistantService.createAssistant(AppConstants.INSTRUCTIONS , AppConstants.NAME + "_"+ AppConstants.VERSION, AppConstants.MODEL);
     }
+
+    /** 스레드 생성 */
+    @PostMapping("/ai/threads")
+    public AssistantThread createThread(
+            @RequestParam("user_id")
+            Integer userId
+    ){
+        return gptAssistantService.createThread(userId);
+    }
+
+    /**메시지 생성*/
+    @PostMapping("/ai/threads/{threadId}/messages")
+    public CreateMessageResDto createMessage(
+            @RequestParam("c")
+            String c,
+            @RequestParam("a")
+            String age,
+            @RequestParam("g")
+            String gender,
+            @PathVariable("threadId")
+            String threadId
+    ){
+        // 메시지 포메팅
+//        String message = "C:25,A:27,G:M Please keep the response data format."
+        String message = "C:"+ c + ",A:" + age + ",G:" + gender + " Please keep the response data format.";
+
+        return gptAssistantService.createMessage(threadId,message);
+    }
+
+    /**실행*/
+    @PostMapping("/ai/run")
+    public CreateRunResDto createRun(
+            @RequestParam("thread_id")
+            String threadId,
+            @RequestParam("assistant_id")
+            String assistantId
+    ){
+        return gptAssistantService.runAssistant(threadId,assistantId);
+    }
+
 }
