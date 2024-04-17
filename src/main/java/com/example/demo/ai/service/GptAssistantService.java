@@ -1,12 +1,14 @@
 package com.example.demo.ai.service;
 
-import com.example.demo.ai.dto.CreateAssistantResDto;
-import com.example.demo.ai.dto.GetAssistantResDto;
-import com.example.demo.ai.dto.CreateAssistantReqDto;
-import com.example.demo.ai.dto.GetModelsResDto;
+import com.example.demo.ai.dto.*;
+import com.example.demo.ai.entity.Assistant;
+import com.example.demo.ai.entity.AssistantThread;
+import com.example.demo.ai.repo.AssistantRepo;
+import com.example.demo.ai.repo.AssistantThreadRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,20 +23,25 @@ import java.util.Set;
 
 /**
  * <p>Chat GPT Assistans와 통신하기 위한 서비스 입니다.</p>
- * */
+ */
 @Slf4j
 @Service
+@AllArgsConstructor
+
 public class GptAssistantService {
     private final RestClient restClient;
+    private final AssistantThreadRepo assistantThreadRepo;
+    private final AssistantRepo assistantRepo;
 
     @Autowired
-    public GptAssistantService(@Qualifier("gptAssistantRestClient") RestClient restClient) {
+    public GptAssistantService(@Qualifier("gptAssistantRestClient") RestClient restClient, AssistantThreadRepo assistantThreadRepo, AssistantRepo assistantRepo) {
         this.restClient = restClient;
+        this.assistantThreadRepo = assistantThreadRepo;
+        this.assistantRepo = assistantRepo;
     }
 
 
     ObjectMapper objectMapper = new ObjectMapper();
-
 
 
     private static final String FATION_EXPERT_ASSISTANT_NAME = "Fashion Expert";
@@ -42,7 +49,6 @@ public class GptAssistantService {
             "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-1106",
             "gpt-3.5-turbo-0613", "gpt-3.5-turbo-0125", "gpt-3.5-turbo"
     ));
-
 
 
     public Set<String> getActiveModels() {
@@ -76,7 +82,7 @@ public class GptAssistantService {
 
     /**
      * <p>어시스턴트 생성 메서드</p>
-     * */
+     */
     @Transactional
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
         GetAssistantResDto assistantResDto = getAssistants();
@@ -87,13 +93,13 @@ public class GptAssistantService {
         }
 
         // 존재하는 어시스턴트 인지 체크
-        if(isExistAssistant){
+        if (isExistAssistant) {
             log.info("이미 생성된 어시스턴트 입니다.");
             return null;
         }
 
         // 존재하는 모델인지 체크
-        if(!isActiveTargetModel(model)){
+        if (!isActiveTargetModel(model)) {
             log.info("모델이 존재하지 않습니다.");
             return null;
         }
@@ -127,7 +133,7 @@ public class GptAssistantService {
 
     /**
      * <p>어시스턴트 목록 조회 메서드</p>
-     * */
+     */
     public GetAssistantResDto getAssistants() {
         String url = "v1/assistants";
 
@@ -139,7 +145,7 @@ public class GptAssistantService {
 
         try {
             return objectMapper.readValue(jsonResponse, GetAssistantResDto.class);
-        }catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             System.out.println(e.getMessage() + "에러 메시지");
             throw new RuntimeException("json 가공 에러");
         }
@@ -150,37 +156,60 @@ public class GptAssistantService {
 
     /**
      * <p>어시스턴트 수정 메서드</p>
-     * */
-    public void modifyAssistant(){
+     */
+    public void modifyAssistant() {
         // TODO: 어시스턴트 수정
         String url = "/v1/assistants";
     }
 
-    public void createThread(Integer userId){
+    @Transactional
+    public AssistantThread createThread(Integer userId) {
         // TODO: 유저마다 하나의 스레드를 생성함
         // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
         String url = "/v1/threads";
 
+        Assistant assistant = assistantRepo.findAssistantByName(FATION_EXPERT_ASSISTANT_NAME).orElseThrow(
+                () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
+        );
 
+        // 유저 아이디 혹은 유저네임을 통해 생성된 스레드가 있는지 체크
+        if(true){
+            // userRepo.findBy ...
+        }
+
+        // 스레드 생성
         String jsonResponse = restClient
                 .post()
                 .uri(url)
                 .retrieve()
                 .body(String.class);
 
+
+        try {
+            CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
+            AssistantThread assistantThreadEntity = AssistantThread.builder()
+                    .assistant(assistant)
+                    .name(createThreadResDto.getId())
+                    .build();
+            return assistantThreadRepo.save(assistantThreadEntity);
+        } catch (JsonProcessingException e) {
+            log.info(e + " :Json 에러");
+
+        }
         System.out.println(jsonResponse + ":json response");
+        return null;
     }
 
-    public void getThreads(){
+    public void getThreads() {
         // TODO: 스레드 목록 조회
     }
 
-    public void createMessage(String threadId){
+    public void createMessage(String threadId) {
         // TODO: 스레드에 추가할 메시지 생성
         String url = "/v1/assistants";
     }
 
-    public void runAssistant(String threadId, String assistantId){
+    public void runAssistant(String threadId, String assistantId) {
         // TODO: 어시스턴트에 요청
         String url = "/v1/assistants";
     }
