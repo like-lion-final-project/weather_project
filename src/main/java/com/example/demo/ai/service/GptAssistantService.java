@@ -157,7 +157,6 @@ public class GptAssistantService {
     }
 
     public void createThread(Integer userId){
-        // TODO: 스레드 생성
         // TODO: 유저마다 하나의 스레드를 생성함
         // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
         String url = "/v1/threads";
@@ -170,6 +169,10 @@ public class GptAssistantService {
                 .body(String.class);
 
         System.out.println(jsonResponse + ":json response");
+    }
+
+    public void getThreads(){
+        // TODO: 스레드 목록 조회
     }
 
     public void createMessage(String threadId){
