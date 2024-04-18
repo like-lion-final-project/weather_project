@@ -1,17 +1,22 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
+import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.entity.Assistant;
+import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.repo.AssistantRepo;
+import com.example.demo.ai.repo.AssistantThreadRepo;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import javax.swing.text.html.Option;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 
@@ -23,6 +28,7 @@ import java.util.Random;
 @Service
 class GptAssistantLifeCycleService {
     private final AssistantRepo assistantRepo;
+    private final AssistantThreadRepo assistantThreadRepo;
     private final ObjectMapper objectMapper;
 
     @Qualifier("gptAssistantRestClient")
@@ -31,8 +37,11 @@ class GptAssistantLifeCycleService {
     GptAssistantLifeCycleService(
             @Qualifier("gptAssistantRestClient") RestClient restClient,
             ObjectMapper objectMapper,
-            AssistantRepo assistantRepo) {
+            AssistantRepo assistantRepo,
+            AssistantThreadRepo assistantThreadRepo
+    ) {
         this.assistantRepo = assistantRepo;
+        this.assistantThreadRepo = assistantThreadRepo;
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
@@ -50,23 +59,45 @@ class GptAssistantLifeCycleService {
 
         try {
             DeleteAssistantResDto deleteAssistantResDto = objectMapper.readValue(jsonResponse, DeleteAssistantResDto.class);
-            Optional<Assistant> assistantEntity = assistantRepo.findAssistantByName(deleteAssistantResDto.getId());
-
+            Optional<Assistant> assistantEntity = assistantRepo.findAssistantByAssistantId(deleteAssistantResDto.getId());
             assistantEntity.ifPresent(assistant -> assistantRepo.deleteById(assistant.getId()));
-
         } catch (JsonProcessingException e) {
             log.warn("Json Processing Exception - deleteAssistant");
             throw new RuntimeException("Json Processing Exception - deleteAssistant");
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.warn("Runtime Exception");
-            throw new RuntimeException("Json Processing Exception - deleteAssistant");
+            throw new RuntimeException("Exception - deleteAssistant");
         }
+    }
+
+    private void deleteThread(String threadId) {
+        String url = "/v1/threads/" + threadId;
+
+        try {
+            String jsonResponse = restClient
+                    .delete()
+                    .uri(url)
+                    .retrieve()
+                    .body(String.class);
+
+            DeleteThreadResDto deleteThreadResDto = objectMapper.readValue(jsonResponse, DeleteThreadResDto.class);
+            Optional<AssistantThread> threadEntity = assistantThreadRepo.findThreadByThreadId(deleteThreadResDto.getId());
+            threadEntity.ifPresent(thread -> assistantRepo.deleteById(thread.getId()));
+        } catch (JsonProcessingException e) {
+            log.warn("Json Processing Exception - deleteAssistant");
+            throw new RuntimeException("Json Processing Exception - deleteAssistant");
+        } catch (Exception e) {
+            log.warn("Exception");
+            throw new RuntimeException("Exception - deleteAssistant");
+        }
+
     }
 
 
     public void syncSaveAssistant(CreateAssistantResDto dto) {
         Assistant entity = Assistant.builder()
                 .assistantId(dto.getId())
+                .isActive(true)
                 .instructions(dto.getInstructions())
                 .name(dto.getName())
                 .version(dto.getName().split("_")[1])
@@ -83,7 +114,30 @@ class GptAssistantLifeCycleService {
         }
     }
 
-    public void saveThread() {
+    public AssistantThread syncSaveThread(String threadId, String assistantId) {
+        Optional<Assistant> assistant = assistantRepo.findAssistantByAssistantId(assistantId);
+
+        // 어시스턴트가 어떠한 이유로 생성되지 않았거나 존재하지 않으면 DB에 이를 기록하지 않음.
+        if (assistant.isEmpty()) {
+            log.warn("NotFound Assistant - ID: " + assistantId);
+            throw new RuntimeException("NotFound Assistant - ID: " + assistantId);
+        }
+
+        try {
+            return assistantThreadRepo.save(AssistantThread.builder()
+                    .assistant(assistant.get())
+                    .threadId(threadId)
+                    .isDeleteFromOpenAi(false)
+                    .build());
+        } catch (DataAccessException e) {
+            log.error("Database access error when saving assistant thread for ID: " + assistantId, e);
+            deleteThread(threadId);
+            throw new RuntimeException("Database error occurred while saving assistant thread");
+        } catch (Exception e) {
+            log.error("Unexpected error occurred", e);
+            deleteThread(threadId);
+            throw new RuntimeException("Unexpected error occurred", e);
+        }
         // TODO: 생성된 스레드 정보를 저장 ( thread_id )
     }
 

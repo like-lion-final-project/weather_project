@@ -240,16 +240,11 @@ public class GptAssistantService {
 
         try {
             CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
-            AssistantThread assistantThreadEntity = AssistantThread.builder()
-                    .assistant(assistant)
-                    .threadId(createThreadResDto.getId())
-                    .build();
-            return assistantThreadRepo.save(assistantThreadEntity);
+            return gptAssistantLifeCycleService.syncSaveThread(createThreadResDto.getId(),assistant.getAssistantId());
         } catch (JsonProcessingException e) {
             log.info(e + " :Json 에러");
+            throw new RuntimeException("JsonProcessingException - createThread");
         }
-        System.out.println(jsonResponse + ":json response");
-        return null;
     }
 
     public void getThreads() {

@@ -26,7 +26,7 @@ public class AssistantThread {
     /**
      * <p>어플리케이션 서버에서 독단적으로 이 값을 제어하지 않도록 주의. api를 통해 실제 OpenAi 서버에서 이 값을 지웠는지 체크 후 값을 제어해야함</p>
      * */
-    private String isDeleteFromOpenAi;
+    private boolean isDeleteFromOpenAi;
 
 
 }
