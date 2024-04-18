@@ -18,6 +18,8 @@ public class Assistant {
     private String instructions;
     private String name;
     private String version;
+    @Column(name = "assistant_unique_id")
+    private String assistantId;
 
     @Column(name = "is_active")
     private Boolean isActive;
