@@ -5,6 +5,7 @@ import com.example.demo.weather.dto.fcst.FcstApiResponse;
 
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
+import com.example.demo.weather.service.GridConversionService;
 import com.example.demo.weather.service.NDApiService;
 import com.example.demo.weather.service.NDSearchService;
 import com.example.demo.weather.service.VilageSrtFcstService;
@@ -23,6 +24,7 @@ public class WeatherController {
     private final VilageSrtFcstService vilageSrtFcstService;
     private final NcpGeocodeService geocodeService;
     private final NDSearchService ndSearchService;
+    private final GridConversionService gridConversionService;
 
     /**
      * geocode
@@ -71,4 +73,6 @@ public class WeatherController {
     ) {
         return ndSearchService.ndNewsSearch(start);
     }
+
+
 }

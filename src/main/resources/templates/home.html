@@ -9,6 +9,22 @@
 </head>
 <body>
 
+<div>
+    <h3>오늘의 날씨</h3>
+    <div id="weather-info">
+        <h4>예보 날짜와 시간</h4>
+        <p id="base-date"></p>
+        <p id="base-time"></p>
+
+        <h4>카테고리 별 예보 관측값</h4>
+        <ul id="weather-list"></ul>
+    </div>
+</div>
+
+<div>
+    <p>날씨 뉴스</p>
+</div>
+
 <!-- 지도 -->
 <div id="map" style="width:75%;height: 50vh;" class="mb-3"></div>
 
@@ -31,12 +47,34 @@
             var longitude = position.coords.longitude;
             console.log("Latitude: " + latitude + ", Longitude: " + longitude);
 
+
+
+
+            // Fetch data from the API
+            fetch(`http://localhost:8080/api/v1/weather/by-current?nx=${latitude}&ny=${longitude}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display base date and time
+                    document.getElementById('base-date').textContent = `Base Date: ${data.response.body.items.item[0].baseDate}`;
+                    document.getElementById('base-time').textContent = `Base Time: ${data.response.body.items.item[0].baseTime}`;
+
+                    // Display weather categories and observation values
+                    const weatherList = document.getElementById('weather-list');
+                    data.response.body.items.item.forEach(item => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${item.category}: ${item.obsrValue}`;
+                        weatherList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
         }, function(error) {
             console.error("Error getting geolocation:", error);
         });
     } else {
         console.error("Geolocation is not supported by this browser.");
     }
+
+
 
 </script>
 </body>
