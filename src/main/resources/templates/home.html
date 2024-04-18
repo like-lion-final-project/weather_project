@@ -9,6 +9,22 @@
 </head>
 <body>
 
+<div>
+    <h3>오늘의 날씨</h3>
+    <div id="weather-info">
+        <h4>예보 날짜와 시간</h4>
+        <p id="base-date"></p>
+        <p id="base-time"></p>
+
+        <h4>카테고리 별 예보 관측값</h4>
+        <ul id="weather-list"></ul>
+    </div>
+
+    <hr>
+    <h3>오늘의 날씨 뉴스</h3>
+
+</div>
+
 <!-- 지도 -->
 <div id="map" style="width:75%;height: 50vh;" class="mb-3"></div>
 
@@ -24,6 +40,41 @@
     };
 
     let map = new naver.maps.Map('map', mapOptions);
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        console.log("lat: " + latitude + ", lng: " + longitude);
+
+        fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${latitude}&lng=${longitude}`)
+            .then(response => response.json())
+            .then(data => {
+                const nx = data.nx;
+                const ny = data.ny;
+
+                fetch(`http://localhost:8080/api/v1/weather/by-current?nx=${nx}&ny=${ny}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('base-date').textContent = `Base Date: ${data.response.body.items.item[0].baseDate}`;
+                        document.getElementById('base-time').textContent = `Base Time: ${data.response.body.items.item[0].baseTime}`;
+
+                        const weatherList = document.getElementById('weather-list');
+                        data.response.body.items.item.forEach(item => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `${item.category}: ${item.obsrValue}`;
+                            weatherList.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => console.error('날씨 데이터를 가져오는 중 오류 발생:', error));
+            })
+            .catch(error => console.error('격자 좌표를 가져오는 중 오류 발생:', error));
+    }, function(error) {
+        console.error("날씨 데이터를 가져오는 중 오류 발생:", error);
+    });
+
+
+
+
 </script>
 </body>
 </html>
