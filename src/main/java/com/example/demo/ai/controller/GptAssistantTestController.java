@@ -34,7 +34,7 @@ public class GptAssistantTestController {
     @PostMapping("/ai/assistants")
     public CreateAssistantResDto createAssistant(
     ) {
-        return gptAssistantService.createAssistant(AppConstants.INSTRUCTIONS, AppConstants.NAME + "_" + AppConstants.VERSION, AppConstants.MODEL);
+        return gptAssistantService.createAndSyncAssistant(AppConstants.INSTRUCTIONS, AppConstants.NAME + "_" + AppConstants.VERSION, AppConstants.MODEL);
     }
 
     /**
@@ -43,9 +43,11 @@ public class GptAssistantTestController {
     @PostMapping("/ai/threads")
     public AssistantThread createThread(
             @RequestParam("user_id")
-            Integer userId
+            Integer userId,
+            @RequestParam("assistantId")
+            String assistantId
     ) {
-        return gptAssistantService.createThread(userId);
+        return gptAssistantService.createThread(userId, assistantId);
     }
 
     @PostMapping("/ai/create-and-run")

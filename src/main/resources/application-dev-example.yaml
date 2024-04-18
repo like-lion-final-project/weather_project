@@ -1,3 +1,5 @@
+jwt:
+  secret:
 Fcst:
   serviceKey:
 naver:
