@@ -35,17 +35,22 @@ import java.util.Set;
 @Slf4j
 @Service
 @AllArgsConstructor
-
 public class GptAssistantService {
     private final RestClient restClient;
     private final AssistantThreadRepo assistantThreadRepo;
     private final AssistantRepo assistantRepo;
+    private final GptAssistantLifeCycleService gptAssistantLifeCycleService;
 
     @Autowired
-    public GptAssistantService(@Qualifier("gptAssistantRestClient") RestClient restClient, AssistantThreadRepo assistantThreadRepo, AssistantRepo assistantRepo) {
+    public GptAssistantService(@Qualifier("gptAssistantRestClient") RestClient restClient,
+                               AssistantThreadRepo assistantThreadRepo,
+                               AssistantRepo assistantRepo,
+                               GptAssistantLifeCycleService gptAssistantLifeCycleService
+    ) {
         this.restClient = restClient;
         this.assistantThreadRepo = assistantThreadRepo;
         this.assistantRepo = assistantRepo;
+        this.gptAssistantLifeCycleService = gptAssistantLifeCycleService;
     }
 
 
@@ -166,7 +171,10 @@ public class GptAssistantService {
         }
 
         try {
-            return objectMapper.readValue(jsonResponse.getBody(), CreateAssistantResDto.class);
+            CreateAssistantResDto createAssistantResDto = objectMapper.readValue(jsonResponse.getBody(), CreateAssistantResDto.class);
+            gptAssistantLifeCycleService.syncSaveAssistant(createAssistantResDto);
+
+            return createAssistantResDto;
         } catch (JsonProcessingException e) {
             log.info("JSON 직렬화 에러");
             return null;
@@ -232,16 +240,11 @@ public class GptAssistantService {
 
         try {
             CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
-            AssistantThread assistantThreadEntity = AssistantThread.builder()
-                    .assistant(assistant)
-                    .name(createThreadResDto.getId())
-                    .build();
-            return assistantThreadRepo.save(assistantThreadEntity);
+            return gptAssistantLifeCycleService.syncSaveThread(createThreadResDto.getId(),assistant.getAssistantId());
         } catch (JsonProcessingException e) {
             log.info(e + " :Json 에러");
+            throw new RuntimeException("JsonProcessingException - createThread");
         }
-        System.out.println(jsonResponse + ":json response");
-        return null;
     }
 
     public void getThreads() {

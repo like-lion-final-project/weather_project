@@ -19,8 +19,14 @@ public class AssistantThread {
     //    private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     private Assistant assistant;
-    private String name;
 
+    @Column(name = "thread_unique_id")
+    private String threadId;
+
+    /**
+     * <p>어플리케이션 서버에서 독단적으로 이 값을 제어하지 않도록 주의. api를 통해 실제 OpenAi 서버에서 이 값을 지웠는지 체크 후 값을 제어해야함</p>
+     * */
+    private boolean isDeleteFromOpenAi;
 
 
 }
