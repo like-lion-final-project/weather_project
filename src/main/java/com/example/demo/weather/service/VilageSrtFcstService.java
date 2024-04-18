@@ -25,7 +25,15 @@ public class VilageSrtFcstService {
             Integer nx,
             Integer ny
     ) {
-        LocalDateTime currentTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime currentTime = LocalDateTime.now();
+        int minutes = currentTime.getMinute();
+
+        // 현재 시각에서 가장 가까운 과거의 30분 계산
+        if (minutes < 30) {
+            currentTime = currentTime.minusHours(1).withMinute(30);
+        } else {
+            currentTime = currentTime.withMinute(0);
+        }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
 
@@ -36,7 +44,6 @@ public class VilageSrtFcstService {
         params.put("dataType", "JSON");
         params.put("base_date", dateTimeFormatter.format(currentTime));  // 발표 일자
         params.put("base_time", timeFormatter.format(currentTime));      // 발표 시각 (1시간전 기준)
-        // TODO : 현재 시각을 매 시간 30분에 생성되는 Base_Time 으로 조정하는 계산 구현
         params.put("nx", nx);                                            // 예보지점 x좌표 값
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
@@ -50,6 +57,14 @@ public class VilageSrtFcstService {
             Integer ny
     ) {
         LocalDateTime currentTime = LocalDateTime.now();
+        int minutes = currentTime.getMinute();
+
+        // 현재 시각에서 가장 가까운 과거의 30분 계산
+        if (minutes < 30) {
+            currentTime = currentTime.minusHours(1).withMinute(30);
+        } else {
+            currentTime = currentTime.withMinute(0);
+        }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
 
