@@ -1,8 +1,11 @@
 package com.example.demo.ai.dto.message;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,15 +32,18 @@ public class CreateMessageResDto {
     @JsonProperty("run_id")
     private String runId;
 
-    @JsonProperty("role_id")
-    private String roleId;
+    @JsonProperty("role")
+    private String role;
+
+    @JsonProperty("content")
+    private List<Content> content;
 
 
     @Getter
     @Setter
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public class Content {
+    public static class Content {
         @JsonProperty("type")
         String type;
 
@@ -48,7 +54,7 @@ public class CreateMessageResDto {
         @Setter
         @RequiredArgsConstructor
         @AllArgsConstructor
-        public class Text{
+        public static class Text{
 
             @JsonProperty("value")
             String value;
@@ -56,11 +62,13 @@ public class CreateMessageResDto {
             @JsonProperty("annotations")
             Object annotations;
         }
-        @JsonProperty("file_ids")
-        List<String> fileIds;
 
-        @JsonProperty("metadata")
-        Object metadata;
+
     }
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("file_ids")
+    private List<String> fileIds = new ArrayList<>();  // 초기화
 
+    @JsonProperty("metadata")
+    Object metadata;
 }
