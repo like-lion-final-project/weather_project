@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Show Images</title>
+</head>
+<body>
+<div id="image-container">
+    <!-- Thymeleaf를 사용하여 모델의 images를 동적으로 렌더링 -->
+    <div th:each="image : ${images}">
+        <img th:src="${image.image}" alt="Image">
+    </div>
+</div>
+
+<script>
+    // 이미지를 표시할 컨테이너 요소 가져오기
+    var imageContainer = document.getElementById("image-container");
+    // AJAX 요청 보내기
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/ser?query=" + encodeURIComponent(window.location.search.slice(1)));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                // 요청이 성공하면 이미지 목록을 받아와서 이미지를 표시
+                var images = JSON.parse(xhr.responseText);
+                images.forEach(function(image) {
+                    var img = document.createElement("img");
+                    // 이미지 URL을 가져와서 src 속성에 할당
+                    img.src = image.image;
+                    imageContainer.appendChild(img);
+                });
+            } else {
+                console.error('요청에 실패했습니다.');
+            }
+        }
+    };
+    xhr.send();
+</script>
+</body>
+</html>

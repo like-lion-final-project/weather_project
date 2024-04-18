@@ -1,5 +1,6 @@
 package com.example.demo.cody.service;
 
+import com.example.demo.cody.dto.ImageDto;
 import com.example.demo.cody.dto.ItemDto;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,5 +21,18 @@ public class NaverSearchService {
             itemDtoList.add(itemDto);
         }
         return itemDtoList;
+    }
+
+    public List<ImageDto> fromJSONtoImage(String result) {
+        JSONObject rjson = new JSONObject(result);
+        System.out.println(rjson);
+        JSONArray images = rjson.getJSONArray("items");
+        List<ImageDto> imagetdoList = new ArrayList<>();
+        for (int i = 0; i < images.length(); i++) {
+            JSONObject imageJson = images.getJSONObject(i);
+            ImageDto imageDto = new ImageDto(imageJson);
+            imagetdoList.add(imageDto);
+        }
+        return imagetdoList;
     }
 }

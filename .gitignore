@@ -37,6 +37,9 @@ out/
 .vscode/
 
 .DS_Store
+db.sqlite
+build.gradle
+gradlew.bat
 application.yaml
 application-prod.yaml
 application-dev.yaml

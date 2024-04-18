@@ -1,24 +1,40 @@
 package com.example.demo.cody.controller;
 
-import com.example.demo.cody.dto.ItemDto;
+import com.example.demo.cody.dto.ImageDto;
+import com.example.demo.cody.service.NaverSearchService;
 import com.example.demo.utils.NaverShopSearch;
 import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
+@Slf4j
 public class SearchController {
     private final NaverShopSearch naverShopSearch;
+    private final NaverSearchService naverSearchService;
 
-    @GetMapping("/home")
-    private String main1(){
-        return "home";
-    }
+        @GetMapping("/ser")
+        public String naverSearch(@RequestParam String query, Model model) {
+            String resultString = naverShopSearch.search(query);
+            List<ImageDto> images = naverSearchService.fromJSONtoImage(resultString);
+            model.addAttribute("images", images);
+            return "naversearch";
+        }
+
+
+//    @GetMapping("/image")
+//    public List<ImageDto> getImage(@RequestParam String query) {
+//        // 이미지 URL을 DTO에 담아서 반환
+//        String resultString = naverShopSearch.search(query);
+//        return naverSearchService.fromJSONtoImage(resultString);
+//    }
+
 
 
     }
