@@ -4,6 +4,7 @@ import com.example.demo.weather.dto.PointDto;
 import com.example.demo.weather.dto.fcst.FcstApiResponse;
 
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
+import com.example.demo.weather.dto.news.NDNewsResponse;
 import com.example.demo.weather.service.NDApiService;
 import com.example.demo.weather.service.NDSearchService;
 import com.example.demo.weather.service.VilageSrtFcstService;
@@ -64,7 +65,7 @@ public class WeatherController {
      * 날씨 뉴스 기사 조회
      */
     @GetMapping("/news")
-    public Object getWeatherNews(
+    public NDNewsResponse getWeatherNews(
             @RequestParam("start")
             Integer start
     ) {

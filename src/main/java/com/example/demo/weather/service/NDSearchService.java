@@ -1,5 +1,6 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.news.NDNewsResponse;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class NDSearchService {
     private final NDApiService ndApiService;
 
-    public Object ndNewsSearch(
+    public NDNewsResponse ndNewsSearch(
         Integer start
     ) {
         Map<String, Object> params = new HashMap<>();
