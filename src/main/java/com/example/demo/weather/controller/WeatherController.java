@@ -11,6 +11,7 @@ import com.example.demo.weather.service.NDSearchService;
 import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,5 +75,17 @@ public class WeatherController {
         return ndSearchService.ndNewsSearch(start);
     }
 
+    /**
+     * 위경도 좌표 정보를 격자 XY로 변환 (브라우저 geolocation 전용)
+     */
+    @GetMapping("/convert-grid")
+    public PointDto convertToGrid(
+            @RequestParam("lat")
+            Double lat,
+            @RequestParam("lng")
+            Double lng
+    ) {
+        return gridConversionService.convertToGridXY(lat, lng);
+    }
 
 }

@@ -57,6 +57,14 @@ public class VilageSrtFcstService {
             Integer ny
     ) {
         LocalDateTime currentTime = LocalDateTime.now();
+        int minutes = currentTime.getMinute();
+
+        // 현재 시각에서 가장 가까운 과거의 30분 계산
+        if (minutes < 30) {
+            currentTime = currentTime.minusHours(1).withMinute(30);
+        } else {
+            currentTime = currentTime.withMinute(0);
+        }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
 
