@@ -24,6 +24,20 @@
     };
 
     let map = new naver.maps.Map('map', mapOptions);
+
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+
+        }, function(error) {
+            console.error("Error getting geolocation:", error);
+        });
+    } else {
+        console.error("Geolocation is not supported by this browser.");
+    }
+
 </script>
 </body>
 </html>
