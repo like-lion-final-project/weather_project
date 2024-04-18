@@ -5,9 +5,7 @@ import com.example.demo.ai.dto.*;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
-import com.example.demo.ai.dto.message.CreateMessageReqDto;
-import com.example.demo.ai.dto.message.CreateMessageResDto;
-import com.example.demo.ai.dto.message.GetMessagesResDto;
+import com.example.demo.ai.dto.message.*;
 import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -53,14 +52,10 @@ public class GptAssistantService {
     ObjectMapper objectMapper = new ObjectMapper();
 
 
-
-
-
     /**
      * <p>현재 Chat GPT API 에서 사용 가능한 모델 정보를 반환하는 메서드</p>
      * <p>DEFAULT_MODEL_IDENTIFIER_LIST 변수에 저장된 기본 값들과 응답 값을 비교해서 교집합 데이터만 반환함</p>
-     *
-     * */
+     */
     public Set<String> getActiveModels() {
         String url = "/v1/models";
         String jsonResponse = restClient
@@ -86,19 +81,49 @@ public class GptAssistantService {
 
     /**
      * <p>타겟 모델이 사용가능한 상태인지 체크하는 메서드</p>
+     *
      * @param modelName 모델의 이름입니다. ex) gpt-3.5-turbor-0613
-     * */
+     */
     public boolean isActiveTargetModel(String modelName) {
         Set<String> activeModels = getActiveModels(); // Use the getActiveModels method
         return activeModels.contains(modelName); // Check if the model is in the active models set
     }
 
+    /**
+     * <p>스레드를 생성하고 동시에 메시지를 포함한 실행요청을 보내는 메서드</p>
+     * @param assistantId 어시스턴트의 아이디 입니다.
+     * @param messages 스레드에 담을 메시지 객체 리스트 입니다.
+     */
+    public CreateThreadAndRunResDto createThreadAndRun(String assistantId, List<CreateMessageDto> messages) {
+        String url = "/v1/threads/runs";
+        CreateThreadAndRunReqDto dto = CreateThreadAndRunReqDto.builder()
+                .assistantId(assistantId)
+                .thread(CreateThreadAndRunReqDto.Thread.builder().messages(messages).build()
+                ).build();
+
+        ResponseEntity<String> jsonResponse = restClient
+                .post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toEntity(String.class);
+
+        try{
+            return objectMapper.readValue(jsonResponse.getBody(), CreateThreadAndRunResDto.class);
+        }catch(JsonProcessingException e){
+            System.out.println(e + "에러내용");
+            log.warn("JSON Processing Exception - createdThreadAndRun");
+            return null;
+        }
+
+    }
 
     /**
      * <p>어시스턴트 생성 메서드</p>
+     *
      * @param instructions 어시스턴트 생성시 어떤 역할을 수행할지 자연어로 작성
-     * @param name 어시스턴트의 이름 입니다.
-     * @param model 어시스턴트의 기반 모델 ex) gpt-3.5
+     * @param name         어시스턴트의 이름 입니다.
+     * @param model        어시스턴트의 기반 모델 ex) gpt-3.5
      */
     @Transactional
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
@@ -181,20 +206,21 @@ public class GptAssistantService {
 
     /**
      * <p>스레드 생성 메서드</p>
+     *
      * @param userId User 엔티티에서 유저를 식별할 고유 값을 의미합니다. 현재 임시 값이며 User 엔티티 구조에 따라 변경 될 수 있습니다.
-     * */
+     */
     @Transactional
     public AssistantThread createThread(Integer userId) {
         // TODO: 유저마다 하나의 스레드를 생성함
         // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
         String url = "/v1/threads";
 
-        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" +AppConstants.VERSION).orElseThrow(
+        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" + AppConstants.VERSION).orElseThrow(
                 () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
         );
 
         // 유저 아이디 혹은 유저네임을 통해 생성된 스레드가 있는지 체크
-        if(true){
+        if (true) {
             // userRepo.findBy ...
         }
 
@@ -227,7 +253,7 @@ public class GptAssistantService {
 
         String url = "/v1/threads/" + threadId + "/messages";
 
-        CreateMessageReqDto messageReqDto = CreateMessageReqDto.builder()
+        CreateMessageDto messageReqDto = CreateMessageDto.builder()
                 .role("user")
                 .content(message)
                 .build();
@@ -239,15 +265,16 @@ public class GptAssistantService {
                 .retrieve()
                 .toEntity(String.class);
 
-        try{
+        try {
             return objectMapper.readValue(jsonResponse.getBody(), CreateMessageResDto.class);
-        }catch(JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             log.info("JSON 직렬화 에러");
             return null;
         }
 
     }
-    public GetMessagesResDto getMessages(String threadId){
+
+    public GetMessagesResDto getMessages(String threadId) {
         String url = "/v1/threads/" + threadId + "/messages";
 
         String jsonResponse = restClient.get()
@@ -255,9 +282,9 @@ public class GptAssistantService {
                 .retrieve()
                 .body(String.class);
 
-        try{
-           return objectMapper.readValue(jsonResponse, GetMessagesResDto.class);
-        }catch(JsonProcessingException e){
+        try {
+            return objectMapper.readValue(jsonResponse, GetMessagesResDto.class);
+        } catch (JsonProcessingException e) {
             System.out.println(e + " 에러내용");
             log.warn("Json 직렬화 에러");
             return null;
@@ -278,8 +305,8 @@ public class GptAssistantService {
                 .toEntity(String.class);
 
         try {
-            return objectMapper.readValue(jsonResponse.getBody(),CreateRunResDto.class);
-        }catch(JsonProcessingException e){
+            return objectMapper.readValue(jsonResponse.getBody(), CreateRunResDto.class);
+        } catch (JsonProcessingException e) {
             log.info(e + " :Json 에러");
             return null;
         }
