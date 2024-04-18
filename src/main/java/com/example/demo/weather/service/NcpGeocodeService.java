@@ -2,6 +2,9 @@ package com.example.demo.weather.service;
 
 import com.example.demo.weather.dto.PointDto;
 import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
+import com.example.demo.weather.dto.rgeocoding.RGeoNcpResponse;
+import com.example.demo.weather.dto.rgeocoding.RGeoRegion;
+import com.example.demo.weather.dto.rgeocoding.RGeoResponseDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,23 @@ public class NcpGeocodeService {
         Double lng = Double.valueOf(response.getAddresses().get(0).getX());
 
         return gridConversionService.convertToGridXY(lat, lng);
+    }
+
+    public RGeoResponseDto getAddress(PointDto pointDto) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("coords", pointDto.toQueryValue());
+        params.put("output", "json");
+        RGeoNcpResponse response = ncpMapApiService.reverseGeocode(params);
+        RGeoRegion region = response.getResults()
+                .get(0)
+                .getRegion();
+
+        String address = region.getArea0().getName() + " " +
+                region.getArea1().getName() + " " +
+                region.getArea2().getName() + " " +
+                region.getArea3().getName() + " " +
+                region.getArea4().getName();
+        return new RGeoResponseDto(address.trim());
     }
 
 }

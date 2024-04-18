@@ -13,4 +13,8 @@ public class PointDto {
     // 격자 XY
     private Integer nx;
     private Integer ny;
+
+    public String toQueryValue() {
+        return String.format("%f,%f", lng, lat);
+    }
 }
