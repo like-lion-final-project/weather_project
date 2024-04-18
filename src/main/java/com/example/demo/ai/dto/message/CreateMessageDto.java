@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class CreateMessageReqDto {
+public class CreateMessageDto {
 
     @JsonProperty("role")
     private String role;

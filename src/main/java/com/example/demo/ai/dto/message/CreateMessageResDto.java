@@ -65,7 +65,7 @@ public class CreateMessageResDto {
 
 
     }
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+
     @JsonProperty("file_ids")
     private List<String> fileIds = new ArrayList<>();  // 초기화
 
