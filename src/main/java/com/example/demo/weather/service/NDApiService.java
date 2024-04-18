@@ -1,0 +1,14 @@
+package com.example.demo.weather.service;
+
+import java.util.Map;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.GetExchange;
+
+
+public interface NDApiService {
+    @GetExchange("v1/search/news")
+    Object newsSearch(
+            @RequestParam
+            Map<String, Object> params
+    );
+}
