@@ -7,6 +7,7 @@ import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageReqDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
@@ -242,6 +243,23 @@ public class GptAssistantService {
             return objectMapper.readValue(jsonResponse.getBody(), CreateMessageResDto.class);
         }catch(JsonProcessingException e){
             log.info("JSON 직렬화 에러");
+            return null;
+        }
+
+    }
+    public GetMessagesResDto getMessages(String threadId){
+        String url = "/v1/threads/" + threadId + "/messages";
+
+        String jsonResponse = restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(String.class);
+
+        try{
+           return objectMapper.readValue(jsonResponse, GetMessagesResDto.class);
+        }catch(JsonProcessingException e){
+            System.out.println(e + " 에러내용");
+            log.warn("Json 직렬화 에러");
             return null;
         }
 
