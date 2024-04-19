@@ -28,13 +28,6 @@ public class SearchController {
         }
 
 
-//    @GetMapping("/image")
-//    public List<ImageDto> getImage(@RequestParam String query) {
-//        // 이미지 URL을 DTO에 담아서 반환
-//        String resultString = naverShopSearch.search(query);
-//        return naverSearchService.fromJSONtoImage(resultString);
-//    }
-
 
 
     }
