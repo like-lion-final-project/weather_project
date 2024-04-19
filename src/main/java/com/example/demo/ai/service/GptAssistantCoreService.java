@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -129,12 +128,12 @@ class GptAssistantCoreService {
      * @param model        어시스턴트의 기반 모델 ex) gpt-3.5
      */
 
-    public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
-        Optional<Assistant> assistant = assistantRepo.findAssistantByName(name);
-        if (assistant.isPresent()) {
-            return null;
-        }
 
+    /**
+     * <p>어시스턴트 정보를 DB에 저장하는 메서드 입니다.</p>
+     */
+
+    private CreateAssistantResDto createAssistantAPI(String instructions, String name, String model) {
         String url = "/v1/assistants";
         CreateAssistantReqDto dto = CreateAssistantReqDto.builder()
                 .instructions(instructions)
@@ -142,41 +141,68 @@ class GptAssistantCoreService {
                 .model(model)
                 .build();
 
-        ResponseEntity<String> jsonResponse = restClient
-                .post()
+        ResponseEntity<String> jsonResponse = restClient.post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
                 .toEntity(String.class);
 
-        if (!jsonResponse.getStatusCode().is2xxSuccessful())
-            throw new RuntimeException("Failed to create assistant - Open AI API " + jsonResponse.getStatusCode());
+        if (!jsonResponse.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to create assistant - Open AI API: " + jsonResponse.getStatusCode());
+        }
 
-        String assistantId = "";
         try {
-            CreateAssistantResDto createAssistantResDto = objectMapper.readValue(jsonResponse.getBody(), CreateAssistantResDto.class);
-            assistantId = createAssistantResDto.getId();
-
-            assistantRepo.save(
-                    Assistant.builder()
-                            .name(createAssistantResDto.getName())
-                            .assistantId(createAssistantResDto.getId())
-                            .isActive(true)
-                            .version(createAssistantResDto.getName().split("_")[1])
-                            .isDelete(false)
-                            .instructions(createAssistantResDto.getInstructions())
-                            .model(createAssistantResDto.getModel())
-                            .build()
-            );
-            return createAssistantResDto;
+            return objectMapper.readValue(jsonResponse.getBody(), CreateAssistantResDto.class);
         } catch (JsonProcessingException e) {
-            log.info("JSON 직렬화 에러");
-            return null;
+            log.error("JSON Serialization Error: " + e.getMessage());
+            throw new RuntimeException("JSON Serialization Exception - createAssistant");
         } catch (Exception e) {
-            deleteAssistant(assistantId);
-            throw new RuntimeException("Failed to created assistant - Application API");
+            log.error("Failed to create assistant - Exception occurred during the process: " + e.getMessage());
+            throw new RuntimeException("Exception during assistant creation: " + e.getMessage());
         }
     }
+
+    public Assistant createAssistantDB(String instructions, String name, String model, String version, boolean isActive
+    ) {
+        Optional<Assistant> assistant = assistantRepo.findAssistantByName(name);
+        if (assistant.isEmpty()) {
+            return assistantRepo.save(
+                    Assistant.builder()
+                            .name(name)
+                            .isActive(isActive)
+                            .version(version)
+                            .isDelete(false)
+                            .instructions(instructions)
+                            .model(model)
+                            .build()
+            );
+        }
+        return null;
+    }
+
+    private Assistant updatedAssistantIdDB(Assistant assistant, String assistantId) {
+        System.out.println(assistant.getId() + "IDID");
+        Optional<Assistant> assistantEntity = assistantRepo.findAssistantByName(assistant.getName());
+
+        System.out.println(assistant.getName() + "GetNAme");
+        System.out.println(assistantEntity.isPresent() + "IsPresent");
+        if (assistantEntity.isPresent()) {
+
+            return assistantRepo.save(Assistant.builder()
+                    .id(assistant.getId())
+                    .assistantId(assistantId)
+                    .instructions(assistant.getInstructions())
+                    .name(assistant.getName())
+                    .version(assistant.getVersion())
+                    .model(assistant.getModel())
+                    .isActive(assistant.getIsActive())
+                    .isDelete(assistant.getIsDelete())
+                    .build());
+        }
+        return null;
+
+    }
+
 
     /**
      * <p>스레드 생성 메서드</p>
@@ -216,12 +242,12 @@ class GptAssistantCoreService {
 
             return createThreadResDto;
         } catch (JsonProcessingException e) {
-           log.warn("----  Json Processing Exception  ----");
-           log.info(jsonResponse + " : JsonResponse");
-           log.warn("-------------------------------------");
-           deleteThread(threadId);
-           throw new RuntimeException("Json Processing Exception");
-        } catch (Exception e){
+            log.warn("----  Json Processing Exception  ----");
+            log.info(jsonResponse + " : JsonResponse");
+            log.warn("-------------------------------------");
+            deleteThread(threadId);
+            throw new RuntimeException("Json Processing Exception");
+        } catch (Exception e) {
             deleteThread(threadId);
             throw new RuntimeException("Exception occurred during thread creation", e);
         }
@@ -230,7 +256,7 @@ class GptAssistantCoreService {
     /**
      * <p>어시스턴트 삭제 메서드 입니다. 같은 패키지 내에서도 사용할 수 없도록 private 접근 제한자 설정</p>
      */
-    private void deleteAssistant(String assistantId) {
+    private void deleteAssistantAPI(String assistantId) {
         String url = "/v1/assistants/" + assistantId;
         String jsonResponse = restClient
                 .delete()
@@ -277,30 +303,44 @@ class GptAssistantCoreService {
     /**
      * <p>어시스턴트 동기화 메서드 입니다.</p>
      */
-    public SyncDto synchronizeAssistants(String instructions, String name, String model) {
+    @Transactional
+    public SyncDto synchronizeAssistants() {
         List<GetAssistantResDto.Data> apiAssistants = getAssistants().getData();
         List<Assistant> dbAssistants = assistantRepo.findAll();
-        Map<String, Assistant> dbAssistantMap = dbAssistants.stream()
-                .collect(Collectors.toMap(
-                        Assistant::getAssistantId, Function.identity()));
 
+        Map<String, Assistant> dbAssistantMap = dbAssistants.stream()
+                .collect(Collectors.toMap(Assistant::getAssistantId, Function.identity(), (existing, replacement) -> existing));
+
+        SyncDto.SyncDtoBuilder syncResult = SyncDto.builder().syncCreated(false).syncDeleted(false);
+
+        // 둘 다 없는 경우, 동기화 작업을 수행하지 않습니다.
+        if (apiAssistants.isEmpty() && dbAssistants.isEmpty()) {
+            log.info("No assistants found in both OpenAI and DB.");
+            return syncResult.build();
+        }
+
+        // OpenAI의 API 어시스턴트 목록을 기반으로 필터링하여 DB에 없으면 삭제
         for (GetAssistantResDto.Data apiAssistant : apiAssistants) {
-            String key = apiAssistant.getId();
-            if (!dbAssistantMap.containsKey(key)) {
-                deleteAssistant(apiAssistant.getId());
+            if (!dbAssistantMap.containsKey(apiAssistant.getId())) {
+                deleteAssistantAPI(apiAssistant.getId());
                 log.info("Deleted orphaned assistant from OpenAI: " + apiAssistant.getName());
-                return SyncDto.builder()
-                        .deleted(true)
-                        .build();
-            }else{
-                createAssistant(instructions,name,model);
-                return SyncDto.builder()
-                        .created(true)
-                        .build();
+                syncResult.syncDeleted(true);
             }
         }
 
-        return SyncDto.builder().build();
+        // DB 어시스턴트 목록을 기반으로 필터링하여 OpenAI에 없으면 생성
+        for (Assistant dbAssistant : dbAssistants) {
+            if (apiAssistants.stream().noneMatch(apiAssistant -> apiAssistant.getId().equals(dbAssistant.getAssistantId()))) {
+                String name = dbAssistant.getName();
+                CreateAssistantResDto createdAssistant = createAssistantAPI(dbAssistant.getInstructions(), name, dbAssistant.getModel());
+                updatedAssistantIdDB(dbAssistant, createdAssistant.getId());
+                log.info("Created missing assistant in OpenAI: " + dbAssistant.getName());
+                syncResult.syncCreated(true);
+            }
+        }
+
+
+        return syncResult.build();
     }
 
     /**

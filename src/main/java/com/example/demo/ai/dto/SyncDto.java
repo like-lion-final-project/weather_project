@@ -25,9 +25,17 @@ import lombok.Setter;
 @Setter
 @Builder
 public class SyncDto {
+    // 신규 생성 ( 서비스 DB, OpenAI 두군데 모두 )
+    boolean failed = false;
     boolean created = false;
     boolean deleted = false;
     boolean updated = false;
+
+    // 서비스 DB와 싱크 맞추면서 OpenAI 쪽에만 생성
+    boolean syncCreated = false;
+
+    // 서비스 DB와 싱크 맞추기 위해 OpenAI 쪽 데이터 삭제
+    boolean syncDeleted = false;
 
     /**
      * 동기화과정 중 생성, 삭제, 업데이트 중 아무런 작업도 수행하지 않았을 경우 ( 동기화가 되어있는 경우를 말함 ) 이를 체크하는 메서드

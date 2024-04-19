@@ -135,10 +135,13 @@ public class GptAssistantService {
      * @param model        어시스턴트의 기반 모델 ex) gpt-3.5
      */
     @Transactional
-    public CreateAssistantResDto createAndSyncAssistant(String instructions, String name, String model) {
-        SyncDto syncResult = gptAssistantCoreService.synchronizeAssistants(instructions,name,model);
-        if(syncResult.isSyncNotPerformed()) return gptAssistantCoreService.createAssistant(instructions, name, model);
-        return null;
+    public Assistant createAndSyncAssistant(String instructions, String name, String model, String version, boolean isActive) {
+        Assistant createAssistantResDto = gptAssistantCoreService.createAssistantDB(instructions, name+"_"+version, model,version,isActive);
+        SyncDto syncResult = gptAssistantCoreService.synchronizeAssistants();
+
+        // 동기화 후 신규 생성이 필요한 경우
+
+        return createAssistantResDto;
     }
 
 
