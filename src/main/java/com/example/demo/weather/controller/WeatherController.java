@@ -1,7 +1,7 @@
 package com.example.demo.weather.controller;
 
 import com.example.demo.weather.dto.PointDto;
-import com.example.demo.weather.dto.fcst.FcstApiResponse;
+import com.example.demo.weather.dto.WeatherForecast;
 
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
@@ -11,6 +11,7 @@ import com.example.demo.weather.service.NDSearchService;
 import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,9 +53,10 @@ public class WeatherController {
 
     /**
      * 초단기 예보 조회 (시간대별 날씨)
+     * 시간대별 카테고리, 값 쌍 정리 버전
      */
     @GetMapping("/by-hour")
-    public FcstApiResponse getUltraSrtFcst(
+    public List<WeatherForecast> getUltraSrtFcst(
             @RequestParam("nx")
             Integer nx,
             @RequestParam("ny")
@@ -99,5 +101,4 @@ public class WeatherController {
     ) {
         return gridConversionService.convertToGridXY(lat, lng);
     }
-
 }
