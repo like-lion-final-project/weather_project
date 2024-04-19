@@ -64,6 +64,7 @@ public class GptAssistantService {
      * <p>현재 Chat GPT API 에서 사용 가능한 모델 정보를 반환하는 메서드</p>
      * <p>DEFAULT_MODEL_IDENTIFIER_LIST 변수에 저장된 기본 값들과 응답 값을 비교해서 교집합 데이터만 반환함</p>
      */
+
     public Set<String> getActiveModels() {
         String url = "/v1/models";
         String jsonResponse = restClient
@@ -87,15 +88,18 @@ public class GptAssistantService {
         }
     }
 
+
     /**
      * <p>타겟 모델이 사용가능한 상태인지 체크하는 메서드</p>
      *
      * @param modelName 모델의 이름입니다. ex) gpt-3.5-turbor-0613
      */
+
     public boolean isActiveTargetModel(String modelName) {
         Set<String> activeModels = getActiveModels(); // Use the getActiveModels method
         return activeModels.contains(modelName); // Check if the model is in the active models set
     }
+
 
     /**
      * <p>스레드를 생성하고 동시에 메시지를 포함한 실행요청을 보내는 메서드</p>
@@ -103,6 +107,7 @@ public class GptAssistantService {
      * @param assistantId 어시스턴트의 아이디 입니다.
      * @param messages    스레드에 담을 메시지 객체 리스트 입니다.
      */
+
     public CreateThreadAndRunResDto createThreadAndRun(String assistantId, List<CreateMessageDto> messages) {
         String url = "/v1/threads/runs";
         CreateThreadAndRunReqDto dto = CreateThreadAndRunReqDto.builder()
@@ -127,6 +132,7 @@ public class GptAssistantService {
 
     }
 
+
     /**
      * <p>어시스턴트 생성 및 동기화 메서드</p>
      *
@@ -134,13 +140,11 @@ public class GptAssistantService {
      * @param name         어시스턴트의 이름 입니다.
      * @param model        어시스턴트의 기반 모델 ex) gpt-3.5
      */
+
     @Transactional
     public Assistant createAndSyncAssistant(String instructions, String name, String model, String version, boolean isActive) {
         Assistant createAssistantResDto = gptAssistantCoreService.createAssistantDB(instructions, name+"_"+version, model,version,isActive);
-        SyncDto syncResult = gptAssistantCoreService.synchronizeAssistants();
-
-        // 동기화 후 신규 생성이 필요한 경우
-
+        gptAssistantCoreService.synchronizeAssistants();
         return createAssistantResDto;
     }
 
@@ -150,27 +154,36 @@ public class GptAssistantService {
      * @param userId 유저 고유 식별자 입니다.
      * @param assistantId 스레드와 연결할 어시스턴트 아이디 입니다.
      * */
+
     @Transactional
-    public CreateThreadResDto createAndSyncThread(Long userId, String assistantId) {
-        SyncDto syncResult = gptAssistantCoreService.synchronizeThread(userId, assistantId);
-        if(syncResult.isSyncNotPerformed()) return gptAssistantCoreService.createThread(userId, assistantId);
-        return null;
+    public void createAndSyncThread(Long userId, String assistantId) {
+        gptAssistantCoreService.createThreadDB(userId, assistantId);
+        gptAssistantCoreService.synchronizeThread(userId, assistantId);
     };
 
 
     /**
      * <p>어시스턴트 수정 메서드</p>
      */
+
     public void modifyAssistant() {
         // TODO: 어시스턴트 수정
         String url = "/v1/assistants";
     }
 
 
+    /**
+     * <p>스레드 목록 조회 메서드</p>
+     * */
+
     public void getThreads() {
         // TODO: 스레드 목록 조회
     }
 
+
+    /**
+     * <p>메시지 생성 메서드</p>
+     * */
     public CreateMessageResDto createMessage(String threadId, String message) {
         // TODO: 스레드에 추가할 메시지 생성
 
@@ -197,6 +210,11 @@ public class GptAssistantService {
 
     }
 
+
+    /**
+     * <p>메시지 목록 조회 메서드</p>
+     * */
+
     public GetMessagesResDto getMessages(String threadId) {
         String url = "/v1/threads/" + threadId + "/messages";
 
@@ -214,6 +232,11 @@ public class GptAssistantService {
         }
 
     }
+
+
+    /**
+     * <p>실행 메서드</p>
+     * */
 
     public CreateRunResDto runAssistant(String threadId, String assistantId) {
         CreateRunReqDto createRunReqDto = CreateRunReqDto.builder()
