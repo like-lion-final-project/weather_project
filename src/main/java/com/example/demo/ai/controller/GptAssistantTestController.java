@@ -5,6 +5,7 @@ import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.*;
 import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.service.GptAssistantService;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,13 @@ import java.util.List;
 public class GptAssistantTestController {
     private final GptAssistantService gptAssistantService;
 
-    /**
-     * <p>어시스턴트 목록 조회</p>
-     */
-    @GetMapping("/ai/assistants")
-    public GetAssistantResDto getAssistants() {
-        return gptAssistantService.getAssistants();
-    }
+//    /**
+//     * <p>어시스턴트 목록 조회</p>
+//     */
+//    @GetMapping("/ai/assistants")
+//    public GetAssistantResDto getAssistants() {
+//        return gptAssistantService.getAssistants();
+//    }
 
     /**
      * 어시스턴트 생성
@@ -41,13 +42,13 @@ public class GptAssistantTestController {
      * 스레드 생성
      */
     @PostMapping("/ai/threads")
-    public AssistantThread createThread(
+    public CreateThreadResDto createThread(
             @RequestParam("user_id")
-            Integer userId,
-            @RequestParam("assistantId")
+            Long userId,
+            @RequestParam("assistant_Id")
             String assistantId
     ) {
-        return gptAssistantService.createThread(userId, assistantId);
+        return gptAssistantService.createAndSyncThread(userId, assistantId);
     }
 
     @PostMapping("/ai/create-and-run")

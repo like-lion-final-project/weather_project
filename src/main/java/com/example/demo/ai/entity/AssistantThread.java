@@ -16,7 +16,9 @@ public class AssistantThread {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    //    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     private Assistant assistant;
 

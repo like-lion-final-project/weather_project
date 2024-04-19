@@ -6,7 +6,9 @@ naver:
   ncp:
     client-id:
     client-secret:
-
+  developers:
+    client-id:
+    client-secret:
     api-access:
     api-secret:
 open-ai:

@@ -7,6 +7,7 @@ import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.*;
 import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.dto.thread.CreateThreadReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
@@ -149,25 +150,12 @@ public class GptAssistantService {
     }
 
 
-    /**
-     * <p>어시스턴트 목록 조회 메서드</p>
-     */
-    public GetAssistantResDto getAssistants() {
-        String url = "v1/assistants";
+    @Transactional
+    public CreateThreadResDto createAndSyncThread(Long userId, String assistantId){
+        gptAssistantCoreService.synchronizeThread(userId, assistantId);
+      return gptAssistantCoreService.createThread(userId, assistantId);
+    };
 
-        String jsonResponse = restClient
-                .get()
-                .uri(url)
-                .retrieve()
-                .body(String.class);
-
-        try {
-            return objectMapper.readValue(jsonResponse, GetAssistantResDto.class);
-        } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage() + "에러 메시지");
-            throw new RuntimeException("json 가공 에러");
-        }
-    }
 
 
     /**
@@ -179,46 +167,7 @@ public class GptAssistantService {
     }
 
 
-    /**
-     * <p>스레드 생성 메서드</p>
-     *
-     * @param userId User 엔티티에서 유저를 식별할 고유 값을 의미합니다. 현재 임시 값이며 User 엔티티 구조에 따라 변경 될 수 있습니다.
-     */
-    @Transactional
-    public AssistantThread createThread(Integer userId, String assistantId) {
-        // TODO: 유저마다 하나의 스레드를 생성함
-        // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
-        String url = "/v1/threads";
 
-
-        // 유저 아이디 혹은 유저네임을 통해 생성된 스레드가 있는지 체크
-        if (true) {
-            // userRepo.findBy ...
-        }
-        GetAssistantResDto assistantResDto = getAssistants();
-
-        if (!assistantResDto.getData().isEmpty()) {
-            throw new RuntimeException("Exist Assistant - createThread");
-        }
-
-        String jsonResponse = restClient
-                .post()
-                .uri(url)
-                .retrieve()
-                .body(String.class);
-
-        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" + AppConstants.VERSION).orElseThrow(
-                () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
-        );
-
-        try {
-            CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
-            return gptAssistantCoreService.syncSaveThread(createThreadResDto.getId(), assistant.getAssistantId());
-        } catch (JsonProcessingException e) {
-            log.info(e + " :Json 에러");
-            throw new RuntimeException("JsonProcessingException - createThread");
-        }
-    }
 
     public void getThreads() {
         // TODO: 스레드 목록 조회

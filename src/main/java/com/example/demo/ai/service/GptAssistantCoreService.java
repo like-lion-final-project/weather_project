@@ -5,11 +5,14 @@ import com.example.demo.ai.dto.GetModelsResDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
+import com.example.demo.ai.entity.User;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
+import com.example.demo.ai.repo.UserRepo;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 class GptAssistantCoreService {
+    private final UserRepo userRepo;
     private final AssistantRepo assistantRepo;
     private final AssistantThreadRepo assistantThreadRepo;
     private final ObjectMapper objectMapper;
@@ -42,9 +46,11 @@ class GptAssistantCoreService {
     GptAssistantCoreService(
             @Qualifier("gptAssistantRestClient") RestClient restClient,
             ObjectMapper objectMapper,
+            UserRepo userRepo,
             AssistantRepo assistantRepo,
             AssistantThreadRepo assistantThreadRepo
     ) {
+        this.userRepo = userRepo;
         this.assistantRepo = assistantRepo;
         this.assistantThreadRepo = assistantThreadRepo;
         this.restClient = restClient;
@@ -105,6 +111,14 @@ class GptAssistantCoreService {
         }
     }
 
+    public ResponseEntity<String> getThread(String threadId) {
+        String url = "/v1/threads/" + threadId;
+        return restClient.get()
+                .uri(url)
+                .retrieve()
+                .toEntity(String.class);
+    }
+
 
     /**
      * <p>어시스턴트 core 메서드 입니다.</p>
@@ -118,7 +132,7 @@ class GptAssistantCoreService {
         List<GetAssistantResDto.Data> assistantResDto = getAssistants().getData();
 
         for (GetAssistantResDto.Data assistant : assistantResDto) {
-            if(assistant.getName().equals(name)){
+            if (assistant.getName().equals(name)) {
                 throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
             }
         }
@@ -160,12 +174,58 @@ class GptAssistantCoreService {
         } catch (JsonProcessingException e) {
             log.info("JSON 직렬화 에러");
             return null;
-        } catch (Exception e){
+        } catch (Exception e) {
             deleteAssistant(assistantId);
             throw new RuntimeException("Failed to created assistant - Application API");
         }
     }
 
+    /**
+     * <p>스레드 생성 메서드</p>
+     *
+     * @param userId User 엔티티에서 유저를 식별할 고유 값을 의미합니다. 현재 임시 값이며 User 엔티티 구조에 따라 변경 될 수 있습니다.
+     */
+    public CreateThreadResDto createThread(Long userId, String assistantId) {
+        // TODO: 유저마다 하나의 스레드를 생성함
+        // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
+        String url = "/v1/threads";
+        // 유저 아이디 혹은 유저네임을 통해 생성된 스레드가 있는지 체크
+
+        // TODO: 해당 유저와 연결된 스레드가 있다면 아무것도 하지 않음.
+        // TODO: DB에 스레드가 없다면 생성해야함.
+        Optional<AssistantThread> assistantThread = assistantThreadRepo.findThreadByUserId(userId);
+        if (assistantThread.isPresent()) {
+            return null;
+        }
+
+        User userEntity = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
+
+
+        String jsonResponse = restClient
+                .post()
+                .uri(url)
+                .retrieve()
+                .body(String.class);
+
+        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" + AppConstants.VERSION).orElseThrow(
+                () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
+        );
+
+        try {
+            CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
+
+            assistantThreadRepo.save(AssistantThread.builder()
+                    .user(userEntity)
+                    .assistant(assistant)
+                    .threadId(createThreadResDto.getId())
+                    .build());
+
+            return createThreadResDto;
+        } catch (JsonProcessingException e) {
+            log.info(e + " :Json 에러");
+            throw new RuntimeException("JsonProcessingException - createThread");
+        }
+    }
 
     /**
      * <p>어시스턴트 삭제 메서드 입니다. 같은 패키지 내에서도 사용할 수 없도록 private 접근 제한자 설정</p>
@@ -203,7 +263,7 @@ class GptAssistantCoreService {
 
             DeleteThreadResDto deleteThreadResDto = objectMapper.readValue(jsonResponse, DeleteThreadResDto.class);
             Optional<AssistantThread> threadEntity = assistantThreadRepo.findThreadByThreadId(deleteThreadResDto.getId());
-            threadEntity.ifPresent(thread -> assistantRepo.deleteById(thread.getId()));
+            threadEntity.ifPresent(thread -> assistantThreadRepo.deleteById(thread.getId()));
         } catch (JsonProcessingException e) {
             log.warn("Json Processing Exception - deleteAssistant");
             throw new RuntimeException("Json Processing Exception - deleteAssistant");
@@ -216,13 +276,13 @@ class GptAssistantCoreService {
 
     /**
      * <p>어시스턴트 동기화 메서드 입니다.</p>
-     * */
+     */
     public void synchronizeAssistants() {
         List<GetAssistantResDto.Data> apiAssistants = getAssistants().getData();
         List<Assistant> dbAssistants = assistantRepo.findAll();
         Map<String, Assistant> dbAssistantMap = dbAssistants.stream()
                 .collect(Collectors.toMap(
-                        Assistant::getAssistantId,  Function.identity()));
+                        Assistant::getAssistantId, Function.identity()));
 
         for (GetAssistantResDto.Data apiAssistant : apiAssistants) {
             String key = apiAssistant.getId();
@@ -234,30 +294,31 @@ class GptAssistantCoreService {
     }
 
 
-    public AssistantThread syncSaveThread(String threadId, String assistantId) {
-        Optional<Assistant> assistant = assistantRepo.findAssistantByAssistantId(assistantId);
 
-        if (assistant.isEmpty()) {
-            log.warn("NotFound Assistant - ID: " + assistantId);
-            throw new RuntimeException("NotFound Assistant - ID: " + assistantId);
-        }
+    /**
+     * <p>스레드 동기화 메서드 입니다. 각 유저들의 스레드를 조회하고 동기화 합니다.</p>
+     */
+    @Transactional
+    public void synchronizeThread(Long userId, String assistantId) {
+        Optional<AssistantThread> dbAssistantThread = assistantThreadRepo.findThreadByUserId(userId);
 
-        try {
-            return assistantThreadRepo.save(AssistantThread.builder()
-                    .assistant(assistant.get())
-                    .threadId(threadId)
-                    .isDeleteFromOpenAi(false)
-                    .build());
-        } catch (DataAccessException e) {
-            log.error("Database access error when saving assistant thread for ID: " + assistantId, e);
-            deleteThread(threadId);
-            throw new RuntimeException("Database error occurred while saving assistant thread");
-        } catch (Exception e) {
-            log.error("Unexpected error occurred", e);
-            deleteThread(threadId);
-            throw new RuntimeException("Unexpected error occurred", e);
-        }
-        // TODO: 생성된 스레드 정보를 저장 ( thread_id )
+        // DB에는 값이 있음
+        dbAssistantThread.ifPresent(thread -> {
+            ResponseEntity<String> jsonResponse = getThread(thread.getThreadId());
+            if (jsonResponse.getStatusCode().value() == 404) {
+                createThread(userId, assistantId);
+            } else if(jsonResponse.getStatusCode().value() == 200) {
+               log.info("Not Created - API and DB in Sync Success");
+            } else{
+                try {
+                    CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse.getBody(), CreateThreadResDto.class);
+                    deleteThread(createThreadResDto.getId());
+                } catch (JsonProcessingException e) {
+                    log.warn("JSON Processing Exception - synchronizeThread");
+                    throw new RuntimeException("JSON Processing Exception - synchronizeThread");
+                }
+            }
+        });
     }
 
     public void saveMessage() {
