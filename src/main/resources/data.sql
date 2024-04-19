@@ -3,4 +3,4 @@
 #         true,'Fashion Expert_0.0.1','0.0.1','gpt-3.5-turbo',false
 #        ) ON DUPLICATE KEY UPDATE id=id;
 
-INSERT INTO user (name) VALUES ('test-user')
+INSERT INTO user (username) VALUES ('test-user')
