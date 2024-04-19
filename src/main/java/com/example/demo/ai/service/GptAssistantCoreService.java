@@ -271,7 +271,7 @@ class GptAssistantCoreService {
     /**
      * <p>어시스턴트 동기화 메서드 입니다.</p>
      */
-    public void synchronizeAssistants() {
+    public void synchronizeAssistants(String instructions, String name, String model) {
         List<GetAssistantResDto.Data> apiAssistants = getAssistants().getData();
         List<Assistant> dbAssistants = assistantRepo.findAll();
         Map<String, Assistant> dbAssistantMap = dbAssistants.stream()
@@ -286,7 +286,7 @@ class GptAssistantCoreService {
                 deleteAssistant(apiAssistant.getId());
                 log.info("Deleted orphaned assistant from OpenAI: " + apiAssistant.getName());
             }else{
-
+                createAssistant(instructions,name,model);
             }
         }
     }

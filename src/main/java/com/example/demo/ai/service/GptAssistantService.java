@@ -136,20 +136,19 @@ public class GptAssistantService {
      */
     @Transactional
     public CreateAssistantResDto createAndSyncAssistant(String instructions, String name, String model) {
-
-//        gptAssistantCoreService.synchronizeAssistants();
-
-            return gptAssistantCoreService.createAssistant(instructions, name, model);
+        gptAssistantCoreService.synchronizeAssistants(instructions,name,model);
+        return gptAssistantCoreService.createAssistant(instructions, name, model);
 
     }
 
 
     @Transactional
-    public CreateThreadResDto createAndSyncThread(Long userId, String assistantId){
+    public CreateThreadResDto createAndSyncThread(Long userId, String assistantId) {
         gptAssistantCoreService.synchronizeThread(userId, assistantId);
-      return gptAssistantCoreService.createThread(userId, assistantId);
-    };
+        return gptAssistantCoreService.createThread(userId, assistantId);
+    }
 
+    ;
 
 
     /**
@@ -159,8 +158,6 @@ public class GptAssistantService {
         // TODO: 어시스턴트 수정
         String url = "/v1/assistants";
     }
-
-
 
 
     public void getThreads() {
