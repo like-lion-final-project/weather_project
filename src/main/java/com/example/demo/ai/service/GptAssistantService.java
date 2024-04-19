@@ -136,19 +136,23 @@ public class GptAssistantService {
      */
     @Transactional
     public CreateAssistantResDto createAndSyncAssistant(String instructions, String name, String model) {
-        gptAssistantCoreService.synchronizeAssistants(instructions,name,model);
-        return gptAssistantCoreService.createAssistant(instructions, name, model);
-
+        SyncDto syncResult = gptAssistantCoreService.synchronizeAssistants(instructions,name,model);
+        if(syncResult.isSyncNotPerformed()) return gptAssistantCoreService.createAssistant(instructions, name, model);
+        return null;
     }
 
 
+    /**
+     * <p>스레드 생성 및 동기화 메서드</p>
+     * @param userId 유저 고유 식별자 입니다.
+     * @param assistantId 스레드와 연결할 어시스턴트 아이디 입니다.
+     * */
     @Transactional
     public CreateThreadResDto createAndSyncThread(Long userId, String assistantId) {
-        gptAssistantCoreService.synchronizeThread(userId, assistantId);
-        return gptAssistantCoreService.createThread(userId, assistantId);
-    }
-
-    ;
+        SyncDto syncResult = gptAssistantCoreService.synchronizeThread(userId, assistantId);
+        if(syncResult.isSyncNotPerformed()) return gptAssistantCoreService.createThread(userId, assistantId);
+        return null;
+    };
 
 
     /**
