@@ -33,10 +33,18 @@
         <p id="base-time"></p>
         <ul id="weather-list"></ul>
 
-        <h4>향후 6시간동안의 날씨 예보</h4>
+        <h3>향후 6시간 동안의 날씨 예보</h3>
         <ul id="six-hour-weather-list"></ul>
 
-        <button id="search-weather">날씨 검색</button>
+        <h3>지역 검색</h3>
+        <div>
+            <input type="text" id="search-location" placeholder="주소를 입력하세요">
+            <button id="search-weather">검색</button>
+            <p id="search-result"></p>
+        </div>
+
+        <!-- 지도 -->
+        <div id="map" style="width:50%;height: 30vh;" class="mb-3"></div>
     </div>
 
     <hr>
@@ -44,8 +52,6 @@
 
 </div>
 
-<!-- 지도 -->
-<div id="map" style="width:50%;height: 50vh;" class="mb-3"></div>
 
 <script>
     let position = new naver.maps.LatLng(37.3595704, 127.105399)
@@ -66,16 +72,7 @@
         console.log("lat: " + latitude + ", lng: " + longitude);
 
         // 지역명 표시
-        fetch(`http://localhost:8080/api/v1/weather/rgeocode`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                lat: latitude,
-                lng: longitude
-            })
-        })
+        fetch(`http://localhost:8080/api/v1/weather/rgeocode?lat=${latitude}&lng=${longitude}`)
             .then(response => response.json())
             .then(data => {
                 const address = data.address;
@@ -138,6 +135,28 @@
             }, function (error) {
                 console.error("날씨 데이터를 가져오는 중 오류 발생:", error);
             });
+    });
+
+    // 날씨 검색 버튼 클릭 이벤트 핸들러
+    document.getElementById('search-weather').addEventListener('click', function () {
+        // 입력된 주소 가져오기
+        const query = document.getElementById('search-location').value;
+
+        // 주소를 이용하여 좌표 정보 가져오기
+        fetch(`http://localhost:8080/api/v1/weather/geocode?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const searchResult = document.getElementById('search-result');
+                searchResult.innerHTML = ''; // 이전 검색 결과 지우기
+
+                // 검색 결과를 화면에 표시하기
+                data.forEach(point => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `주소: ${point.roadAddress}, 위도: ${point.lat}, 경도: ${point.lng}`;
+                    searchResult.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('주소를 이용하여 좌표 정보를 가져오는 중 오류 발생:', error));
     });
 
 </script>

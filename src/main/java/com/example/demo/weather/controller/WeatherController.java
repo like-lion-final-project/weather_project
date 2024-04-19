@@ -1,8 +1,10 @@
 package com.example.demo.weather.controller;
 
+import com.example.demo.weather.dto.GridDto;
 import com.example.demo.weather.dto.PointDto;
 import com.example.demo.weather.dto.WeatherForecast;
 
+import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
 import com.example.demo.weather.dto.rgeocoding.RGeoResponseDto;
@@ -33,7 +35,7 @@ public class WeatherController {
      * geocode
      */
     @GetMapping("/geocode")
-    public PointDto pointRegion(
+    public List<PointDto> pointRegion(
             @RequestParam("query")
             String query
     ) {
@@ -43,12 +45,14 @@ public class WeatherController {
     /**
      * Rgeocode
      */
-    @PostMapping("/rgeocode")
+    @GetMapping("/rgeocode")
     public RGeoResponseDto getAddress(
-            @RequestBody
-            PointDto dto
+        @RequestParam("lat")
+        Double lat,
+        @RequestParam("lng")
+        Double lng
     ) {
-        return geocodeService.getAddress(dto);
+        return geocodeService.getAddress(lat, lng);
     }
 
     /**
@@ -93,7 +97,7 @@ public class WeatherController {
      * 위경도 좌표 정보를 격자 XY로 변환 (브라우저 geolocation 전용)
      */
     @GetMapping("/convert-grid")
-    public PointDto convertToGrid(
+    public GridDto convertToGrid(
             @RequestParam("lat")
             Double lat,
             @RequestParam("lng")
