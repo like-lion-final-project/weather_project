@@ -13,6 +13,7 @@ import com.example.demo.weather.service.NcpGeocodeService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +42,7 @@ public class WeatherController {
     /**
      * Rgeocode
      */
-    @GetMapping("/rgeocode")
+    @PostMapping("/rgeocode")
     public RGeoResponseDto getAddress(
             @RequestBody
             PointDto dto
