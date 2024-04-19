@@ -43,13 +43,13 @@ public class GptAssistantTestController {
      * 스레드 생성
      */
     @PostMapping("/ai/threads")
-    public CreateThreadResDto createThread(
+    public void createThread(
             @RequestParam("user_id")
             Long userId,
             @RequestParam("assistant_Id")
             String assistantId
     ) {
-        return gptAssistantService.createAndSyncThread(userId, assistantId);
+        gptAssistantService.createAndSyncThread(userId, assistantId);
     }
 
     @PostMapping("/ai/create-and-run")
