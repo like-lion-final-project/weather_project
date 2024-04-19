@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class CreateThreadResDto {
     private String id;
-    private String object;
+    private String objectt123;
 
     @JsonProperty("created_at")
     private Long createdAt;

@@ -2,6 +2,7 @@ package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.GetModelsResDto;
+import com.example.demo.ai.dto.SyncDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
@@ -129,7 +130,6 @@ class GptAssistantCoreService {
      */
 
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
-
         Optional<Assistant> assistant = assistantRepo.findAssistantByName(name);
         if (assistant.isPresent()) {
             return null;
@@ -183,41 +183,47 @@ class GptAssistantCoreService {
      *
      * @param userId User 엔티티에서 유저를 식별할 고유 값을 의미합니다. 현재 임시 값이며 User 엔티티 구조에 따라 변경 될 수 있습니다.
      */
+    @Transactional
     public CreateThreadResDto createThread(Long userId, String assistantId) {
-        // TODO: 유저마다 하나의 스레드를 생성함
         String url = "/v1/threads";
-        // 유저 아이디 혹은 유저네임을 통해 생성된 스레드가 있는지 체크
-        // TODO: 해당 유저와 연결된 스레드가 있다면 아무것도 하지 않음.
-        // TODO: DB에 스레드가 없다면 생성해야함.
-        Optional<AssistantThread> assistantThread = assistantThreadRepo.findThreadByUserId(userId);
-        if (assistantThread.isPresent()) {
+        Optional<AssistantThread> existingThread = assistantThreadRepo.findThreadByUserId(userId);
+
+        if (existingThread.isPresent()) {
             return null;
         }
 
         User userEntity = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
+        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" + AppConstants.VERSION).orElseThrow(
+                () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
+        );
+
         String jsonResponse = restClient
                 .post()
                 .uri(url)
                 .retrieve()
                 .body(String.class);
 
-        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" + AppConstants.VERSION).orElseThrow(
-                () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
-        );
-
+        String threadId = null;
         try {
             CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
+            threadId = createThreadResDto.getId();
 
             assistantThreadRepo.save(AssistantThread.builder()
                     .user(userEntity)
                     .assistant(assistant)
-                    .threadId(createThreadResDto.getId())
+                    .threadId(threadId)
                     .build());
 
             return createThreadResDto;
         } catch (JsonProcessingException e) {
-            log.info(e + " :Json 에러");
-            throw new RuntimeException("JsonProcessingException - createThread");
+           log.warn("----  Json Processing Exception  ----");
+           log.info(jsonResponse + " : JsonResponse");
+           log.warn("-------------------------------------");
+           deleteThread(threadId);
+           throw new RuntimeException("Json Processing Exception");
+        } catch (Exception e){
+            deleteThread(threadId);
+            throw new RuntimeException("Exception occurred during thread creation", e);
         }
     }
 
@@ -271,51 +277,48 @@ class GptAssistantCoreService {
     /**
      * <p>어시스턴트 동기화 메서드 입니다.</p>
      */
-    public void synchronizeAssistants(String instructions, String name, String model) {
+    public SyncDto synchronizeAssistants(String instructions, String name, String model) {
         List<GetAssistantResDto.Data> apiAssistants = getAssistants().getData();
         List<Assistant> dbAssistants = assistantRepo.findAll();
         Map<String, Assistant> dbAssistantMap = dbAssistants.stream()
                 .collect(Collectors.toMap(
                         Assistant::getAssistantId, Function.identity()));
 
-        // TODO: Open AI에 어시스턴트가 없고, DB에는 있을 때 -> DB우선이므로 생성처리
-        // TODO: Open AI에 어시스턴트가 있고, DB에는 없을 때 -> DB우선이므로 삭제 처리
         for (GetAssistantResDto.Data apiAssistant : apiAssistants) {
             String key = apiAssistant.getId();
             if (!dbAssistantMap.containsKey(key)) {
                 deleteAssistant(apiAssistant.getId());
                 log.info("Deleted orphaned assistant from OpenAI: " + apiAssistant.getName());
+                return SyncDto.builder()
+                        .deleted(true)
+                        .build();
             }else{
                 createAssistant(instructions,name,model);
+                return SyncDto.builder()
+                        .created(true)
+                        .build();
             }
         }
+
+        return SyncDto.builder().build();
     }
 
     /**
      * <p>스레드 동기화 메서드 입니다. 각 유저들의 스레드를 조회하고 동기화 합니다.</p>
      */
     @Transactional
-    public void synchronizeThread(Long userId, String assistantId) {
+    public SyncDto synchronizeThread(Long userId, String assistantId) {
         Optional<AssistantThread> dbAssistantThread = assistantThreadRepo.findThreadByUserId(userId);
-
-        // DB에는 값이 있음
-        dbAssistantThread.ifPresent(thread -> {
-            ResponseEntity<String> jsonResponse = getThread(thread.getThreadId());
-            if (jsonResponse.getStatusCode().value() == 404) {
-                createThread(userId, assistantId);
-            } else if(jsonResponse.getStatusCode().value() == 200) {
-               log.info("Not Created - API and DB in Sync Success");
-            } else{
-                try {
-                    CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse.getBody(), CreateThreadResDto.class);
-                    deleteThread(createThreadResDto.getId());
-                } catch (JsonProcessingException e) {
-                    log.warn("JSON Processing Exception - synchronizeThread");
-                    throw new RuntimeException("JSON Processing Exception - synchronizeThread");
-                }
-            }
-        });
+        if (dbAssistantThread.isEmpty()) {
+            createThread(userId, assistantId);
+            return SyncDto.builder()
+                    .created(true)
+                    .build();
+        }
+        log.info("Not Created - API and DB in Sync Success");
+        return SyncDto.builder().build();
     }
+
 
     public void saveMessage() {
         // TODO: 생성된 메시지 정보를 저장 ( 보낸 메시지, 스레드 아이디 등 )
