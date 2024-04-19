@@ -129,12 +129,10 @@ class GptAssistantCoreService {
      */
 
     public CreateAssistantResDto createAssistant(String instructions, String name, String model) {
-        List<GetAssistantResDto.Data> assistantResDto = getAssistants().getData();
 
-        for (GetAssistantResDto.Data assistant : assistantResDto) {
-            if (assistant.getName().equals(name)) {
-                throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
-            }
+        Optional<Assistant> assistant = assistantRepo.findAssistantByName(name);
+        if (assistant.isPresent()) {
+            return null;
         }
 
         String url = "/v1/assistants";
@@ -187,10 +185,8 @@ class GptAssistantCoreService {
      */
     public CreateThreadResDto createThread(Long userId, String assistantId) {
         // TODO: 유저마다 하나의 스레드를 생성함
-        // TODO: 유저의 스레드 정보를 DB에 기록하고 삭제 요청시 삭제함
         String url = "/v1/threads";
         // 유저 아이디 혹은 유저네임을 통해 생성된 스레드가 있는지 체크
-
         // TODO: 해당 유저와 연결된 스레드가 있다면 아무것도 하지 않음.
         // TODO: DB에 스레드가 없다면 생성해야함.
         Optional<AssistantThread> assistantThread = assistantThreadRepo.findThreadByUserId(userId);
@@ -199,8 +195,6 @@ class GptAssistantCoreService {
         }
 
         User userEntity = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
-
-
         String jsonResponse = restClient
                 .post()
                 .uri(url)
@@ -284,16 +278,18 @@ class GptAssistantCoreService {
                 .collect(Collectors.toMap(
                         Assistant::getAssistantId, Function.identity()));
 
+        // TODO: Open AI에 어시스턴트가 없고, DB에는 있을 때 -> DB우선이므로 생성처리
+        // TODO: Open AI에 어시스턴트가 있고, DB에는 없을 때 -> DB우선이므로 삭제 처리
         for (GetAssistantResDto.Data apiAssistant : apiAssistants) {
             String key = apiAssistant.getId();
             if (!dbAssistantMap.containsKey(key)) {
                 deleteAssistant(apiAssistant.getId());
                 log.info("Deleted orphaned assistant from OpenAI: " + apiAssistant.getName());
+            }else{
+
             }
         }
     }
-
-
 
     /**
      * <p>스레드 동기화 메서드 입니다. 각 유저들의 스레드를 조회하고 동기화 합니다.</p>

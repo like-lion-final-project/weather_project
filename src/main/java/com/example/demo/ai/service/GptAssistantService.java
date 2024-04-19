@@ -136,17 +136,11 @@ public class GptAssistantService {
      */
     @Transactional
     public CreateAssistantResDto createAndSyncAssistant(String instructions, String name, String model) {
-        List<GetAssistantResDto.Data> assistants = gptAssistantCoreService.getAssistants().getData();
-        Map<String, GetAssistantResDto.Data> assistantMap = assistants.stream()
-                .collect(Collectors.toMap(
-                        GetAssistantResDto.Data::getName,
-                        Function.identity()
-                ));
-        gptAssistantCoreService.synchronizeAssistants();
 
-        if (!assistantMap.containsKey(name))
+//        gptAssistantCoreService.synchronizeAssistants();
+
             return gptAssistantCoreService.createAssistant(instructions, name, model);
-        return null;
+
     }
 
 
