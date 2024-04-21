@@ -163,8 +163,6 @@ public class GptAssistantService {
         return assistantThread;
     }
 
-    ;
-
 
     /**
      * <p>어시스턴트 수정 메서드</p>

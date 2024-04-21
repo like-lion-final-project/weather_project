@@ -88,6 +88,7 @@ class GptAssistantCoreService {
     }
 
 
+
     /**
      * <p>타겟 모델이 사용가능한 상태인지 체크하는 메서드</p>
      *
@@ -98,6 +99,7 @@ class GptAssistantCoreService {
         Set<String> activeModels = getActiveModels(); // Use the getActiveModels method
         return activeModels.contains(modelName); // Check if the model is in the active models set
     }
+
 
 
     /**
@@ -186,6 +188,7 @@ class GptAssistantCoreService {
     }
 
 
+
     /**
      * <p>어시스턴트 정보를 DB에 저장하는 메서드 입니다.</p>
      * @return 어시스턴트 엔티티 정보 혹은 null
@@ -207,6 +210,7 @@ class GptAssistantCoreService {
         }
         return null;
     }
+
 
 
     /**
@@ -235,9 +239,12 @@ class GptAssistantCoreService {
 
     }
 
+
+
     /**
      * <p>스레드 생성 메서드 입니다.</p>
      * */
+
     public AssistantThread createThreadDB(Long userId, String assistantId){
         // TODO: DB에 스레드 저장 이후 동기화 관련은 해당 메서드에서 신경쓰지 않음
         Optional<User> userEntity = userRepo.findById(userId);
@@ -257,6 +264,12 @@ class GptAssistantCoreService {
                         .build());
     }
 
+
+
+    /**
+     * <p>스레드 아이디를 업데이트 하는 메서드 입니다. API로 생성후 생성된 threadId값을 저장함</p>
+     * */
+
     private void updateThreadIdDB(AssistantThread assistantThread, String newThreadId){
         System.out.println(assistantThread.getId() + "아이디");
         System.out.println(newThreadId + "새로운 스레드 아이디");
@@ -270,6 +283,27 @@ class GptAssistantCoreService {
                         .isDeleteFromOpenAi(false)
                         .build()
         ));
+    }
+
+
+
+    /**
+     * <p>DB에 저장된 스레드를 삭제하는 메서드 입니다.</p>
+     * <p>값을 실제로 삭제 하는게 아닌 논리적으로 삭제하는 메서드 입니다.</p>
+     * */
+
+    private AssistantThread deleteThreadDB(String threadId){
+        Optional<AssistantThread> assistantThreadOptional = assistantThreadRepo.findThreadByThreadId(threadId);
+        return assistantThreadOptional.map(thread -> {
+            AssistantThread updatedThread = AssistantThread.builder()
+                    .id(thread.getId())
+                    .user(thread.getUser())
+                    .assistant(thread.getAssistant())
+                    .threadId(thread.getThreadId())
+                    .isDeleteFromOpenAi(true)
+                    .build();
+            return assistantThreadRepo.save(updatedThread);
+        }).orElse(null);
     }
 
 
@@ -315,12 +349,15 @@ class GptAssistantCoreService {
             log.info(jsonResponse + " : JsonResponse");
             log.warn("-------------------------------------");
             deleteThreadAPI(threadId);
+            deleteThreadDB(threadId);
             throw new RuntimeException("Json Processing Exception");
         } catch (Exception e) {
             deleteThreadAPI(threadId);
+            deleteThreadDB(threadId);
             throw new RuntimeException("Exception occurred during thread creation", e);
         }
     }
+
 
 
     /**
@@ -350,6 +387,7 @@ class GptAssistantCoreService {
     }
 
 
+
     /**
      * <p>어시스턴트 삭제 메서드 입니다. 같은 패키지 내에서도 사용할 수 없도록 private 접근 제한자 설정</p>
      */
@@ -375,12 +413,15 @@ class GptAssistantCoreService {
     }
 
 
+
     /**
      * <p>메시지 생성 메서드 입니다.</p>
      * */
+
     public void saveMessage() {
         // TODO: 생성된 메시지 정보를 저장 ( 보낸 메시지, 스레드 아이디 등 )
     }
+
 
 
     /**
@@ -429,6 +470,7 @@ class GptAssistantCoreService {
     }
 
 
+
     /**
      * <p>스레드 동기화 메서드 입니다. 각 유저들의 스레드를 조회하고 동기화 합니다.</p>
      */
@@ -447,19 +489,18 @@ class GptAssistantCoreService {
         if(dbAssistantThread.get().getThreadId() == null){
             CreateThreadResDto createThreadResDto = createThreadAPI(tempUserId,dbAssistantThread.get().getAssistant().getAssistantId());
             if(createThreadResDto == null) return;
-            System.out.println(createThreadResDto.getId() + "스레드 아이디 2");
             updateThreadIdDB(dbAssistantThread.get(), createThreadResDto.getId());
             return;
         }
 
         // DB에 스레드 정보가 기록되어있지만 API로 조회했을 땐 존재하지 않을 때, 신규생성함
         if( getThreadAPI(dbAssistantThread.get().getThreadId()) == null ){
-            System.out.println("또 실행 되는지 체크");
             CreateThreadResDto createThreadResDto = createThreadAPI(tempUserId,dbAssistantThread.get().getAssistant().getAssistantId());
             if(createThreadResDto == null) return;
             updateThreadIdDB(dbAssistantThread.get(), createThreadResDto.getId());
-            return;
         }
+
+        // 신규 생성시 기존에 존재하던 항목을 논리적 삭제 하는 로직이 필요함
     }
 
 }
