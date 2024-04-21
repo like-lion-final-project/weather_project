@@ -221,7 +221,23 @@ class GptAssistantCoreService {
     /**
      * <p>스레드 생성 메서드 입니다.</p>
      * */
-    public void createThreadDB(Long userId, String assistantId){}
+    public AssistantThread createThreadDB(Long userId, String assistantId){
+        // TODO: DB에 스레드 저장 이후 동기화 관련은 해당 메서드에서 신경쓰지 않음
+        Optional<User> userEntity = userRepo.findById(userId);
+        Optional<Assistant> assistant = assistantRepo.findAssistantByAssistantId(assistantId);
+        if(userEntity.isEmpty()){
+            throw new RuntimeException("존재하지 않는 유저 입니다.");
+        }else if (assistant.isEmpty()){
+            throw new RuntimeException("존재하지 않는 어시스턴트 입니다.");
+        }
+
+        return assistantThreadRepo.save(
+                AssistantThread.builder()
+                        .user(userEntity.get())
+                        .assistant(assistant.get())
+                        .isDeleteFromOpenAi(false)
+                        .build());
+    }
 
 
 
