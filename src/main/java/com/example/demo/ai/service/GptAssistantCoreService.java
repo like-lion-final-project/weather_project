@@ -120,6 +120,7 @@ class GptAssistantCoreService {
     }
 
 
+
     /**
      * <p>어시스턴트 정보를 OpenAI에 저장하는 API 입니다.</p>
      * @return 생성된 어시스턴트 정보 혹은 null
@@ -160,12 +161,26 @@ class GptAssistantCoreService {
      * @return 인자로 받은 스레드 정보 혹은 존재하지 않음 응답
      * */
 
-    public ResponseEntity<String> getThreadAPI(String threadId) {
-        String url = "/v1/threads/" + threadId;
-        return restClient.get()
+    public CreateThreadResDto getThreadAPI(String threadId) {
+        String url = "v1/threads/" + threadId;
+
+        ResponseEntity<String> jsonResponse = restClient
+                .get()
                 .uri(url)
                 .retrieve()
                 .toEntity(String.class);
+
+        if(jsonResponse.getStatusCode().value() == 404){
+            log.warn("Not Found Thread - ThreadID: " + threadId);
+            return null;
+        }
+
+        try{
+            return objectMapper.readValue(jsonResponse.getBody(),CreateThreadResDto.class);
+        }catch (JsonProcessingException e){
+            log.warn("Json Processing Exception");
+            throw new RuntimeException("Json Processing Exception");
+        }
     }
 
 
@@ -420,13 +435,8 @@ class GptAssistantCoreService {
 
     @Transactional
     public SyncDto synchronizeThread(Long userId, String assistantId) {
-        Optional<AssistantThread> dbAssistantThread = assistantThreadRepo.findThreadByUserId(userId);
-        if (dbAssistantThread.isEmpty()) {
-            createThreadAPI(userId, assistantId);
-            return SyncDto.builder()
-                    .created(true)
-                    .build();
-        }
+        Optional<AssistantThread> dbAssistantThread = assistantThreadRepo.findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(userId);
+
         log.info("Not Created - API and DB in Sync Success");
         return SyncDto.builder().build();
     }
