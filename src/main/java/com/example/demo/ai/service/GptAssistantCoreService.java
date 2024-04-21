@@ -196,7 +196,7 @@ class GptAssistantCoreService {
      * <p>어시스턴트 아이디를 DB에 업데이트 하는 메서드 입니다.</p>
      * <p>DB에 어시스턴트 정보 생성 하고 OpenAI에 어시스턴트를 생성한 뒤 생성된 정보를 바탕으로 해당하는 row를 업데이트 할 때 사용합니다.</p>
      * */
-    private void updatedAssistantIdDB(Assistant assistant, String assistantId) {
+    private void updateAssistantIdDB(Assistant assistant, String newAssistantId) {
         System.out.println(assistant.getId() + "IDID");
         Optional<Assistant> assistantEntity = assistantRepo.findAssistantByName(assistant.getName());
 
@@ -206,7 +206,7 @@ class GptAssistantCoreService {
 
             assistantRepo.save(Assistant.builder()
                     .id(assistant.getId())
-                    .assistantId(assistantId)
+                    .assistantId(newAssistantId)
                     .instructions(assistant.getInstructions())
                     .name(assistant.getName())
                     .version(assistant.getVersion())
@@ -237,6 +237,22 @@ class GptAssistantCoreService {
                         .assistant(assistant.get())
                         .isDeleteFromOpenAi(false)
                         .build());
+    }
+
+    private void updateThreadIdDB(AssistantThread assistantThread, String newThreadId){
+        Optional<AssistantThread> assistantThreadEntity = assistantThreadRepo.findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(assistantThread.getUser().getId());
+        if(assistantThreadEntity.isPresent()){
+            assistantThreadRepo.save(
+                    AssistantThread.builder()
+                            .id(assistantThread.getId())
+                            .user(assistantThread.getUser())
+                            .assistant(assistantThread.getAssistant())
+                            .threadId(newThreadId)
+                            .isDeleteFromOpenAi(false)
+                            .build()
+            );
+        }
+
     }
 
 
@@ -390,7 +406,7 @@ class GptAssistantCoreService {
             if (apiAssistants.stream().noneMatch(apiAssistant -> apiAssistant.getId().equals(dbAssistant.getAssistantId()))) {
                 String name = dbAssistant.getName();
                 CreateAssistantResDto createdAssistant = createAssistantAPI(dbAssistant.getInstructions(), name, dbAssistant.getModel());
-                updatedAssistantIdDB(dbAssistant, createdAssistant.getId());
+                updateAssistantIdDB(dbAssistant, createdAssistant.getId());
                 log.info("Created missing assistant in OpenAI: " + dbAssistant.getName());
                 syncResult.syncCreated(true);
             }
