@@ -143,7 +143,7 @@ public class GptAssistantService {
 
     @Transactional
     public Assistant createAndSyncAssistant(String instructions, String name, String model, String version, boolean isActive) {
-        Assistant createAssistantResDto = gptAssistantCoreService.createAssistantDB(instructions, name+"_"+version, model,version,isActive);
+        Assistant createAssistantResDto = gptAssistantCoreService.createAssistantDB(instructions, name + "_" + version, model, version, isActive);
         gptAssistantCoreService.synchronizeAssistants();
         return createAssistantResDto;
     }
@@ -151,15 +151,19 @@ public class GptAssistantService {
 
     /**
      * <p>스레드 생성 및 동기화 메서드</p>
-     * @param userId 유저 고유 식별자 입니다.
+     *
+     * @param userId      유저 고유 식별자 입니다.
      * @param assistantId 스레드와 연결할 어시스턴트 아이디 입니다.
-     * */
+     */
 
     @Transactional
-    public void createAndSyncThread(Long userId, String assistantId) {
-        gptAssistantCoreService.createThreadDB(userId, assistantId);
-        gptAssistantCoreService.synchronizeThread(userId, assistantId);
-    };
+    public AssistantThread createAndSyncThread(Long userId, String assistantId) {
+        AssistantThread assistantThread = gptAssistantCoreService.createThreadDB(userId, assistantId);
+        gptAssistantCoreService.synchronizeThread();
+        return assistantThread;
+    }
+
+    ;
 
 
     /**
@@ -174,7 +178,7 @@ public class GptAssistantService {
 
     /**
      * <p>스레드 목록 조회 메서드</p>
-     * */
+     */
 
     public void getThreads() {
         // TODO: 스레드 목록 조회
@@ -183,7 +187,7 @@ public class GptAssistantService {
 
     /**
      * <p>메시지 생성 메서드</p>
-     * */
+     */
     public CreateMessageResDto createMessage(String threadId, String message) {
         // TODO: 스레드에 추가할 메시지 생성
 
@@ -213,7 +217,7 @@ public class GptAssistantService {
 
     /**
      * <p>메시지 목록 조회 메서드</p>
-     * */
+     */
 
     public GetMessagesResDto getMessages(String threadId) {
         String url = "/v1/threads/" + threadId + "/messages";
@@ -236,7 +240,7 @@ public class GptAssistantService {
 
     /**
      * <p>실행 메서드</p>
-     * */
+     */
 
     public CreateRunResDto runAssistant(String threadId, String assistantId) {
         CreateRunReqDto createRunReqDto = CreateRunReqDto.builder()

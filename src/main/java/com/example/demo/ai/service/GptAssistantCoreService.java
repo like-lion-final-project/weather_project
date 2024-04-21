@@ -20,10 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -168,12 +170,12 @@ class GptAssistantCoreService {
                 .get()
                 .uri(url)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    return;
+                })
                 .toEntity(String.class);
 
-        if(jsonResponse.getStatusCode().value() == 404){
-            log.warn("Not Found Thread - ThreadID: " + threadId);
-            return null;
-        }
+
 
         try{
             return objectMapper.readValue(jsonResponse.getBody(),CreateThreadResDto.class);
@@ -249,25 +251,25 @@ class GptAssistantCoreService {
         return assistantThreadRepo.save(
                 AssistantThread.builder()
                         .user(userEntity.get())
+                        .createdAt(LocalDateTime.now())
                         .assistant(assistant.get())
                         .isDeleteFromOpenAi(false)
                         .build());
     }
 
     private void updateThreadIdDB(AssistantThread assistantThread, String newThreadId){
+        System.out.println(assistantThread.getId() + "아이디");
+        System.out.println(newThreadId + "새로운 스레드 아이디");
         Optional<AssistantThread> assistantThreadEntity = assistantThreadRepo.findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(assistantThread.getUser().getId());
-        if(assistantThreadEntity.isPresent()){
-            assistantThreadRepo.save(
-                    AssistantThread.builder()
-                            .id(assistantThread.getId())
-                            .user(assistantThread.getUser())
-                            .assistant(assistantThread.getAssistant())
-                            .threadId(newThreadId)
-                            .isDeleteFromOpenAi(false)
-                            .build()
-            );
-        }
-
+        assistantThreadEntity.ifPresent(thread -> assistantThreadRepo.save(
+                AssistantThread.builder()
+                        .id(thread.getId())
+                        .user(assistantThread.getUser())
+                        .assistant(assistantThread.getAssistant())
+                        .threadId(newThreadId)
+                        .isDeleteFromOpenAi(false)
+                        .build()
+        ));
     }
 
 
@@ -281,34 +283,32 @@ class GptAssistantCoreService {
     @Transactional
     public CreateThreadResDto createThreadAPI(Long userId, String assistantId) {
         String url = "/v1/threads";
-        Optional<AssistantThread> existingThread = assistantThreadRepo.findThreadByUserId(userId);
+        Optional<AssistantThread> existingThread = assistantThreadRepo.findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(userId);
 
-        if (existingThread.isPresent()) {
+        if (existingThread.isPresent() && existingThread.get().getThreadId() != null) {
             return null;
         }
 
         User userEntity = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
-        Assistant assistant = assistantRepo.findAssistantByName(AppConstants.FATION_EXPERT_ASSISTANT_NAME + "_" + AppConstants.VERSION).orElseThrow(
+        Assistant assistant = assistantRepo.findAssistantByAssistantId(assistantId).orElseThrow(
                 () -> new RuntimeException("어시스턴트를 찾을 수 없습니다.")
         );
 
-        String jsonResponse = restClient
+        ResponseEntity<String> jsonResponse = restClient
                 .post()
                 .uri(url)
                 .retrieve()
-                .body(String.class);
+                .toEntity(String.class);
+
+        if(jsonResponse.getStatusCode().is4xxClientError()){
+            System.out.println("400번대 에러");
+            return null;
+        }
 
         String threadId = null;
         try {
-            CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse, CreateThreadResDto.class);
+            CreateThreadResDto createThreadResDto = objectMapper.readValue(jsonResponse.getBody(), CreateThreadResDto.class);
             threadId = createThreadResDto.getId();
-
-            assistantThreadRepo.save(AssistantThread.builder()
-                    .user(userEntity)
-                    .assistant(assistant)
-                    .threadId(threadId)
-                    .build());
-
             return createThreadResDto;
         } catch (JsonProcessingException e) {
             log.warn("----  Json Processing Exception  ----");
@@ -434,11 +434,32 @@ class GptAssistantCoreService {
      */
 
     @Transactional
-    public SyncDto synchronizeThread(Long userId, String assistantId) {
-        Optional<AssistantThread> dbAssistantThread = assistantThreadRepo.findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(userId);
+    public void synchronizeThread() {
+        Long tempUserId = 1L;
+        Optional<AssistantThread> dbAssistantThread = assistantThreadRepo.findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(tempUserId);
 
-        log.info("Not Created - API and DB in Sync Success");
-        return SyncDto.builder().build();
+        // DB에 스레드 정보가 없으면 아무것도 수행하지 않음. 이전 메서드가 제대로 작동하지 않은 것이라 판단함
+        if(dbAssistantThread.isEmpty()){
+            return;
+        }
+
+        // DB에 기록된 스레드 정보에 스레드 아이디가 없다면 OpenAI에 신규 생성하고 그 값을 업데이트
+        if(dbAssistantThread.get().getThreadId() == null){
+            CreateThreadResDto createThreadResDto = createThreadAPI(tempUserId,dbAssistantThread.get().getAssistant().getAssistantId());
+            if(createThreadResDto == null) return;
+            System.out.println(createThreadResDto.getId() + "스레드 아이디 2");
+            updateThreadIdDB(dbAssistantThread.get(), createThreadResDto.getId());
+            return;
+        }
+
+        // DB에 스레드 정보가 기록되어있지만 API로 조회했을 땐 존재하지 않을 때, 신규생성함
+        if( getThreadAPI(dbAssistantThread.get().getThreadId()) == null ){
+            System.out.println("또 실행 되는지 체크");
+            CreateThreadResDto createThreadResDto = createThreadAPI(tempUserId,dbAssistantThread.get().getAssistant().getAssistantId());
+            if(createThreadResDto == null) return;
+            updateThreadIdDB(dbAssistantThread.get(), createThreadResDto.getId());
+            return;
+        }
     }
 
 }
