@@ -303,13 +303,8 @@
                         const baseTime = data.response.body.items.item[0].baseTime;
 
                         // 기준 시간을 시, 분으로 분할
-                        const baseHour = parseInt(baseTime.substr(0, 2)); // 시
-                        const baseMinute = parseInt(baseTime.substr(2, 2)); // 분
-
-                        // 오전/오후 구분
+                        const baseHour = parseInt(baseTime.substring(0, 2));
                         const ampm = baseHour >= 12 ? '오후' : '오전';
-
-                        // 오후일 경우 시간 보정
                         const displayHour = baseHour % 12 || 12;
 
                         // 기준 날짜를 형식에 맞게 변환 (YYYY. MM. DD)
@@ -320,9 +315,12 @@
 
                         const weatherList = document.getElementById('weather-list');
                         weatherList.innerHTML = ''; // 이전에 표시된 날씨 정보 지우기
+
                         data.response.body.items.item.forEach(item => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `${item.category}: ${item.obsrValue}`;
+                            const category = replaceCategory(item.category);
+                            const value = replaceCategoryValue(item.category, item.obsrValue); // 각 카테고리에 대한 값 대체
+                            listItem.textContent = `${category}: ${value}`;
                             weatherList.appendChild(listItem);
                         });
 
@@ -340,12 +338,14 @@
                                     const forecastValues = item.forecastValues;
 
                                     // 시간대 별로 묶어서 화면에 표시하기
-                                    let htmlContent = `<h4>${fcstTime.slice(0, 2)}:${fcstTime.slice(2)}</h4>`;
+                                    let htmlContent = `<h5>${fcstTime.slice(0, 2)}:${fcstTime.slice(2)}</h5>`;
                                     htmlContent += '<ul>';
 
                                     // forecastValues에 대한 정보 표시
                                     for (const [key, value] of Object.entries(forecastValues)) {
-                                        htmlContent += `<li>${key}: ${value}</li>`;
+                                        const replacedCategory = replaceCategory(key); // 카테고리 한글로 대체
+                                        const replacedValue = replaceCategoryValue(key, value); // 값 대체
+                                        htmlContent += `<li>${replacedCategory}: ${replacedValue}</li>`;
                                     }
 
                                     htmlContent += '</ul>';
@@ -354,7 +354,7 @@
                                     weatherList.appendChild(listItem);
                                 });
                             })
-                            .catch(error => console.error('향후 6시간 동안의 날씨 예보 정보를 가져오는 중 오류 발생:', error));
+                            .catch(error => console.error('날씨 정보를 가져오는 중 오류 발생:', error));
                     })
                     .catch(error => console.error('날씨 정보를 가져오는 중 오류 발생:', error));
             })
