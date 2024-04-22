@@ -64,23 +64,29 @@ public class GptAssistantTestController {
             String threadId,
             @RequestBody
             CreateMessageDto dto
-    ){
-        return gptAssistantApiService.createMessageAPI(dto.getRole(),dto.getContent(),threadId);
+    ) {
+        return gptAssistantApiService.createMessageAPI(dto.getRole(), dto.getContent(), threadId);
     }
 
     @GetMapping("/v1/threads/{threadId}/messages/{messageId}")
-    public GetMessagesResDto getMessages(
+    public GetMessagesResDto getMessage(
             @PathVariable("threadId")
             String threadId,
             @PathVariable("messageId")
             String messageId
-    ){
+    ) {
         return gptAssistantApiService.getMessageAPI(threadId, messageId);
+    }
+
+    @GetMapping("/v1/threads/{threadId}/messages")
+    public GetMessagesResDto getMessages(
+            @PathVariable("threadId")
+            String threadId
+    ) {
+        return gptAssistantApiService.getMessagesAPI(threadId);
     }
 }
 
 /**
  * thread_8EZ9Fm2oxQI0iBuEiK9SX1CG
- *
- *
- * */
+ */

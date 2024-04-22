@@ -199,6 +199,7 @@ public class GptAssistantApiService {
         }
     }
 
+
     /**
      * <p>메시지 생성 메서드 입니다.</p>
      *
@@ -259,7 +260,30 @@ public class GptAssistantApiService {
         }
     }
 
-    // TODO: 메시지 리스트 보기
-    public void getMessagesAPI(String threadId) {
+
+    /**
+     * <p>메시지 리스트 조회 메서드 입니다.</p>
+     * <p>조회할 때 스레드 아이디가 필요합니다. 스레드가 이미 삭제되었다면 해당 스레드에 포함되어있는 모든 메시지를 조회할 수 없습니다.</p>
+     * @param threadId 조회할 메시지들이 들어있는 스레드 아이디
+     * */
+    public GetMessagesResDto getMessagesAPI(String threadId) {
+        String uri = "/v1/threads/" + threadId + "/messages";
+        ResponseEntity<String> json = restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+        try {
+            return objectMapper.readValue(json.getBody(), GetMessagesResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
     }
 }
