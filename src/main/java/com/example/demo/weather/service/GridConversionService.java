@@ -1,7 +1,7 @@
 package com.example.demo.weather.service;
 
 
-import com.example.demo.weather.dto.PointDto;
+import com.example.demo.weather.dto.GridDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class GridConversionService {
     private static final double YO = 136; // 기준점 Y좌표(GRID)
 
 
-    public PointDto convertToGridXY(Double lat, Double lng) {
+    public GridDto convertToGridXY(Double lat, Double lng) {
         double DEGRAD = Math.PI / 180.0;
 
         double re = RE / GRID;
@@ -44,6 +44,6 @@ public class GridConversionService {
         int x = (int) Math.floor(ra * Math.sin(theta) + XO + 0.5);
         int y = (int) Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
 
-        return new PointDto(lat, lng, x, y);
+        return new GridDto(x, y);
     }
 }
