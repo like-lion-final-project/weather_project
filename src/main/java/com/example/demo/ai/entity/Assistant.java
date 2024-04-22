@@ -22,9 +22,4 @@ public class Assistant {
     @Column(name = "assistant_unique_id")
     private String assistantId;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
-
-    @Column(name = "is_delete")
-    private Boolean isDelete;
 }

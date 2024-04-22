@@ -5,16 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-
+import java.time.LocalDateTime;
 
 
 @Entity
 @Getter
-@Builder
+@SuperBuilder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class AssistantThreadMessage {
+public class AssistantThreadMessage extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -38,5 +39,6 @@ public class AssistantThreadMessage {
     private String file_ids;
     private String annotataions;
     private String metadata;
+    private boolean isDeleteFromOpenAi;
 
 }

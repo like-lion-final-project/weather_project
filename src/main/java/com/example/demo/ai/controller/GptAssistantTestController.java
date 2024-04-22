@@ -1,19 +1,15 @@
 package com.example.demo.ai.controller;
 
 import com.example.demo.ai.AppConstants;
-import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
-import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.*;
 import com.example.demo.ai.dto.run.CreateRunResDto;
-import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.entity.AssistantThreadMessage;
-import com.example.demo.ai.service.GptAssistantService;
+import com.example.demo.ai.service.GptAssistantCoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class GptAssistantTestController {
-    private final GptAssistantService gptAssistantService;
+    private final GptAssistantCoreService gptAssistantService;
 
 //    /**
 //     * <p>어시스턴트 목록 조회</p>
