@@ -3,21 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <title>네이버 지도 테스트</title>
-    <script type="text/javascript" th:src="@{https://oapi.map.naver.com/openapi/v3/maps.js(ncpClientId=${clientId})}"></script>
+    <script type="text/javascript"
+            th:src="@{https://oapi.map.naver.com/openapi/v3/maps.js(ncpClientId=${clientId})}"></script>
+
+    <style>
+        #six-hour-weather-list {
+            display: flex;
+            flex-wrap: nowrap; /* 가로로 넘치는 경우에도 줄 바꿈 없이 유지 */
+            overflow-x: auto; /* 가로 스크롤을 추가하고 넘치는 경우에 스크롤을 표시 */
+            overflow-y: hidden; /* 세로 스크롤이 나타나지 않도록 함 */
+        }
+
+        #six-hour-weather-list li {
+            flex: 0 0 auto; /* 자식 요소의 크기가 자동으로 조정되지 않도록 고정 */
+            margin-right: 10px; /* 각 요소 사이의 간격 조정 */
+        }
+    </style>
 </head>
 <body>
 
 <div>
     <h3>오늘의 날씨</h3>
     <div id="weather-info">
-        <h4>예보 날짜와 시간</h4>
+        <p id="location"></p>
         <p id="base-date"></p>
         <p id="base-time"></p>
-
-        <h4>카테고리 별 예보 관측값</h4>
         <ul id="weather-list"></ul>
+
+        <h3>향후 6시간 동안의 날씨 예보</h3>
+        <ul id="six-hour-weather-list"></ul>
+
+        <h3>지역 검색</h3>
+        <div>
+            <input type="text" id="search-location" placeholder="주소를 입력하세요">
+            <button id="search-weather">검색</button>
+            <p id="search-result"></p>
+        </div>
+
+        <!-- 지도 -->
+        <div id="map" style="width:50%;height: 30vh;" class="mb-3"></div>
     </div>
 
     <hr>
@@ -25,14 +52,12 @@
 
 </div>
 
-<!-- 지도 -->
-<div id="map" style="width:75%;height: 50vh;" class="mb-3"></div>
 
 <script>
     let position = new naver.maps.LatLng(37.3595704, 127.105399)
     let mapOptions = {
         center: position,
-        zoom: 10,
+        zoom: 9,
         zoomControl: true,
         zoomControlOptions: {
             position: naver.maps.Position.TOP_RIGHT
@@ -41,39 +66,98 @@
 
     let map = new naver.maps.Map('map', mapOptions);
 
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation.getCurrentPosition(function (position) {
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
         console.log("lat: " + latitude + ", lng: " + longitude);
 
-        fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${latitude}&lng=${longitude}`)
+        // 지역명 표시
+        fetch(`http://localhost:8080/api/v1/weather/rgeocode?lat=${latitude}&lng=${longitude}`)
             .then(response => response.json())
             .then(data => {
-                const nx = data.nx;
-                const ny = data.ny;
+                const address = data.address;
 
-                fetch(`http://localhost:8080/api/v1/weather/by-current?nx=${nx}&ny=${ny}`)
+                document.getElementById('location').textContent = `지역명: ${address}`;
+
+                // 격자 XY 변환
+                fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${latitude}&lng=${longitude}`)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('base-date').textContent = `Base Date: ${data.response.body.items.item[0].baseDate}`;
-                        document.getElementById('base-time').textContent = `Base Time: ${data.response.body.items.item[0].baseTime}`;
+                        const nx = data.nx;
+                        const ny = data.ny;
 
-                        const weatherList = document.getElementById('weather-list');
-                        data.response.body.items.item.forEach(item => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `${item.category}: ${item.obsrValue}`;
-                            weatherList.appendChild(listItem);
-                        });
+                        // 초단기 실황
+                        fetch(`http://localhost:8080/api/v1/weather/by-current?nx=${nx}&ny=${ny}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById('base-date').textContent = `Base Date: ${data.response.body.items.item[0].baseDate}`;
+                                document.getElementById('base-time').textContent = `Base Time: ${data.response.body.items.item[0].baseTime}`;
+
+                                const weatherList = document.getElementById('weather-list');
+                                data.response.body.items.item.forEach(item => {
+                                    const listItem = document.createElement('li');
+                                    listItem.textContent = `${item.category}: ${item.obsrValue}`;
+                                    weatherList.appendChild(listItem);
+                                });
+
+                                // 날씨 정보 요청
+                                fetch(`http://localhost:8080/api/v1/weather/by-hour?nx=${nx}&ny=${ny}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const weatherList = document.getElementById('six-hour-weather-list');
+
+                                        // 날씨 정보를 화면에 동적으로 표시하기
+                                        data.forEach(item => {
+                                            const listItem = document.createElement('li');
+                                            const fcstTime = item.fcstTime;
+                                            const forecastValues = item.forecastValues;
+
+                                            // 시간대 별로 묶어서 화면에 표시하기
+                                            let htmlContent = `<h4>${fcstTime.slice(0, 2)}:${fcstTime.slice(2)}</h4>`;
+                                            htmlContent += '<ul>';
+
+                                            // forecastValues에 대한 정보 표시
+                                            for (const [key, value] of Object.entries(forecastValues)) {
+                                                htmlContent += `<li>${key}: ${value}</li>`;
+                                            }
+
+                                            htmlContent += '</ul>';
+                                            listItem.innerHTML = htmlContent;
+
+                                            weatherList.appendChild(listItem);
+                                        });
+                                    })
+                                    .catch(error => console.error('날씨 정보를 가져오는 중 오류 발생:', error));
+                            })
+                            .catch(error => console.error('날씨 데이터를 가져오는 중 오류 발생:', error));
                     })
-                    .catch(error => console.error('날씨 데이터를 가져오는 중 오류 발생:', error));
-            })
-            .catch(error => console.error('격자 좌표를 가져오는 중 오류 발생:', error));
-    }, function(error) {
-        console.error("날씨 데이터를 가져오는 중 오류 발생:", error);
+                    .catch(error => console.error('격자 좌표를 가져오는 중 오류 발생:', error));
+            }, function (error) {
+                console.error("날씨 데이터를 가져오는 중 오류 발생:", error);
+            });
     });
 
+    // 날씨 검색 버튼 클릭 이벤트 핸들러
+    document.getElementById('search-weather').addEventListener('click', function () {
+        // 입력된 주소 가져오기
+        const query = document.getElementById('search-location').value;
 
+        // 주소를 이용하여 좌표 정보 가져오기
+        fetch(`http://localhost:8080/api/v1/weather/geocode?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const searchResult = document.getElementById('search-result');
+                searchResult.innerHTML = ''; // 이전 검색 결과 지우기
 
+                // 검색 결과를 화면에 표시하기
+                data.forEach(point => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `주소: ${point.roadAddress}, 위도: ${point.lat}, 경도: ${point.lng}`;
+                    searchResult.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('주소를 이용하여 좌표 정보를 가져오는 중 오류 발생:', error));
+    });
 
 </script>
 </body>

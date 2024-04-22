@@ -1,10 +1,14 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.WeatherForecast;
 import com.example.demo.weather.dto.fcst.FcstApiResponse;
+import com.example.demo.weather.dto.fcst.FcstItem;
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +25,7 @@ public class VilageSrtFcstService {
     private String serviceKey;
 
     // 초단기 예보 (Short-Term Forecast)
-    public FcstApiResponse getUltraSrtFcst(
+    public List<WeatherForecast> getUltraSrtFcst(
             Integer nx,
             Integer ny
     ) {
@@ -47,7 +51,26 @@ public class VilageSrtFcstService {
         params.put("nx", nx);                                            // 예보지점 x좌표 값
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
-        return vilageFcstApiService.UltraSrtFcst(params);
+        // API 응답 받기
+        FcstApiResponse response = vilageFcstApiService.UltraSrtFcst(params);
+
+        // 각 fcstTime에 대한 forecastValues를 하나의 맵으로 합치기
+        List<WeatherForecast> forecasts = new ArrayList<>();
+        Map<String, WeatherForecast> forecastMap = new HashMap<>();
+        for (FcstItem item : response.getResponse().getBody().getItems().getItem()) {
+            String fcstTime = item.getFcstTime();
+            WeatherForecast weatherForecast = forecastMap.get(fcstTime);
+            if (weatherForecast == null) {
+                weatherForecast = new WeatherForecast(fcstTime);
+                forecastMap.put(fcstTime, weatherForecast);
+                forecasts.add(weatherForecast);
+            }
+            weatherForecast.addForecastValue(item.getCategory(), item.getFcstValue());
+        }
+
+        return forecasts;
+
+
     }
 
 

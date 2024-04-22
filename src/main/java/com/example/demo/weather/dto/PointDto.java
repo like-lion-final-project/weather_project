@@ -6,15 +6,13 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PointDto {
-    // 위경도 좌표
+    private String roadAddress;
     private Double lat;
     private Double lng;
 
-    // 격자 XY
-    private Integer nx;
-    private Integer ny;
-
-    public String toQueryValue() {
-        return String.format("%f,%f", lng, lat);
+    public PointDto(Double lat, Double lng) {
+        this.roadAddress = null;
+        this.lat = lat;
+        this.lng = lng;
     }
 }

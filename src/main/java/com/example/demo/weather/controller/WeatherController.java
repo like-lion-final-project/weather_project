@@ -1,8 +1,10 @@
 package com.example.demo.weather.controller;
 
+import com.example.demo.weather.dto.GridDto;
 import com.example.demo.weather.dto.PointDto;
-import com.example.demo.weather.dto.fcst.FcstApiResponse;
+import com.example.demo.weather.dto.WeatherForecast;
 
+import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
 import com.example.demo.weather.dto.rgeocoding.RGeoResponseDto;
@@ -11,8 +13,10 @@ import com.example.demo.weather.service.NDSearchService;
 import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +35,7 @@ public class WeatherController {
      * geocode
      */
     @GetMapping("/geocode")
-    public PointDto pointRegion(
+    public List<PointDto> pointRegion(
             @RequestParam("query")
             String query
     ) {
@@ -43,17 +47,20 @@ public class WeatherController {
      */
     @GetMapping("/rgeocode")
     public RGeoResponseDto getAddress(
-            @RequestBody
-            PointDto dto
+        @RequestParam("lat")
+        Double lat,
+        @RequestParam("lng")
+        Double lng
     ) {
-        return geocodeService.getAddress(dto);
+        return geocodeService.getAddress(lat, lng);
     }
 
     /**
      * 초단기 예보 조회 (시간대별 날씨)
+     * 시간대별 카테고리, 값 쌍 정리 버전
      */
     @GetMapping("/by-hour")
-    public FcstApiResponse getUltraSrtFcst(
+    public List<WeatherForecast> getUltraSrtFcst(
             @RequestParam("nx")
             Integer nx,
             @RequestParam("ny")
@@ -90,7 +97,7 @@ public class WeatherController {
      * 위경도 좌표 정보를 격자 XY로 변환 (브라우저 geolocation 전용)
      */
     @GetMapping("/convert-grid")
-    public PointDto convertToGrid(
+    public GridDto convertToGrid(
             @RequestParam("lat")
             Double lat,
             @RequestParam("lng")
@@ -98,5 +105,4 @@ public class WeatherController {
     ) {
         return gridConversionService.convertToGridXY(lat, lng);
     }
-
 }
