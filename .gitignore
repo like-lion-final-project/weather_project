@@ -41,3 +41,5 @@ out/
 application.yaml
 application-prod.yaml
 application-dev.yaml
+
+data.sql

@@ -29,7 +29,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 prependBaseUrl("users/login"),
-                                prependBaseUrl("users/signup")
+                                prependBaseUrl("users/signup"),
+                                // 테스트를 위해 임시로 permitAll()
+                                prependBaseUrl("weather/**")
                         )
                         .permitAll()
                         .requestMatchers(
@@ -52,10 +54,6 @@ public class WebSecurityConfig {
                                 prependBaseUrl("users/profile"),
                                 prependBaseUrl("users/update"),
                                 prependBaseUrl("users/delete"),
-                                prependBaseUrl("weather/my-area"),
-                                prependBaseUrl("weather/search"),
-                                prependBaseUrl("weather/{locationId}"),
-                                prependBaseUrl("weather/news"),
                                 prependBaseUrl("cody"),
                                 prependBaseUrl("cody/feedback")
                         )

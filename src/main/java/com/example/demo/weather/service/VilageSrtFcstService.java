@@ -1,10 +1,14 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.WeatherForecast;
 import com.example.demo.weather.dto.fcst.FcstApiResponse;
+import com.example.demo.weather.dto.fcst.FcstItem;
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +25,19 @@ public class VilageSrtFcstService {
     private String serviceKey;
 
     // 초단기 예보 (Short-Term Forecast)
-    public FcstApiResponse getUltraSrtFcst(
+    public List<WeatherForecast> getUltraSrtFcst(
             Integer nx,
             Integer ny
     ) {
-        LocalDateTime currentTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime currentTime = LocalDateTime.now();
+        int minutes = currentTime.getMinute();
+
+        // 현재 시각에서 가장 가까운 과거의 30분 계산
+        if (minutes < 30) {
+            currentTime = currentTime.minusHours(1).withMinute(30);
+        } else {
+            currentTime = currentTime.withMinute(0);
+        }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
 
@@ -36,11 +48,29 @@ public class VilageSrtFcstService {
         params.put("dataType", "JSON");
         params.put("base_date", dateTimeFormatter.format(currentTime));  // 발표 일자
         params.put("base_time", timeFormatter.format(currentTime));      // 발표 시각 (1시간전 기준)
-        // TODO : 현재 시각을 매 시간 30분에 생성되는 Base_Time 으로 조정하는 계산 구현
         params.put("nx", nx);                                            // 예보지점 x좌표 값
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
-        return vilageFcstApiService.UltraSrtFcst(params);
+        // API 응답 받기
+        FcstApiResponse response = vilageFcstApiService.UltraSrtFcst(params);
+
+        // 각 fcstTime에 대한 forecastValues를 하나의 맵으로 합치기
+        List<WeatherForecast> forecasts = new ArrayList<>();
+        Map<String, WeatherForecast> forecastMap = new HashMap<>();
+        for (FcstItem item : response.getResponse().getBody().getItems().getItem()) {
+            String fcstTime = item.getFcstTime();
+            WeatherForecast weatherForecast = forecastMap.get(fcstTime);
+            if (weatherForecast == null) {
+                weatherForecast = new WeatherForecast(fcstTime);
+                forecastMap.put(fcstTime, weatherForecast);
+                forecasts.add(weatherForecast);
+            }
+            weatherForecast.addForecastValue(item.getCategory(), item.getFcstValue());
+        }
+
+        return forecasts;
+
+
     }
 
 
@@ -50,6 +80,14 @@ public class VilageSrtFcstService {
             Integer ny
     ) {
         LocalDateTime currentTime = LocalDateTime.now();
+        int minutes = currentTime.getMinute();
+
+        // 현재 시각에서 가장 가까운 과거의 30분 계산
+        if (minutes < 30) {
+            currentTime = currentTime.minusHours(1).withMinute(30);
+        } else {
+            currentTime = currentTime.withMinute(0);
+        }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
 
