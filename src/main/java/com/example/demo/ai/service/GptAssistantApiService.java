@@ -238,7 +238,7 @@ public class GptAssistantApiService {
      * <p>조회할 때 스레드 아이디가 필요합니다. 스레드가 이미 삭제되었다면 해당 스레드에 포함되어있는 모든 메시지를 조회할 수 없습니다.</p>
      * @param messageId 조회할 메시지의 아이디 입니다.
      * */
-    public GetMessagesResDto getMessagesAPI(String threadId, String messageId) {
+    public GetMessagesResDto getMessageAPI(String threadId, String messageId) {
         String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
         ResponseEntity<String> json = restClient
                 .get()

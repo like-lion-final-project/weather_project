@@ -75,7 +75,7 @@ public class GptAssistantTestController {
             @PathVariable("messageId")
             String messageId
     ){
-        return gptAssistantApiService.getMessagesAPI(threadId, messageId);
+        return gptAssistantApiService.getMessageAPI(threadId, messageId);
     }
 }
 
