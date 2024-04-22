@@ -43,3 +43,4 @@ application-prod.yaml
 application-dev.yaml
 
 data.sql
+db.sqlite

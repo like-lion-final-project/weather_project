@@ -1,0 +1,45 @@
+#six-hour-weather-list {
+    display: flex;
+    flex-wrap: nowrap; /* 가로로 넘치는 경우에도 줄 바꿈 없이 유지 */
+    overflow-x: auto; /* 가로 스크롤을 추가하고 넘치는 경우에 스크롤을 표시 */
+    overflow-y: hidden; /* 세로 스크롤이 나타나지 않도록 함 */
+}
+
+#six-hour-weather-list li {
+    flex: 0 0 auto; /* 자식 요소의 크기가 자동으로 조정되지 않도록 고정 */
+    margin-right: 10px; /* 각 요소 사이의 간격 조정 */
+}
+#weather-info {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    margin-left: 140px; /* 좌측 여백 추가 */
+    margin-right: 140px; /* 우측 여백 추가 */
+}
+
+#location, #base-time {
+    float: right;
+}
+
+#search-region {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    margin-left: 140px; /* 좌측 여백 추가 */
+    margin-right: 140px; /* 우측 여백 추가 */
+}
+
+#weather-news {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    margin-left: 140px; /* 좌측 여백 추가 */
+    margin-right: 140px; /* 우측 여백 추가 */
+}
+
+#weather-news h3 {
+    text-align: center;
+}
