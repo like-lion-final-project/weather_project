@@ -3,6 +3,8 @@ package com.example.demo.ai.service;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.message.CreateMessageDto;
+import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.repo.AssistantRepo;
@@ -171,8 +173,9 @@ public class GptAssistantApiService {
 
     /**
      * <p>스레드 삭제 메서드 입니다.</p>
+     *
      * @param threadId 삭제할 스레드 아이디 입니다.
-     * */
+     */
     public DeleteThreadResDto deleteThreadAPI(String threadId) {
         String uri = "/v1/threads/" + threadId;
         ResponseEntity<String> json = restClient
@@ -195,8 +198,37 @@ public class GptAssistantApiService {
         }
     }
 
-    // TODO: 메시지 생성
-    public void createMessageAPI(String message) {
+    /**
+     * <p>메시지 생성 메서드 입니다.</p>
+     *
+     * @param message 전송할 단일 메시지 입니다.
+     */
+    public CreateMessageResDto createMessageAPI(String role, String message, String threadId) {
+        String uri = "/v1/threads/" + threadId + "/messages";
+
+        ResponseEntity<String> json = restClient
+                .post()
+                .uri(uri)
+                .body(
+                        CreateMessageDto.builder()
+                                .content(message)
+                                .role(role)
+                                .build()
+                ).retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+
+        try {
+            return objectMapper.readValue(json.getBody(), CreateMessageResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
     }
 
     // TODO: 메시지 조회

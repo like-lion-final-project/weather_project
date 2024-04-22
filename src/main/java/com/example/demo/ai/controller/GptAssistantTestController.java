@@ -4,6 +4,8 @@ package com.example.demo.ai.controller;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.message.CreateMessageDto;
+import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
@@ -55,4 +57,13 @@ public class GptAssistantTestController {
         return gptAssistantApiService.deleteThreadAPI(threadId);
     }
 
+    @PostMapping("/v1/threads/{threadId}/messages")
+    public CreateMessageResDto createMessage(
+            @PathVariable("threadId")
+            String threadId,
+            @RequestBody
+            CreateMessageDto dto
+    ){
+        return gptAssistantApiService.createMessageAPI(dto.getRole(),dto.getContent(),threadId);
+    }
 }
