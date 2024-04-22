@@ -10,10 +10,10 @@ function getTimeDifference(pubDate) {
     const timeDiffMinutes = Math.floor((currentTime - articleTime) / (1000 * 60));
 
     if (timeDiffMinutes < 60) {
-        return `${timeDiffMinutes}분 전`;
+        return ` ${timeDiffMinutes}분 전`;
     } else {
         const timeDiffHours = Math.floor(timeDiffMinutes / 60);
-        return `${timeDiffHours}시간 전`;
+        return ` ${timeDiffHours}시간 전`;
     }
 }
 // 날씨 뉴스 가져오기
@@ -22,25 +22,29 @@ function fetchWeatherNews(start) {
         .then(response => response.json())
         .then(data => {
             data.items.forEach(item => {
-                const li = document.createElement('li');
+                const newsContainer = document.createElement('div'); // 뉴스 목록을 감싸는 박스 요소
+                newsContainer.classList.add('news-box'); // CSS 클래스 추가
 
-                const title = document.createElement('h4');
+                const title = document.createElement('a');
+                title.href = item.link;
                 title.innerHTML = item.title;
 
                 const description = document.createElement('p');
                 description.innerHTML = item.description;
 
                 const pubDate = new Date(item.pubDate);
-                const timeDiff = Math.floor((currentTime - pubDate) / (1000 * 60));
+                const timeDifference = getTimeDifference(item.pubDate);
 
                 const timeDifferenceElement = document.createElement('span');
-                timeDifferenceElement.innerText = getTimeDifference(item.pubDate);
+                timeDifferenceElement.innerText = timeDifference;
 
-                li.appendChild(title);
-                li.appendChild(description);
-                li.appendChild(timeDifferenceElement);
+                // 제목과 시간 차이를 포함하는 컨테이너에 추가
+                newsContainer.appendChild(title);
+                newsContainer.appendChild(timeDifferenceElement);
+                newsContainer.appendChild(description);
 
-                newsList.appendChild(li);
+                // 뉴스 목록을 감싸는 박스를 ul 대신에 바로 추가
+                newsList.appendChild(newsContainer);
             });
         })
         .catch(error => console.error('날씨 뉴스를 가져오는 중 오류 발생:', error));
@@ -52,3 +56,4 @@ function loadMoreNews() {
     start += 1;
     fetchWeatherNews(start);
 }
+
