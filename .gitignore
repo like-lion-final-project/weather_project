@@ -35,7 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
-
 .DS_Store
 db.sqlite
 build.gradle
