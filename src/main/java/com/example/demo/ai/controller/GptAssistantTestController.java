@@ -1,122 +1,86 @@
 package com.example.demo.ai.controller;
 
-import com.example.demo.ai.AppConstants;
+
+import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
-import com.example.demo.ai.dto.message.*;
-import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.dto.message.CreateMessageDto;
+import com.example.demo.ai.dto.message.CreateMessageResDto;
+import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
-import com.example.demo.ai.entity.Assistant;
-import com.example.demo.ai.entity.AssistantThread;
-import com.example.demo.ai.service.GptAssistantService;
+import com.example.demo.ai.dto.thread.DeleteThreadResDto;
+import com.example.demo.ai.service.GptAssistantApiService;
+
+import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 
 public class GptAssistantTestController {
-    private final GptAssistantService gptAssistantService;
+    private final GptAssistantApiService gptAssistantApiService;
 
-//    /**
-//     * <p>어시스턴트 목록 조회</p>
-//     */
-//    @GetMapping("/ai/assistants")
-//    public GetAssistantResDto getAssistants() {
-//        return gptAssistantService.getAssistants();
-//    }
 
-    /**
-     * 어시스턴트 생성
-     */
-    @PostMapping("/ai/assistants")
-    public Assistant createAssistant(
+    @PostMapping("/v1/assistants")
+    public CreateAssistantResDto createAssistant(
+            @RequestBody
+            CreateAssistantReqDto dto
     ) {
-        return gptAssistantService.createAndSyncAssistant(AppConstants.INSTRUCTIONS, AppConstants.NAME, AppConstants.MODEL, AppConstants.VERSION,true);
+        return gptAssistantApiService.createAssistantAPI(dto);
     }
 
-    /**
-     * 스레드 생성
-     */
-    @PostMapping("/ai/threads")
-    public void createThread(
-            @RequestParam("user_id")
-            Long userId,
-            @RequestParam("assistant_Id")
+    @GetMapping("/v1/assistants/{assistantId}")
+    public GetAssistantResDto.Data getAssistant(
+            @PathVariable("assistantId")
             String assistantId
     ) {
-        gptAssistantService.createAndSyncThread(userId, assistantId);
+        return gptAssistantApiService.getAssistantAPI(assistantId);
     }
 
-    @PostMapping("/ai/create-and-run")
-    public CreateThreadAndRunResDto createThreadAndRun(
-            @RequestParam("assistant_id")
-            String assistantId,
-            @RequestParam("c")
-            String c,
-            @RequestParam("a")
-            String age,
-            @RequestParam("g")
-            String gender
-            ) {
-        String message = "C:" + c + ",A:" + age + ",G:" + gender + " Please keep the response data format.";
-        List<CreateMessageDto> messages =  new ArrayList<>();
-
-        messages.add(CreateMessageDto.builder()
-                .role("user")
-                .content(message)
-                .build());
-
-        CreateThreadAndRunReqDto.Thread.builder()
-                .messages(messages)
-                .build();
-        return gptAssistantService.createThreadAndRun(assistantId,messages);
+    @GetMapping("/v1/assistants")
+    public GetAssistantResDto getAssistants() {
+        return gptAssistantApiService.getAssistantsAPI();
     }
 
-    /**
-     * 메시지 생성
-     */
-    @PostMapping("/ai/threads/{threadId}/messages")
+    @DeleteMapping("/v1/assistants/{assistantId}")
+    public DeleteAssistantResDto deleteAssistants(@PathVariable("assistantId") String assistantId) {
+        return gptAssistantApiService.deleteAssistantAPI(assistantId);
+    }
+
+    @PostMapping("/v1/threads")
+    public CreateThreadResDto createThread() {
+        return gptAssistantApiService.createThreadAPI();
+    }
+
+    @DeleteMapping("/v1/threads/{threadId}")
+    public DeleteThreadResDto deleteThreadResDto(@PathVariable("threadId") String threadId) {
+        return gptAssistantApiService.deleteThreadAPI(threadId);
+    }
+
+    @PostMapping("/v1/threads/{threadId}/messages")
     public CreateMessageResDto createMessage(
-            @RequestParam("c")
-            String c,
-            @RequestParam("a")
-            String age,
-            @RequestParam("g")
-            String gender,
             @PathVariable("threadId")
-            String threadId
-    ) {
-        // 메시지 포메팅
-//        String message = "C:25,A:27,G:M Please keep the response data format."
-        String message = "C:" + c + ",A:" + age + ",G:" + gender + " Please keep the response data format.";
-
-        return gptAssistantService.createMessage(threadId, message);
-    }
-
-    /**
-     * 실행
-     */
-    @PostMapping("/ai/run")
-    public CreateRunResDto createRun(
-            @RequestParam("thread_id")
             String threadId,
-            @RequestParam("assistant_id")
-            String assistantId
-    ) {
-        return gptAssistantService.runAssistant(threadId, assistantId);
+            @RequestBody
+            CreateMessageDto dto
+    ){
+        return gptAssistantApiService.createMessageAPI(dto.getRole(),dto.getContent(),threadId);
     }
 
-    @GetMapping("/ai/message")
+    @GetMapping("/v1/threads/{threadId}/messages/{messageId}")
     public GetMessagesResDto getMessages(
-            @RequestParam("thread_id")
-            String threadId
-    ) {
-        return gptAssistantService.getMessages(threadId);
+            @PathVariable("threadId")
+            String threadId,
+            @PathVariable("messageId")
+            String messageId
+    ){
+        return gptAssistantApiService.getMessageAPI(threadId, messageId);
     }
-
 }
+
+/**
+ * thread_8EZ9Fm2oxQI0iBuEiK9SX1CG
+ *
+ *
+ * */
