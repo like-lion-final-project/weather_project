@@ -5,11 +5,13 @@ import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
+import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,12 +42,11 @@ public class GptAssistantApiService {
         this.objectMapper = objectMapper;
     }
 
+
     /**
-     * <p>어시스턴트 생성 API 입니다.</p>
-     * */
-    public CreateAssistantResDto createAssistantAPI(
-            CreateAssistantReqDto dto
-    ){
+     * <p>어시스턴트 생성 메서드 입니다.</p>
+     */
+    public CreateAssistantResDto createAssistantAPI(CreateAssistantReqDto dto) {
         String uri = "/v1/assistants";
         ResponseEntity<String> json = restClient
                 .post()
@@ -54,24 +55,51 @@ public class GptAssistantApiService {
                 .retrieve()
                 .toEntity(String.class);
 
-        try{
-            return objectMapper.readValue(json.getBody(),CreateAssistantResDto.class);
-        }catch(JsonProcessingException e){
+        try {
+            return objectMapper.readValue(json.getBody(), CreateAssistantResDto.class);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Exception");
         }
 
     }
 
-    // TODO: 어시스턴트 삭제
-    public void deleteAssistantAPI(){}
+
+    /**
+     * <p>어시스턴트 삭제 메서드 입니다.</p>
+     *
+     * @param assistantId 삭제할 어시스턴트의 아이디 입니다.
+     */
+    public DeleteAssistantResDto deleteAssistantAPI(String assistantId) {
+        String uri = "/v1/assistants/" + assistantId;
+        ResponseEntity<String> json = restClient
+                .delete()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러 메시지: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+
+        try {
+            return objectMapper.readValue(json.getBody(), DeleteAssistantResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
 
     /**
      * <p>어시스턴트 단일 조회 메서드 입니다.</p>
+     *
      * @param assistantId 어시스턴트 아이디 입니다.
-     * */
-    public GetAssistantResDto.Data getAssistantAPI(String assistantId){
+     */
+    public GetAssistantResDto.Data getAssistantAPI(String assistantId) {
         String uri = "/v1/assistants/" + assistantId;
         ResponseEntity<String> json = restClient
                 .get()
@@ -79,11 +107,11 @@ public class GptAssistantApiService {
                 .retrieve()
                 .toEntity(String.class);
 
-        try{
-            return objectMapper.readValue(json.getBody(),GetAssistantResDto.Data.class);
-        }catch(JsonProcessingException e){
+        try {
+            return objectMapper.readValue(json.getBody(), GetAssistantResDto.Data.class);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Exception");
         }
 
@@ -91,11 +119,10 @@ public class GptAssistantApiService {
     }
 
 
-
     /**
      * <p>어시스턴트 리스트 조회 메서드 입니다.</p>
-     * */
-    public GetAssistantResDto getAssistantsAPI(){
+     */
+    public GetAssistantResDto getAssistantsAPI() {
         String uri = "/v1/assistants";
         ResponseEntity<String> json = restClient
                 .get()
@@ -103,11 +130,11 @@ public class GptAssistantApiService {
                 .retrieve()
                 .toEntity(String.class);
 
-        try{
-            return objectMapper.readValue(json.getBody(),GetAssistantResDto.class);
-        }catch(JsonProcessingException e){
+        try {
+            return objectMapper.readValue(json.getBody(), GetAssistantResDto.class);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Exception");
         }
 
@@ -119,18 +146,20 @@ public class GptAssistantApiService {
 //    }
 
     // TODO: 스레드 삭제
-    public void deleteThreadAPI(){}
+    public void deleteThreadAPI() {
+    }
 
     // TODO: 메시지 생성
-    public void createMessageAPI(String message){}
+    public void createMessageAPI(String message) {
+    }
 
     // TODO: 메시지 조회
-    public void getMessageAPI(String messageId){}
+    public void getMessageAPI(String messageId) {
+    }
 
     // TODO: 메시지 리스트 보기
-    public void getMessagesAPI(String threadId){}
-
-
+    public void getMessagesAPI(String threadId) {
+    }
 
 
 }
