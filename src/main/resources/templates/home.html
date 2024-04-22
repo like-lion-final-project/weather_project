@@ -49,6 +49,7 @@
 
     <hr>
     <h3>오늘의 날씨 뉴스</h3>
+    <ul id="news-list"></ul>
 
 </div>
 
@@ -57,7 +58,7 @@
     let position = new naver.maps.LatLng(37.3595704, 127.105399)
     let mapOptions = {
         center: position,
-        zoom: 9,
+        zoom: 6,
         zoomControl: true,
         zoomControlOptions: {
             position: naver.maps.Position.TOP_RIGHT
@@ -224,8 +225,14 @@
             .catch(error => console.error('격자 좌표를 가져오는 중 오류 발생:', error));
     }
 
-    // 날씨 검색 버튼 생성 및 이벤트 핸들러 연결
+
+    // markers 배열 초기화
+    let markers = [];
+
     document.getElementById('search-weather').addEventListener('click', function () {
+        // 이전에 추가된 마커들 제거
+        removeMarkers();
+
         // 입력된 주소 가져오기
         const query = document.getElementById('search-location').value;
 
@@ -256,10 +263,93 @@
 
                     listItem.appendChild(weatherButton);
                     searchResult.appendChild(listItem);
+
+                    // 마커 추가하기
+                    const marker = new naver.maps.Marker({
+                        position: new naver.maps.LatLng(point.lat, point.lng),
+                        map: map
+                    });
+
+                    // 마커 클릭 이벤트 처리
+                    naver.maps.Event.addListener(marker, 'click', function () {
+                        getWeatherByCoordinates(point.lat, point.lng, point.roadAddress);
+                    });
+
+                    // markers 배열에 마커 추가
+                    markers.push(marker);
                 });
             })
             .catch(error => console.error('주소를 이용하여 좌표 정보를 가져오는 중 오류 발생:', error));
     });
+
+    // 지도에 표시된 마커들을 모두 제거하는 함수
+    function removeMarkers() {
+        markers.forEach(marker => {
+            marker.setMap(null); // 마커를 지도에서 제거
+        });
+        markers = []; // markers 배열 초기화
+    }
+
+
+
+
+
+    // 날씨 뉴스
+    let start = 1;
+    const newsList = document.getElementById('news-list');
+
+    const currentTime = new Date();
+
+    // 시간 차이를 계산하고 표시 형식을 설정
+    function getTimeDifference(pubDate) {
+        const articleTime = new Date(pubDate);
+        const timeDiffMinutes = Math.floor((currentTime - articleTime) / (1000 * 60));
+
+        if (timeDiffMinutes < 60) {
+            return `${timeDiffMinutes}분 전`;
+        } else {
+            const timeDiffHours = Math.floor(timeDiffMinutes / 60);
+            return `${timeDiffHours}시간 전`;
+        }
+    }
+    // 날씨 뉴스 가져오기
+    function fetchWeatherNews(start) {
+        fetch(`http://localhost:8080/api/v1/weather/news?start=${start}`)
+            .then(response => response.json())
+            .then(data => {
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+
+                    const title = document.createElement('h4');
+                    title.innerHTML = item.title;
+
+                    const description = document.createElement('p');
+                    description.innerHTML = item.description;
+
+                    const pubDate = new Date(item.pubDate);
+                    const timeDiff = Math.floor((currentTime - pubDate) / (1000 * 60));
+
+                    const timeDifferenceElement = document.createElement('span');
+                    timeDifferenceElement.innerText = getTimeDifference(item.pubDate);
+
+                    li.appendChild(title);
+                    li.appendChild(description);
+                    li.appendChild(timeDifferenceElement);
+
+                    newsList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('날씨 뉴스를 가져오는 중 오류 발생:', error));
+    }
+
+    fetchWeatherNews(start);
+
+    function loadMoreNews() {
+        start += 1;
+        fetchWeatherNews(start);
+    }
+
+
 
 </script>
 </body>
