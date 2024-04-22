@@ -8,6 +8,7 @@ import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
+import com.example.demo.ai.entity.AssistantThreadMessage;
 import com.example.demo.ai.service.GptAssistantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -43,13 +44,13 @@ public class GptAssistantTestController {
      * 스레드 생성
      */
     @PostMapping("/ai/threads")
-    public void createThread(
+    public AssistantThread createThread(
             @RequestParam("user_id")
             Long userId,
             @RequestParam("assistant_Id")
             String assistantId
     ) {
-        gptAssistantService.createAndSyncThread(userId, assistantId);
+        return gptAssistantService.createAndSyncThread(userId, assistantId);
     }
 
     @PostMapping("/ai/create-and-run")
@@ -81,21 +82,22 @@ public class GptAssistantTestController {
      * 메시지 생성
      */
     @PostMapping("/ai/threads/{threadId}/messages")
-    public CreateMessageResDto createMessage(
+    public void createMessage(
             @RequestParam("c")
             String c,
             @RequestParam("a")
             String age,
             @RequestParam("g")
-            String gender,
-            @PathVariable("threadId")
-            String threadId
+            String gender
     ) {
         // 메시지 포메팅
 //        String message = "C:25,A:27,G:M Please keep the response data format."
         String message = "C:" + c + ",A:" + age + ",G:" + gender + " Please keep the response data format.";
 
-        return gptAssistantService.createMessage(threadId, message);
+        AssistantThreadMessage assistantThreadMessage = gptAssistantService.createAndSyncMessage(message);
+        System.out.println(assistantThreadMessage.getMessageId() + "메시지 아이디");
+        System.out.println(assistantThreadMessage.getAssistantThread().getThreadId() + "스레드 아이디");
+        System.out.println(assistantThreadMessage.getAssistantThread().getAssistant().getAssistantId() + "어시스턴트 아이디");
     }
 
     /**

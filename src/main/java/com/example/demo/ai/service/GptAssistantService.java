@@ -11,6 +11,7 @@ import com.example.demo.ai.dto.thread.CreateThreadReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
+import com.example.demo.ai.entity.AssistantThreadMessage;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -184,33 +185,15 @@ public class GptAssistantService {
 
 
     /**
-     * <p>메시지 생성 메서드</p>
-     */
-    public CreateMessageResDto createMessage(String threadId, String message) {
-        // TODO: 스레드에 추가할 메시지 생성
-
-        String url = "/v1/threads/" + threadId + "/messages";
-
-        CreateMessageDto messageReqDto = CreateMessageDto.builder()
-                .role("user")
-                .content(message)
-                .build();
-
-        ResponseEntity<String> jsonResponse = restClient
-                .post()
-                .uri(url)
-                .body(messageReqDto)
-                .retrieve()
-                .toEntity(String.class);
-
-        try {
-            return objectMapper.readValue(jsonResponse.getBody(), CreateMessageResDto.class);
-        } catch (JsonProcessingException e) {
-            log.info("JSON 직렬화 에러");
-            return null;
-        }
-
+     * <p>메시지 생성 및 동기화 메서드</p>
+     * @param message 전송할 단일 메시지
+     * */
+    @Transactional
+    public AssistantThreadMessage createAndSyncMessage(String message){
+        AssistantThreadMessage assistantThreadMessage = gptAssistantCoreService.createMessageDB(message);
+        return assistantThreadMessage;
     }
+
 
 
     /**

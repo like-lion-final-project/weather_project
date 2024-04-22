@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class AssistantThreadMessage {
