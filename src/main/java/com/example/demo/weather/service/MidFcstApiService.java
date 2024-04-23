@@ -1,5 +1,7 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.mid_land.MidLandApiResponse;
+import com.example.demo.weather.dto.mid_ta.MidTaApiResponse;
 import java.util.Map;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
@@ -10,14 +12,14 @@ public interface MidFcstApiService {
 
     // 중기 육상예보 조회
     @GetExchange("/getMidLandFcst")
-    Object MidLandFcst(
+    MidLandApiResponse MidLandFcst(
             @RequestParam
             Map<String, Object> params
     );
 
     // 중기 기온 조회
     @GetExchange("/getMidTa")
-    Object MidTa (
+    MidTaApiResponse MidTa (
             @RequestParam
             Map<String, Object> params
     );

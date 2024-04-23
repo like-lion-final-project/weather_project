@@ -7,7 +7,4 @@ import lombok.Data;
 public class MidLandBody {
     private String dataType;
     private MidLandItems items;
-    private int pageNo;
-    private int numOfRows;
-    private int totalCount;
 }

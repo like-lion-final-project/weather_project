@@ -1,5 +1,7 @@
 package com.example.demo.weather.service;
 
+import com.example.demo.weather.dto.mid_land.MidLandApiResponse;
+import com.example.demo.weather.dto.mid_ta.MidTaApiResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -20,7 +22,7 @@ public class MidFcstService {
     private String serviceKey;
 
     // 중기 육상 예보
-    public Object getMidLandFcst(
+    public MidLandApiResponse getMidLandFcst(
             String regId
     ) {
         LocalDateTime currentTime = LocalDateTime.now();
@@ -43,7 +45,7 @@ public class MidFcstService {
 
 
     // 중기 기온 조회
-    public Object getMidTa(
+    public MidTaApiResponse getMidTa(
             String regId
     ) {
         LocalDateTime currentTime = LocalDateTime.now();

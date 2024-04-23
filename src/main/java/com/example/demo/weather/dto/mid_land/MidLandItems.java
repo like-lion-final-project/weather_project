@@ -6,4 +6,7 @@ import lombok.Data;
 @Data
 public class MidLandItems {
     private List<MidLandItem> item;
+    private int pageNo;
+    private int numOfRows;
+    private int totalCount;
 }

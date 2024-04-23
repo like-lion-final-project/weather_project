@@ -5,6 +5,8 @@ import com.example.demo.weather.dto.PointDto;
 import com.example.demo.weather.dto.WeatherForecast;
 
 import com.example.demo.weather.dto.WeatherNowcast;
+import com.example.demo.weather.dto.mid_land.MidLandApiResponse;
+import com.example.demo.weather.dto.mid_ta.MidTaApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
 import com.example.demo.weather.dto.rgeocoding.RGeoResponseDto;
 import com.example.demo.weather.service.GridConversionService;
@@ -85,7 +87,7 @@ public class WeatherController {
      * 중기 육상 예보 조회
      */
     @GetMapping("/mid-land")
-    public Object getMidLandFcst(
+    public MidLandApiResponse getMidLandFcst(
             @RequestParam("regId")
             String regId
     ) {
@@ -96,7 +98,7 @@ public class WeatherController {
      * 중기 기온 조회
      */
     @GetMapping("/mid-ta")
-    public Object getMidTa(
+    public MidTaApiResponse getMidTa(
             @RequestParam("regId")
             String regId
     ) {
