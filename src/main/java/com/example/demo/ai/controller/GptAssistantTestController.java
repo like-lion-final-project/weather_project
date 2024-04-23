@@ -11,6 +11,7 @@ import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.run.OneStepRunParamDto;
 import com.example.demo.ai.dto.run.OneStepRunReqDto;
+import com.example.demo.ai.dto.thread.CreateThreadReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
@@ -59,8 +60,11 @@ public class GptAssistantTestController {
     }
 
     @PostMapping("/v1/threads")
-    public CreateThreadResDto createThread() {
-        return gptAssistantApiService.createThreadAPI();
+    public CreateThreadResDto createThread(
+            @RequestBody
+            CreateRunReqDto dto
+    ) {
+        return gptAssistantApiService.createThreadAPI(dto.getAssistantId());
     }
 
     @DeleteMapping("/v1/threads/{threadId}")
