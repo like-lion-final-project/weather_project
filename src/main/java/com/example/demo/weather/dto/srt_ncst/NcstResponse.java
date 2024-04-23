@@ -1,4 +1,4 @@
-package com.example.demo.weather.dto.sncst;
+package com.example.demo.weather.dto.srt_ncst;
 
 import lombok.Data;
 

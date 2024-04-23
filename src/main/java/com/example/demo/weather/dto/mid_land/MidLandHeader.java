@@ -1,9 +1,9 @@
-package com.example.demo.weather.dto.sncst;
+package com.example.demo.weather.dto.mid_land;
 
 import lombok.Data;
 
 @Data
-public class NcstHeader {
+public class MidLandHeader {
     private String resultCode;
     private String resultMsg;
 }

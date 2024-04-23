@@ -2,10 +2,10 @@ package com.example.demo.weather.service;
 
 import com.example.demo.weather.dto.WeatherForecast;
 import com.example.demo.weather.dto.WeatherNowcast;
-import com.example.demo.weather.dto.sfcst.FcstApiResponse;
-import com.example.demo.weather.dto.sfcst.FcstItem;
-import com.example.demo.weather.dto.sncst.NcstApiResponse;
-import com.example.demo.weather.dto.sncst.NcstItem;
+import com.example.demo.weather.dto.srt_fcst.FcstApiResponse;
+import com.example.demo.weather.dto.srt_fcst.FcstItem;
+import com.example.demo.weather.dto.srt_ncst.NcstApiResponse;
+import com.example.demo.weather.dto.srt_ncst.NcstItem;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

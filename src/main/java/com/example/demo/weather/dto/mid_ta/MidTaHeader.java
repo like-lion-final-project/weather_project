@@ -1,9 +1,9 @@
-package com.example.demo.weather.dto.sfcst;
+package com.example.demo.weather.dto.mid_ta;
 
 import lombok.Data;
 
 @Data
-public class FcstHeader {
+public class MidTaHeader {
     private String resultCode;
     private String resultMsg;
 }

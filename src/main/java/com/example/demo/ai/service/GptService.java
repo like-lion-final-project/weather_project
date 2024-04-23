@@ -8,7 +8,7 @@ import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.service.dto.DailyCodyReqDto;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
-import com.example.demo.weather.dto.sfcst.FcstItem;
+import com.example.demo.weather.dto.srt_fcst.FcstItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

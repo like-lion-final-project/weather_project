@@ -1,4 +1,4 @@
-package com.example.demo.weather.dto.sfcst;
+package com.example.demo.weather.dto.srt_fcst;
 
 import lombok.Data;
 
