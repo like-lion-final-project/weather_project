@@ -26,7 +26,6 @@ public class AssistantThreadMessage extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "thread_id")
     private AssistantThread assistantThread;
-
     @Column(name = "run_id")
     private String runId;
 
@@ -35,6 +34,8 @@ public class AssistantThreadMessage extends BaseEntity{
 
 
     private String type;
+
+    @Column(columnDefinition = "TEXT")
     private String value;
     private String file_ids;
     private String annotataions;

@@ -16,16 +16,25 @@ import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
 
+import com.example.demo.ai.service.GptService;
+import com.example.demo.ai.service.dto.DailyCodyReqDto;
+import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
+import com.example.demo.weather.dto.fcst.FcstItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 
 public class GptAssistantTestController {
     private final GptAssistantApiService gptAssistantApiService;
+    private final GptService gptService;
 
 
     @PostMapping("/v1/assistants")
@@ -55,7 +64,7 @@ public class GptAssistantTestController {
     }
 
     @GetMapping("/v1/threads/{threadId}")
-    public CreateThreadResDto getThread(@PathVariable("threadId") String threadId){
+    public CreateThreadResDto getThread(@PathVariable("threadId") String threadId) {
         return gptAssistantApiService.getThread(threadId);
     }
 
@@ -83,7 +92,7 @@ public class GptAssistantTestController {
     }
 
     @GetMapping("/v1/threads/{threadId}/messages/{messageId}")
-    public GetMessagesResDto getMessage(
+    public CreateMessageResDto getMessage(
             @PathVariable("threadId")
             String threadId,
             @PathVariable("messageId")
@@ -106,8 +115,8 @@ public class GptAssistantTestController {
             String threadId,
             @RequestBody
             CreateRunReqDto dto
-    ){
-        return gptAssistantApiService.run(threadId,dto.getAssistantId());
+    ) {
+        return gptAssistantApiService.run(threadId, dto.getAssistantId());
     }
 
     @GetMapping("/v1/threads/{threadId}/runs/{runId}")
@@ -116,8 +125,8 @@ public class GptAssistantTestController {
             String threadId,
             @PathVariable("runId")
             String runId
-    ){
-        return gptAssistantApiService.getRun(threadId,runId);
+    ) {
+        return gptAssistantApiService.getRun(threadId, runId);
     }
 
     @PostMapping("/v1/threads/runs")
@@ -125,8 +134,37 @@ public class GptAssistantTestController {
             @RequestBody
             OneStepRunParamDto dto
 
-    ){
-        return gptAssistantApiService.oneStepRun(dto.getRole(),dto.getMessage(),dto.getAssistantId());
+    ) {
+        return gptAssistantApiService.oneStepRun(dto.getRole(), dto.getMessage(), dto.getAssistantId());
+    }
+
+    @PostMapping("/v1/daily-cody")
+    public void dailyCody(
+            @RequestBody
+            OneStepRunParamDto dto
+    ) {
+
+        List<FcstItem> fcstItemList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            FcstItem fcstItem = new FcstItem();
+            fcstItem.setBaseDate("20220423");
+            fcstItem.setBaseTime("0500");
+            fcstItem.setCategory("none");
+            fcstItem.setFcstDate("20220423");
+            fcstItem.setFcstTime(i + ":00");
+            fcstItem.setFcstValue(i + 1 + "");
+            fcstItem.setNx(i);
+            fcstItem.setNy(i);
+            fcstItemList.add(
+                    fcstItem
+            );
+        }
+
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
+        for (String item:dailyCodyResDto.getCategories()
+             ) {
+            System.out.println(item + "카테고리");
+        }
     }
 }
 

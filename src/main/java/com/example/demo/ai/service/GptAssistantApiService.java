@@ -101,6 +101,7 @@ public class GptAssistantApiService {
         } catch (DataAccessException e) {
             throw new RuntimeException("DB Exception");
         } catch (Exception e) {
+            log.warn(e + "메시지");
             throw new RuntimeException("Exception");
         }
 
@@ -327,7 +328,7 @@ public class GptAssistantApiService {
      *
      * @param messageId 조회할 메시지의 아이디 입니다.
      */
-    public GetMessagesResDto getMessageAPI(String threadId, String messageId) {
+    public CreateMessageResDto getMessageAPI(String threadId, String messageId) {
         String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
         ResponseEntity<String> json = restClient
                 .get()
@@ -340,7 +341,7 @@ public class GptAssistantApiService {
                         })
                 .toEntity(String.class);
         try {
-            return objectMapper.readValue(json.getBody(), GetMessagesResDto.class);
+            return objectMapper.readValue(json.getBody(), CreateMessageResDto.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (Exception e) {
@@ -498,6 +499,7 @@ public class GptAssistantApiService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (DataAccessException e) {
+            System.out.println(e.getMessage() + "메시지");
             throw new RuntimeException("DB Exception");
         } catch (Exception e) {
             throw new RuntimeException("Exception");
