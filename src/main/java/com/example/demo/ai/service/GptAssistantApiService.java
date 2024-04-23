@@ -11,6 +11,7 @@ import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.run.OneStepRunReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
+import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
@@ -65,8 +66,20 @@ public class GptAssistantApiService {
                 .retrieve()
                 .toEntity(String.class);
 
+
+
         try {
-            return objectMapper.readValue(json.getBody(), CreateAssistantResDto.class);
+            CreateAssistantResDto response = objectMapper.readValue(json.getBody(), CreateAssistantResDto.class);
+
+            assistantRepo.save(Assistant.builder()
+                    .instructions(response.getInstructions())
+                    .name(response.getName())
+                    .version(response.getName().split("_")[1])
+                    .model(response.getModel())
+                    .assistantId(response.getId())
+                    .isDeleteFromOpenAi(false)
+                    .build());
+            return response;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (Exception e) {
@@ -419,8 +432,6 @@ public class GptAssistantApiService {
     }
 
 
-
-    // TODO: 스레드 생성, 실행을 동시에 하는 메서드
     // TODO: 어시스턴트 생성시 DB에 히스토리 남김
     // TODO: 스레드 생성시 DB에 히스토리 남김
     // TODO: 메시지 생성시 DB에 히스토리 남김
