@@ -133,4 +133,6 @@ public class GptAssistantTestController {
 /**
  * thread_8EZ9Fm2oxQI0iBuEiK9SX1CG
  * thread_R8aj36ScCZLKvK4drIYtA391
+ * thread_LO2j8zzCt0GlGiSxhIe18DGo
+ * thread_BnhYznQAq8HoQclYjTpABCDN
  */

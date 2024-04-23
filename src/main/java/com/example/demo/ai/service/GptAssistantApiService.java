@@ -13,6 +13,7 @@ import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
+import com.example.demo.ai.entity.AssistantThreadMessage;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
@@ -275,6 +276,7 @@ public class GptAssistantApiService {
      */
     public CreateMessageResDto createMessageAPI(String role, String message, String threadId) {
         String uri = "/v1/threads/" + threadId + "/messages";
+        AssistantThread assistantThread = assistantThreadRepo.findThreadByThreadId(threadId).orElseThrow(() -> new RuntimeException("스레드가 데이터베이스에 존재하지 않습니다."));
 
         ResponseEntity<String> json = restClient
                 .post()
@@ -293,7 +295,19 @@ public class GptAssistantApiService {
                 .toEntity(String.class);
 
         try {
-            return objectMapper.readValue(json.getBody(), CreateMessageResDto.class);
+            CreateMessageResDto response = objectMapper.readValue(json.getBody(), CreateMessageResDto.class);
+            if(response.getContent().stream().findFirst().isEmpty()) throw new RuntimeException("메시지 생성 에러");
+            AssistantThreadMessage.builder()
+                    .assistantThread(assistantThread)
+                    .runId(null)
+                    .role(response.getRole())
+                    .value(response.getContent().stream().findFirst().get().getText().getValue())
+                    .file_ids(null)
+                    .annotataions(null)
+                    .metadata(null)
+                    .isDeleteFromOpenAi(false)
+                    .build();
+            return response;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (Exception e) {
