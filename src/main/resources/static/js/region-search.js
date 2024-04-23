@@ -125,14 +125,18 @@ document.getElementById('search-weather').addEventListener('click', function () 
 
             // 검색 결과를 화면에 표시하고 각 결과에 날씨 조회 버튼 생성하기
             data.forEach(point => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `주소: ${point.roadAddress}, 위도: ${point.lat}, 경도: ${point.lng}`;
+                const listItem = document.createElement('a');
+                listItem.href = '#'; // 링크 설정
+                listItem.classList.add('list-group-item', 'list-group-item-action'); // 부트스트랩 클래스 추가
+                listItem.textContent = `${point.roadAddress}`;
 
-                // 날씨 조회 버튼 생성
-                const weatherButton = document.createElement('button');
-                weatherButton.textContent = '날씨 조회';
 
-                weatherButton.addEventListener('click', function () {
+                // 클릭 이벤트 처리
+                listItem.addEventListener('click', function () {
+                    map.setCenter(marker.getPosition());
+                    // 지도를 약간의 줌인
+                    map.setZoom(12);
+
                     // 좌표 정보 가져오기
                     const lat = point.lat;
                     const lng = point.lng;
@@ -141,7 +145,6 @@ document.getElementById('search-weather').addEventListener('click', function () 
                     getWeatherByCoordinates(lat, lng, point.roadAddress);
                 });
 
-                listItem.appendChild(weatherButton);
                 searchResult.appendChild(listItem);
 
                 // 마커 추가하기
@@ -152,6 +155,10 @@ document.getElementById('search-weather').addEventListener('click', function () 
 
                 // 마커 클릭 이벤트 처리
                 naver.maps.Event.addListener(marker, 'click', function () {
+                    // 좌표 정보 가져오기
+                    const lat = marker.getPosition().lat();
+                    const lng = marker.getPosition().lng();
+
                     getWeatherByCoordinates(point.lat, point.lng, point.roadAddress);
                 });
 

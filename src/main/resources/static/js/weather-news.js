@@ -43,8 +43,16 @@ function fetchWeatherNews(start) {
                 newsContainer.appendChild(timeDifferenceElement);
                 newsContainer.appendChild(description);
 
+                // 각 뉴스 기사마다 고유한 클래스를 추가하여 스타일링을 적용
+                const uniqueClassName = `news-box-${start}-${data.items.indexOf(item)}`;
+                newsContainer.classList.add(uniqueClassName);
+
                 // 뉴스 목록을 감싸는 박스를 ul 대신에 바로 추가
                 newsList.appendChild(newsContainer);
+
+                // 뉴스 기사 사이에 수평선(hr 태그) 추가
+                const hr = document.createElement('hr');
+                newsList.appendChild(hr);
             });
         })
         .catch(error => console.error('날씨 뉴스를 가져오는 중 오류 발생:', error));
