@@ -288,7 +288,7 @@ public class GptAssistantApiService {
                 .uri(uri)
                 .body(
                         CreateMessageDto.builder()
-                                .content(message + AppConstants.MESSAGE_SUFFIX)
+                                .content(message)
                                 .role(role)
                                 .build()
                 ).retrieve()
@@ -490,7 +490,7 @@ public class GptAssistantApiService {
                     .assistantThread(thread)
                     .runId(response.getId())
                     .role(role)
-                    .value(message + AppConstants.MESSAGE_SUFFIX)
+                    .value(message)
                     .isDeleteFromOpenAi(false)
                     .build());
 
