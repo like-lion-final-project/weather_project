@@ -1,15 +1,13 @@
-package com.example.demo.weather.dto.fcst;
+package com.example.demo.weather.dto.sncst;
 
 import lombok.Data;
 
 @Data
-public class FcstItem {
+public class NcstItem {
     private String baseDate;
     private String baseTime;
     private String category;
-    private String fcstDate;
-    private String fcstTime;
-    private String fcstValue;
     private Integer nx;
     private Integer ny;
+    private Double obsrValue;
 }

@@ -1,6 +1,5 @@
-package com.example.demo.weather.dto.fcst;
+package com.example.demo.weather.dto.sfcst;
 
-import java.util.List;
 import lombok.Data;
 
 @Data

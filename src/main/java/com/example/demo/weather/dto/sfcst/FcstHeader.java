@@ -1,9 +1,9 @@
-package com.example.demo.weather.dto.ncst;
+package com.example.demo.weather.dto.sfcst;
 
 import lombok.Data;
 
 @Data
-public class NcstHeader {
+public class FcstHeader {
     private String resultCode;
     private String resultMsg;
 }

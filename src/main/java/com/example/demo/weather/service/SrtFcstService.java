@@ -2,10 +2,10 @@ package com.example.demo.weather.service;
 
 import com.example.demo.weather.dto.WeatherForecast;
 import com.example.demo.weather.dto.WeatherNowcast;
-import com.example.demo.weather.dto.fcst.FcstApiResponse;
-import com.example.demo.weather.dto.fcst.FcstItem;
-import com.example.demo.weather.dto.ncst.NcstApiResponse;
-import com.example.demo.weather.dto.ncst.NcstItem;
+import com.example.demo.weather.dto.sfcst.FcstApiResponse;
+import com.example.demo.weather.dto.sfcst.FcstItem;
+import com.example.demo.weather.dto.sncst.NcstApiResponse;
+import com.example.demo.weather.dto.sncst.NcstItem;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VilageSrtFcstService {
-    private final VilageFcstApiService vilageFcstApiService;
+public class SrtFcstService {
+    private final SrtFcstApiService srtFcstApiService;
 
     @Value("${Fcst.serviceKey}")
     private String serviceKey;
@@ -54,7 +54,7 @@ public class VilageSrtFcstService {
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
         // API 응답 받기
-        FcstApiResponse response = vilageFcstApiService.UltraSrtFcst(params);
+        FcstApiResponse response = srtFcstApiService.UltraSrtFcst(params);
 
         // 각 fcstTime에 대한 forecastValues를 하나의 맵으로 합치기
         List<WeatherForecast> forecasts = new ArrayList<>();
@@ -104,7 +104,7 @@ public class VilageSrtFcstService {
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
         // API 응답 받기
-        NcstApiResponse response = vilageFcstApiService.UltraSrtNcst(params);
+        NcstApiResponse response = srtFcstApiService.UltraSrtNcst(params);
 
         String baseDate = response.getResponse().getBody().getItems().getItem().get(0).getBaseDate();
         String baseTime = response.getResponse().getBody().getItems().getItem().get(0).getBaseTime();

@@ -1,20 +1,16 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
-import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
-import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.entity.Assistant;
-import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.service.dto.DailyCodyReqDto;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
-import com.example.demo.weather.dto.fcst.FcstItem;
+import com.example.demo.weather.dto.sfcst.FcstItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

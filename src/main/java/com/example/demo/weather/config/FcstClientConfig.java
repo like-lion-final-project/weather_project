@@ -1,7 +1,7 @@
 package com.example.demo.weather.config;
 
 import com.example.demo.weather.service.MidFcstApiService;
-import com.example.demo.weather.service.VilageFcstApiService;
+import com.example.demo.weather.service.SrtFcstApiService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -9,7 +9,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
-public class VilageFcstClientConfig {
+public class FcstClientConfig {
 
     @Bean
     public RestClient FsctRestClient() {
@@ -19,11 +19,11 @@ public class VilageFcstClientConfig {
     }
 
     @Bean
-    public VilageFcstApiService vilageFcstApiService() {
+    public SrtFcstApiService vilageFcstApiService() {
         return HttpServiceProxyFactory
                 .builderFor(RestClientAdapter.create(FsctRestClient()))
                 .build()
-                .createClient(VilageFcstApiService.class);
+                .createClient(SrtFcstApiService.class);
     }
 
     @Bean

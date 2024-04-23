@@ -1,11 +1,11 @@
-package com.example.demo.weather.dto.fcst;
+package com.example.demo.weather.dto.sncst;
 
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class FcstItems {
-    private List<FcstItem> item;
+public class NcstItems {
+    private List<NcstItem> item;
     private Integer pageNo;
     private Integer numOfRows;
     private Integer totalCount;
