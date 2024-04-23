@@ -1,7 +1,6 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
-import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;

@@ -1,10 +1,8 @@
 package com.example.demo.ai.dto.run;
 
+import com.example.demo.ai.dto.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -52,12 +50,6 @@ public class CreateRunResDto {
 
     @JsonProperty("tools")
     private List<Tool> tools;
-
-    @Getter
-    @Setter
-    public static class Tool{
-        private String type;
-    }
 
     @JsonProperty("file_ids")
     private List<String> fileIds;

@@ -2,32 +2,28 @@ package com.example.demo.ai.controller;
 
 
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
-import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.run.OneStepRunParamDto;
-import com.example.demo.ai.dto.run.OneStepRunReqDto;
-import com.example.demo.ai.dto.thread.CreateThreadReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
 
 import com.example.demo.ai.service.GptService;
-import com.example.demo.ai.service.dto.DailyCodyReqDto;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.example.demo.weather.dto.fcst.FcstItem;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,15 +34,18 @@ public class GptAssistantTestController {
 
 
     @PostMapping("/v1/assistants")
-    public CreateAssistantResDto createAssistant(
+    public GptApiCreateAssistantResDto createAssistant(
             @RequestBody
             CreateAssistantReqDto dto
     ) {
+
+        dto.getTools().forEach(item -> System.out.println(item.getType() + "type"));
+
         return gptAssistantApiService.createAssistantAPI(dto);
     }
 
     @GetMapping("/v1/assistants/{assistantId}")
-    public GetAssistantResDto.Data getAssistant(
+    public Optional<GetAssistantResDto.Data> getAssistant(
             @PathVariable("assistantId")
             String assistantId
     ) {

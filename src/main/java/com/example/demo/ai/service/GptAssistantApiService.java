@@ -2,8 +2,9 @@ package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
-import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
+import com.example.demo.ai.dto.assistant.GptApiCreateAssistantReqDto;
+import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
@@ -36,6 +37,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -74,31 +76,52 @@ public class GptAssistantApiService {
     /**
      * <p>어시스턴트 생성 메서드 입니다.</p>
      */
-    public CreateAssistantResDto createAssistantAPI(CreateAssistantReqDto dto) {
+    public GptApiCreateAssistantResDto createAssistantAPI(CreateAssistantReqDto dto) {
+        if (!dto.getAssistantType().equals("fashion")) {
+            throw new RuntimeException("생성 불가능한 타입 입니다.");
+        }
+
+
+        // TODO: 어시스턴트 생성시 DB에 해당 어시스턴트가 이미 있는지 조회해봄 버전, type으로 검색
+
+        Optional<Assistant> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion(dto.getAssistantType(), dto.getVersion());
+        if (assistant.isPresent()) {
+            throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
+        }
+
+
         String uri = "/v1/assistants";
         ResponseEntity<String> json = restClient
                 .post()
                 .uri(uri)
-                .body(dto)
+                .body(GptApiCreateAssistantReqDto.builder()
+                        .instructions(dto.getInstructions())
+                        .name(dto.getName())
+                        .model(dto.getModel())
+                        .tools(dto.getTools())
+                        .build())
                 .retrieve()
                 .toEntity(String.class);
 
 
         try {
-            CreateAssistantResDto response = objectMapper.readValue(json.getBody(), CreateAssistantResDto.class);
+            GptApiCreateAssistantResDto response = objectMapper.readValue(json.getBody(), GptApiCreateAssistantResDto.class);
 
             assistantRepo.save(Assistant.builder()
                     .instructions(response.getInstructions())
                     .name(response.getName())
                     .version(response.getName().split("_")[1])
                     .model(response.getModel())
+                    .assistantType(dto.getAssistantType())
                     .assistantId(response.getId())
                     .isDeleteFromOpenAi(false)
                     .build());
             return response;
         } catch (JsonProcessingException e) {
+            log.warn(e.getMessage());
             throw new RuntimeException("JsonProcessingException");
         } catch (DataAccessException e) {
+            log.warn(e.getMessage());
             throw new RuntimeException("DB Exception");
         } catch (Exception e) {
             log.warn(e + "메시지");
@@ -141,23 +164,24 @@ public class GptAssistantApiService {
      *
      * @param assistantId 어시스턴트 아이디 입니다.
      */
-    public GetAssistantResDto.Data getAssistantAPI(String assistantId) {
+    public Optional<GetAssistantResDto.Data> getAssistantAPI(String assistantId) {
         String uri = "/v1/assistants/" + assistantId;
-        ResponseEntity<String> json = restClient
+        return restClient
                 .get()
                 .uri(uri)
-                .retrieve()
-                .toEntity(String.class);
-
-        try {
-            return objectMapper.readValue(json.getBody(), GetAssistantResDto.Data.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JsonProcessingException");
-        } catch (Exception e) {
-            throw new RuntimeException("Exception");
-        }
-
-
+                .exchange((request, response) -> {
+                    if (response.getStatusCode().is2xxSuccessful()) {
+                        try {
+                            GetAssistantResDto.Data dto = objectMapper.readValue(response.getBody(), GetAssistantResDto.Data.class);
+                            return Optional.of(dto);
+                        } catch (JsonProcessingException e) {
+                            log.warn(e.getMessage());
+                            return Optional.empty();
+                        }
+                    } else {
+                        return Optional.empty();
+                    }
+                });
     }
 
 
