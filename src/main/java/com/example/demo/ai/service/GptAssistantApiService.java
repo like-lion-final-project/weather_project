@@ -1,5 +1,6 @@
 package com.example.demo.ai.service;
 
+import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.CreateAssistantResDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
@@ -15,6 +16,7 @@ import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.entity.AssistantThread;
 import com.example.demo.ai.entity.AssistantThreadMessage;
 import com.example.demo.ai.repo.AssistantRepo;
+import com.example.demo.ai.repo.AssistantThreadMessageRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.example.demo.auth.AuthenticationFacade;
@@ -42,6 +44,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class GptAssistantApiService {
+    private final AssistantThreadMessageRepo assistantThreadMessageRepo;
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final AssistantThreadRepo assistantThreadRepo;
@@ -56,13 +59,15 @@ public class GptAssistantApiService {
                                   AuthenticationFacade authenticationFacade,
                                   ObjectMapper objectMapper,
 
-                                  UserRepo userRepo) {
+                                  UserRepo userRepo,
+                                  AssistantThreadMessageRepo assistantThreadMessageRepo) {
         this.restClient = restClient;
         this.assistantThreadRepo = assistantThreadRepo;
         this.assistantRepo = assistantRepo;
         this.objectMapper = objectMapper;
         this.authenticationFacade = authenticationFacade;
         this.userRepo = userRepo;
+        this.assistantThreadMessageRepo = assistantThreadMessageRepo;
     }
 
 
@@ -283,7 +288,7 @@ public class GptAssistantApiService {
                 .uri(uri)
                 .body(
                         CreateMessageDto.builder()
-                                .content(message)
+                                .content(message + AppConstants.MESSAGE_SUFFIX)
                                 .role(role)
                                 .build()
                 ).retrieve()
@@ -296,7 +301,7 @@ public class GptAssistantApiService {
 
         try {
             CreateMessageResDto response = objectMapper.readValue(json.getBody(), CreateMessageResDto.class);
-            if(response.getContent().stream().findFirst().isEmpty()) throw new RuntimeException("메시지 생성 에러");
+            if (response.getContent().stream().findFirst().isEmpty()) throw new RuntimeException("메시지 생성 에러");
             AssistantThreadMessage.builder()
                     .assistantThread(assistantThread)
                     .runId(null)
@@ -447,8 +452,8 @@ public class GptAssistantApiService {
         List<CreateMessageDto> messages = new ArrayList<>();
         messages.add(CreateMessageDto.builder().role(role).content(message).build());
 
-        OneStepRunReqDto.Thread thread = OneStepRunReqDto.Thread.builder().messages(messages).build();
-        OneStepRunReqDto oneStepRunReqDto = OneStepRunReqDto.builder().assistantId(assistantId).thread(thread).build();
+        OneStepRunReqDto.Thread reqThread = OneStepRunReqDto.Thread.builder().messages(messages).build();
+        OneStepRunReqDto oneStepRunReqDto = OneStepRunReqDto.builder().assistantId(assistantId).thread(reqThread).build();
 
         String uri = "/v1/threads/runs";
         ResponseEntity<String> json = restClient
@@ -463,10 +468,37 @@ public class GptAssistantApiService {
                         })
                 .toEntity(String.class);
 
+        Long tempUser = 1L;
+        User user = userRepo.findById(tempUser).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
+        Assistant assistant = assistantRepo.findAssistantByAssistantId(assistantId).orElseThrow(() -> new RuntimeException("어시스턴트가 존재하지 않습니다."));
+
+
         try {
-            return objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+            CreateRunResDto response = objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+
+            AssistantThreadMessage.builder().build();
+            AssistantThread thread = AssistantThread.builder()
+                    .user(user)
+                    .assistant(assistant)
+                    .threadId(response.getThreadId())
+                    .isDeleteFromOpenAi(false)
+                    .build();
+            assistantThreadRepo.save(thread);
+
+            assistantThreadMessageRepo.save(AssistantThreadMessage.builder()
+                    .object(response.getObject())
+                    .assistantThread(thread)
+                    .runId(response.getId())
+                    .role(role)
+                    .value(message + AppConstants.MESSAGE_SUFFIX)
+                    .isDeleteFromOpenAi(false)
+                    .build());
+
+            return response;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
+        } catch (DataAccessException e) {
+            throw new RuntimeException("DB Exception");
         } catch (Exception e) {
             throw new RuntimeException("Exception");
         }
@@ -474,8 +506,7 @@ public class GptAssistantApiService {
     }
 
 
-    // TODO: 스레드 생성시 DB에 히스토리 남김
-    // TODO: 메시지 생성시 DB에 히스토리 남김
+    // TODO: oneStepRun 메서드 실행시 스레드, 메시지 정보 DB에 기록
     // TODO: 어시스턴트, 스레드 조회시 없는 항목이라면 is_delete true로 변경
     // TODO: DB에 저장된 어시스턴트 히스토리, 스레드 히스토리 조회시 is_delete false 인 항목만 조회하도록 구현
 }
