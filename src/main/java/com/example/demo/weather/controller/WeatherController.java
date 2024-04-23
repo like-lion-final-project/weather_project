@@ -4,6 +4,7 @@ import com.example.demo.weather.dto.GridDto;
 import com.example.demo.weather.dto.PointDto;
 import com.example.demo.weather.dto.WeatherForecast;
 
+import com.example.demo.weather.dto.WeatherNowcast;
 import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
@@ -73,7 +74,7 @@ public class WeatherController {
      * 초단기 실황 조회 (현시각 날씨)
      */
     @GetMapping("/by-current")
-    public NcstApiResponse getUltraSrtNcst(
+    public WeatherNowcast getUltraSrtNcst(
             @RequestParam("nx")
             Integer nx,
             @RequestParam("ny")

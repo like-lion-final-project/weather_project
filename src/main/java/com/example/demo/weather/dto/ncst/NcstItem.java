@@ -1,5 +1,6 @@
 package com.example.demo.weather.dto.ncst;
 
+import java.util.Map;
 import lombok.Data;
 
 @Data
