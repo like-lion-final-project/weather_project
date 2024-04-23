@@ -7,12 +7,15 @@ import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
+import com.example.demo.ai.dto.run.CreateRunReqDto;
+import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
 
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -84,6 +87,26 @@ public class GptAssistantTestController {
             String threadId
     ) {
         return gptAssistantApiService.getMessagesAPI(threadId);
+    }
+
+    @PostMapping("/v1/threads/{threadId}/runs")
+    public CreateRunResDto createRun(
+            @PathVariable("threadId")
+            String threadId,
+            @RequestBody
+            CreateRunReqDto dto
+    ){
+        return gptAssistantApiService.run(threadId,dto.getAssistantId());
+    }
+
+    @GetMapping("/v1/threads/{threadId}/runs/{runId}")
+    public CreateRunResDto getRun(
+            @PathVariable("threadId")
+            String threadId,
+            @PathVariable("runId")
+            String runId
+    ){
+        return gptAssistantApiService.getRun(threadId,runId);
     }
 }
 

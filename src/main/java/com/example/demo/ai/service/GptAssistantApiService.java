@@ -6,6 +6,8 @@ import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.message.CreateMessageDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
+import com.example.demo.ai.dto.run.CreateRunReqDto;
+import com.example.demo.ai.dto.run.CreateRunResDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.repo.AssistantRepo;
@@ -237,8 +239,9 @@ public class GptAssistantApiService {
     /**
      * <p>메시지 단일 조회 메서드 입니다.</p>
      * <p>조회할 때 스레드 아이디가 필요합니다. 스레드가 이미 삭제되었다면 해당 스레드에 포함되어있는 모든 메시지를 조회할 수 없습니다.</p>
+     *
      * @param messageId 조회할 메시지의 아이디 입니다.
-     * */
+     */
     public GetMessagesResDto getMessageAPI(String threadId, String messageId) {
         String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
         ResponseEntity<String> json = restClient
@@ -264,8 +267,9 @@ public class GptAssistantApiService {
     /**
      * <p>메시지 리스트 조회 메서드 입니다.</p>
      * <p>조회할 때 스레드 아이디가 필요합니다. 스레드가 이미 삭제되었다면 해당 스레드에 포함되어있는 모든 메시지를 조회할 수 없습니다.</p>
+     *
      * @param threadId 조회할 메시지들이 들어있는 스레드 아이디
-     * */
+     */
     public GetMessagesResDto getMessagesAPI(String threadId) {
         String uri = "/v1/threads/" + threadId + "/messages";
         ResponseEntity<String> json = restClient
@@ -286,4 +290,70 @@ public class GptAssistantApiService {
             throw new RuntimeException("Exception");
         }
     }
+
+
+    /**
+     * <p>실행 메서드 입니다.</p>
+     * <p>결과가 비동기로 처리됩니다. 일정주기로 결과를 확인하는 요청을 보내거나 메시지큐 서비스로 처리해야 합니다.</p>
+     * @param threadId 실행 객체에 포함할 스레드 아이디 입니다. 해당 스레드 내에 있는 모든 메시지를 포함합니다.
+     * @param assistantId 실행시 어떤 어시스턴트가 해당 작업을 수행할지 결정하는 어시스턴트 아이디 입니다.
+     */
+    public CreateRunResDto run(String threadId, String assistantId) {
+        String uri = "/v1/threads/" + threadId + "/runs";
+        ResponseEntity<String> json = restClient
+                .post()
+                .uri(uri)
+                .body(CreateRunReqDto.builder()
+                        .assistantId(assistantId)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+
+        try {
+            return objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
+
+    /**
+     * <p>실행 객체를 단일 조회 하는 메서드 입니다.</p>
+     * @param threadId 실행 객체에 포함된 스레드 아이디 입니다.
+     * @param runId 실행객체의 아이디 입니다.
+     * */
+    public CreateRunResDto getRun(String threadId, String runId){
+        String uri = "/v1/threads/" + threadId + "/runs/" + runId;
+        ResponseEntity<String> json = restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+        try {
+            return objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
+
+    // TODO: 어시스턴트 생성시 DB에 히스토리 남김
+    // TODO: 스레드 생성시 DB에 히스토리 남김
+    // TODO: 메시지 생성시 DB에 히스토리 남김
+    // TODO: 어시스턴트, 스레드 조회시 없는 항목이라면 is_delete true로 변경
+    // TODO: DB에 저장된 어시스턴트 히스토리, 스레드 히스토리 조회시 is_delete false 인 항목만 조회하도록 구현
 }
