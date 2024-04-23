@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ootdDetail</title>
+</head>
+<body>
+<div class="container mt-5">
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>게시글</h2>
+    </div>
+    <div>
+        <label for="postId">게시판번호</label>
+        <input type="text" id="postId" name="postId" class="form-control"
+               value="1" th:value="${posts.id}" readonly>
+    </div>
+
+    <div>
+        <label for="postTitle">제목</label>
+        <input type="text" id="postTitle" name="postTitle" class="form-control"
+               value="제목" th:value="${posts.title}" readonly>
+    </div>
+    <div>
+        <label for="postContent">내용</label>
+        <textarea class="form-control" rows="5"
+                  id="postContent" name="postContent"
+                  th:value="${posts.content}" th:text="${posts.content}" readonly></textarea>
+    </div>
+    <div>
+        <label for="postCategory">카테고리</label>
+        <textarea class="form-control" rows="5"
+                  id="postCategory" name="postCategory"
+                  th:value="${posts.category}" th:text="${posts.category}" readonly></textarea>
+    </div>
+    <div>
+        <label for="registerDate">작성일</label>
+        <input type="text" id="registerDate" name="registerDate" class="form-control"
+               value="작성자" th:value="${posts.getCreatedDate}" readonly>
+    </div>
+    <hr class="my-4">
+
+    <form th:action="@{/ootd/update/{postId}(postId=${posts.id})}" th:method="get">
+        <input type="hidden" name="_method" value="update">
+        <input type="submit" class="btn btn-danger" value="수정하기">
+    </form>
+
+    <form th:action="@{/ootd/delete/{postId}(postId=${posts.id})}" th:method="post">
+        <input type="hidden" name="_method" value="delete">
+        <input type="submit" class="btn btn-danger" value="삭제하기">
+    </form>
+    <button class="btn btn-dark pull-right"
+            onclick="location.href='board/postList.html'"
+            th:onclick="|location.href='@{/ootd}'|"
+            type="button">목록으로
+    </button>
+
+</div> <!-- /container -->
+</div>
+</body>
+</html>
