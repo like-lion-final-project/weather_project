@@ -20,13 +20,17 @@
     <div id="weather-info" class="mb-3">
         <div class="row" style="display: flex; justify-content: space-between;">
             <span style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="location" style="margin: 0;"></h3>
+                <h4 id="location" style="margin: 0;"></h4>
                 <p id="base-date" class="text-end" style="margin: 0;"></p>
             </span>
         </div>
-        <span id="t1h"></span>
-        <ul id="weather-list" class="list-unstyled"></ul>
-        <ul id="six-hour-weather-list" class="list-unstyled"></ul>
+        <span>
+            <h1 id="t1h-value"></h1>
+            <ul id="weather-list"></ul>
+        </span>
+        <div id="six-hour-weather-list" class="box">
+            <!-- 시간대 별로 날씨 정보 동적으로 생성되도록 -->
+        </div>
     </div>
     <h4 class="mt-3 mb-3 text-center">지역 검색</h4>
     <div id="search-region" class="mb-3">
