@@ -8,6 +8,7 @@ import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.dto.run.OneStepRunReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.repo.AssistantRepo;
@@ -21,8 +22,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -164,6 +167,31 @@ public class GptAssistantApiService {
                         })
                 .toEntity(String.class);
 
+        try {
+            return objectMapper.readValue(json.getBody(), CreateThreadResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
+
+    /**
+     * <p>스레드 단일 조회 메서드 입니다.</p>
+     * */
+    public CreateThreadResDto getThread(String threadId){
+        String uri = "/v1/threads/" + threadId;
+        ResponseEntity<String> json = restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러메시지: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
         try {
             return objectMapper.readValue(json.getBody(), CreateThreadResDto.class);
         } catch (JsonProcessingException e) {
@@ -351,6 +379,48 @@ public class GptAssistantApiService {
     }
 
 
+    /**
+     * <p>스레드 생성과 메시지 추가 실행을 동시에 처리하는 메서드</p>
+     * @param assistantId 작업을 수행할 어시스턴트의 아이디
+     * @param message 생성된 스레드에 포함할 단일 메시지
+     * @param role 'user', 'assistant' 등 권한을 의미함. 기본 값은 user
+     * */
+    public CreateRunResDto oneStepRun( String role, String message,String assistantId){
+        if(!role.equals("user") && !role.equals("assistant")  ){
+            role = "user";
+        }
+        List<CreateMessageDto> messages = new ArrayList<>();
+        messages.add(CreateMessageDto.builder().role(role).content(message).build());
+
+        OneStepRunReqDto.Thread thread = OneStepRunReqDto.Thread.builder().messages(messages).build();
+        OneStepRunReqDto oneStepRunReqDto = OneStepRunReqDto.builder().assistantId(assistantId).thread(thread).build();
+
+        String uri = "/v1/threads/runs";
+        ResponseEntity<String> json = restClient
+                .post()
+                .uri(uri)
+                .body(oneStepRunReqDto)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+
+        try {
+            return objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+
+    }
+
+
+
+    // TODO: 스레드 생성, 실행을 동시에 하는 메서드
     // TODO: 어시스턴트 생성시 DB에 히스토리 남김
     // TODO: 스레드 생성시 DB에 히스토리 남김
     // TODO: 메시지 생성시 DB에 히스토리 남김

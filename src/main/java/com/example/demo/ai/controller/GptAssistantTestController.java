@@ -9,6 +9,8 @@ import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
 import com.example.demo.ai.dto.run.CreateRunReqDto;
 import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.dto.run.OneStepRunParamDto;
+import com.example.demo.ai.dto.run.OneStepRunReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
@@ -49,6 +51,11 @@ public class GptAssistantTestController {
     @DeleteMapping("/v1/assistants/{assistantId}")
     public DeleteAssistantResDto deleteAssistants(@PathVariable("assistantId") String assistantId) {
         return gptAssistantApiService.deleteAssistantAPI(assistantId);
+    }
+
+    @GetMapping("/v1/threads/{threadId}")
+    public CreateThreadResDto getThread(@PathVariable("threadId") String threadId){
+        return gptAssistantApiService.getThread(threadId);
     }
 
     @PostMapping("/v1/threads")
@@ -108,8 +115,18 @@ public class GptAssistantTestController {
     ){
         return gptAssistantApiService.getRun(threadId,runId);
     }
+
+    @PostMapping("/v1/threads/runs")
+    public CreateRunResDto onStepRun(
+            @RequestBody
+            OneStepRunParamDto dto
+
+    ){
+        return gptAssistantApiService.oneStepRun(dto.getRole(),dto.getMessage(),dto.getAssistantId());
+    }
 }
 
 /**
  * thread_8EZ9Fm2oxQI0iBuEiK9SX1CG
+ * thread_R8aj36ScCZLKvK4drIYtA391
  */
