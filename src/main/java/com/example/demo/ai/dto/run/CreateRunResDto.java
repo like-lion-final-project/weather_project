@@ -49,7 +49,16 @@ public class CreateRunResDto {
     private String lastError;
     private String model;
     private String instructions;
-    private List<String> tools;
+
+    @JsonProperty("tools")
+    private List<Tool> tools;
+
+    @Getter
+    @Setter
+    public static class Tool{
+        private String type;
+    }
+
     @JsonProperty("file_ids")
     private List<String> fileIds;
     private Object metadata;
