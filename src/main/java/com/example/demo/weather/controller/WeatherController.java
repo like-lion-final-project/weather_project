@@ -10,6 +10,7 @@ import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
 import com.example.demo.weather.dto.rgeocoding.RGeoResponseDto;
 import com.example.demo.weather.service.GridConversionService;
+import com.example.demo.weather.service.MidFcstService;
 import com.example.demo.weather.service.NDSearchService;
 import com.example.demo.weather.service.VilageSrtFcstService;
 import com.example.demo.weather.service.NcpGeocodeService;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class WeatherController {
     private final VilageSrtFcstService vilageSrtFcstService;
+    private final MidFcstService midFcstService;
     private final NcpGeocodeService geocodeService;
     private final NDSearchService ndSearchService;
     private final GridConversionService gridConversionService;
@@ -81,6 +83,28 @@ public class WeatherController {
             Integer ny
     ) {
         return vilageSrtFcstService.getUltraSrtNcst(nx, ny);
+    }
+
+    /**
+     * 중기 육상 예보 조회
+     */
+    @GetMapping("/mid-land")
+    public Object getMidLandFcst(
+            @RequestParam("regId")
+            String regId
+    ) {
+        return midFcstService.getMidLandFcst(regId);
+    }
+
+    /**
+     * 중기 기온 조회
+     */
+    @GetMapping("/mid-ta")
+    public Object getMidTa(
+            @RequestParam("regId")
+            String regId
+    ) {
+        return midFcstService.getMidTa(regId);
     }
 
     /**

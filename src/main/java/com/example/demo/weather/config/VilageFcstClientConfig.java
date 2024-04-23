@@ -1,5 +1,6 @@
 package com.example.demo.weather.config;
 
+import com.example.demo.weather.service.MidFcstApiService;
 import com.example.demo.weather.service.VilageFcstApiService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,14 @@ public class VilageFcstClientConfig {
                 .builderFor(RestClientAdapter.create(FsctRestClient()))
                 .build()
                 .createClient(VilageFcstApiService.class);
+    }
+
+    @Bean
+    public MidFcstApiService midFcstApiService() {
+        return HttpServiceProxyFactory
+                .builderFor(RestClientAdapter.create(FsctRestClient()))
+                .build()
+                .createClient(MidFcstApiService.class);
     }
 
 }

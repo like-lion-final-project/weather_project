@@ -1,7 +1,5 @@
 package com.example.demo.weather.service;
 
-import com.example.demo.weather.dto.fcst.FcstApiResponse;
-import com.example.demo.weather.dto.ncst.NcstApiResponse;
 import java.util.Map;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
