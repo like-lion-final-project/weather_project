@@ -179,3 +179,7 @@ function getCurrentWeather() {
 
 // 페이지 로드 시 사용자의 현재 위치 정보를 이용하여 날씨 정보 조회
 document.addEventListener('DOMContentLoaded', getCurrentWeather);
+
+
+// "내위치" 링크를 클릭하면 getCurrentWeather 함수 호출
+document.getElementById('current-location-link').addEventListener('click', getCurrentWeather);

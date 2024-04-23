@@ -14,8 +14,8 @@
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    margin-left: 200px; /* 좌측 여백 추가 */
-    margin-right: 200px; /* 우측 여백 추가 */
+    margin-left: 220px; /* 좌측 여백 추가 */
+    margin-right: 220px; /* 우측 여백 추가 */
 }
 
 #location, #base-time {
@@ -27,8 +27,8 @@
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    margin-left: 140px; /* 좌측 여백 추가 */
-    margin-right: 140px; /* 우측 여백 추가 */
+    margin-left: 280px; /* 좌측 여백 추가 */
+    margin-right: 280px; /* 우측 여백 추가 */
 }
 
 #weather-news {
@@ -36,8 +36,8 @@
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    margin-left: 140px; /* 좌측 여백 추가 */
-    margin-right: 140px; /* 우측 여백 추가 */
+    margin-left: 220px; /* 좌측 여백 추가 */
+    margin-right: 220px; /* 우측 여백 추가 */
 }
 
 #weather-news h3 {
