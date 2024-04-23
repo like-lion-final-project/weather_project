@@ -88,14 +88,15 @@ function getWeatherByCoordinates(lat, lng, address) {
                                 // 시간대 별로 묶어서 화면에 표시하기
                                 let htmlContent = `<h5>${ampm} ${displayHour}시</h5>`;
 
-                                for (const [key, value] of Object.entries(forecastValues)) {
-                                    if (key === 'T1H') {
-                                        const replacedValue = replaceCategoryValue(key, value); // 값 대체
+                                // 기온(T1H)와 하늘 상태(SKY) 표시
+                                ['T1H', 'SKY'].forEach(key => {
+                                    const value = forecastValues[key];
+                                    if (value !== undefined) {
+                                        const replacedValue = replaceCategoryValue(key, value);
                                         htmlContent += `<span>${replacedValue} </span>`;
                                     }
-                                }
+                                });
 
-                                htmlContent += '</div>';
                                 const listItem = document.createElement('div');
                                 listItem.innerHTML = htmlContent;
                                 weatherList.appendChild(listItem);
