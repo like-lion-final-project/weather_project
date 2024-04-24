@@ -2,7 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>ootdDetail</title>
+    <title>OOTD 상세정보</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-5">
@@ -33,11 +35,6 @@
                   id="postCategory" name="postCategory"
                   th:value="${posts.category}" th:text="${posts.category}" readonly></textarea>
     </div>
-    <div>
-        <label for="registerDate">작성일</label>
-        <input type="text" id="registerDate" name="registerDate" class="form-control"
-               value="작성자" th:value="${posts.getCreatedDate}" readonly>
-    </div>
     <hr class="my-4">
 
     <form th:action="@{/ootd/update/{postId}(postId=${posts.id})}" th:method="get">
@@ -57,5 +54,9 @@
 
 </div> <!-- /container -->
 </div>
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

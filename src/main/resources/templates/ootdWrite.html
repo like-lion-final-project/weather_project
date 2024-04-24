@@ -2,11 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>OOTD WRITE</title>
+    <title>OOTD 생성</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
-    <form method="post" action="/ootd/write">
+    <form method="post" action="/ootd/write" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="title-input" class="form-label">Title</label>
             <input type="text" name="title" class="form-control" id="title-input">
@@ -26,10 +28,12 @@
             </select>
         </div>
         -->
-        <div style="text-align: center;">
-            <input type="submit" value="글 작성">
-        </div>
+        <button class="btn btn-primary" > 글 작성</button>
     </form>
 </div>
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
