@@ -2,7 +2,7 @@ package com.example.demo.weather.controller;
 
 import com.example.demo.weather.dto.MidLandDto;
 import com.example.demo.weather.dto.MidTaDto;
-import com.example.demo.weather.service.MidAreaCodeService;
+import com.example.demo.weather.service.fcst.MidAreaCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -9,11 +9,11 @@ import com.example.demo.weather.dto.mid_land.MidLandApiResponse;
 import com.example.demo.weather.dto.mid_ta.MidTaApiResponse;
 import com.example.demo.weather.dto.news.NDNewsResponse;
 import com.example.demo.weather.dto.rgeocoding.RGeoResponseDto;
-import com.example.demo.weather.service.GridConversionService;
-import com.example.demo.weather.service.MidFcstService;
-import com.example.demo.weather.service.NDSearchService;
-import com.example.demo.weather.service.SrtFcstService;
-import com.example.demo.weather.service.NcpGeocodeService;
+import com.example.demo.weather.service.ncp.GridConversionService;
+import com.example.demo.weather.service.fcst.MidFcstService;
+import com.example.demo.weather.service.nd.NDSearchService;
+import com.example.demo.weather.service.fcst.SrtFcstService;
+import com.example.demo.weather.service.ncp.NcpGeocodeService;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;

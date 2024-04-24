@@ -1,4 +1,4 @@
-package com.example.demo.weather.service;
+package com.example.demo.weather.service.nd;
 
 import com.example.demo.weather.dto.news.NDNewsResponse;
 import java.util.HashMap;

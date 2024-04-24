@@ -1,4 +1,4 @@
-package com.example.demo.weather.service;
+package com.example.demo.weather.service.ncp;
 
 import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
 

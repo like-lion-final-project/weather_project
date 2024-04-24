@@ -1,7 +1,7 @@
 package com.example.demo.weather.config;
 
-import com.example.demo.weather.service.MidFcstApiService;
-import com.example.demo.weather.service.SrtFcstApiService;
+import com.example.demo.weather.service.fcst.MidFcstApiService;
+import com.example.demo.weather.service.fcst.SrtFcstApiService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;

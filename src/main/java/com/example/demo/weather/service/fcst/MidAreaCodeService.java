@@ -1,4 +1,4 @@
-package com.example.demo.weather.service;
+package com.example.demo.weather.service.fcst;
 
 import com.example.demo.weather.dto.MidLandDto;
 import com.example.demo.weather.dto.MidTaDto;

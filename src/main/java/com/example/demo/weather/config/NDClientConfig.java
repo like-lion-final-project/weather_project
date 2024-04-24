@@ -1,6 +1,6 @@
 package com.example.demo.weather.config;
 
-import com.example.demo.weather.service.NDApiService;
+import com.example.demo.weather.service.nd.NDApiService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

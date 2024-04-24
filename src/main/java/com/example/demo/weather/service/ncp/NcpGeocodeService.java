@@ -1,6 +1,5 @@
-package com.example.demo.weather.service;
+package com.example.demo.weather.service.ncp;
 
-import com.example.demo.weather.dto.GridDto;
 import com.example.demo.weather.dto.PointDto;
 import com.example.demo.weather.dto.geocoding.GeoAddress;
 import com.example.demo.weather.dto.geocoding.GeoNcpResponse;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Slf4j
