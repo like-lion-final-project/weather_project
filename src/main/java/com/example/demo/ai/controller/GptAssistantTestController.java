@@ -1,146 +1,31 @@
 package com.example.demo.ai.controller;
 
 
-import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
-import com.example.demo.ai.dto.assistant.GetAssistantResDto;
-import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
-import com.example.demo.ai.dto.message.CreateMessageDto;
-import com.example.demo.ai.dto.message.CreateMessageResDto;
-import com.example.demo.ai.dto.message.GetMessagesResDto;
-import com.example.demo.ai.dto.run.CreateRunReqDto;
-import com.example.demo.ai.dto.run.CreateRunResDto;
-import com.example.demo.ai.dto.run.OneStepRunParamDto;
-import com.example.demo.ai.dto.thread.CreateThreadResDto;
-import com.example.demo.ai.dto.thread.DeleteThreadResDto;
+import com.example.demo.ai.dto.assistant.Assistant;
+import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
+import com.example.demo.ai.dto.messages.MessageList;
+import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
+import com.example.demo.ai.dto.run.Run;
 import com.example.demo.ai.service.GptAssistantApiService;
-
 import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
-import com.example.demo.ai.service.dto.DeleteAssistantResDto;
-import com.example.demo.weather.dto.srt_fcst.FcstItem;
+import com.example.demo.weather.dto.fcst.FcstItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 
 public class GptAssistantTestController {
-    private final GptAssistantApiService gptAssistantApiService;
     private final GptService gptService;
-
-
-    @PostMapping("/v1/assistants")
-    public GptApiCreateAssistantResDto createAssistant(
-            @RequestBody
-            CreateAssistantReqDto dto
-    ) {
-
-        dto.getTools().forEach(item -> System.out.println(item.getType() + "type"));
-
-        return gptAssistantApiService.createAssistantAPI(dto);
-    }
-
-    @GetMapping("/v1/assistants/{assistantId}")
-    public Optional<GetAssistantResDto.Data> getAssistant(
-            @PathVariable("assistantId")
-            String assistantId
-    ) {
-        return gptAssistantApiService.getAssistantAPI(assistantId);
-    }
-
-    @GetMapping("/v1/assistants")
-    public GetAssistantResDto getAssistants() {
-        return gptAssistantApiService.getAssistantsAPI();
-    }
-
-    @DeleteMapping("/v1/assistants/{assistantId}")
-    public DeleteAssistantResDto deleteAssistants(@PathVariable("assistantId") String assistantId) {
-        return gptAssistantApiService.deleteAssistantAPI(assistantId);
-    }
-
-    @GetMapping("/v1/threads/{threadId}")
-    public CreateThreadResDto getThread(@PathVariable("threadId") String threadId) {
-        return gptAssistantApiService.getThread(threadId);
-    }
-
-    @PostMapping("/v1/threads")
-    public CreateThreadResDto createThread(
-            @RequestBody
-            CreateRunReqDto dto
-    ) {
-        return gptAssistantApiService.createThreadAPI(dto.getAssistantId());
-    }
-
-    @DeleteMapping("/v1/threads/{threadId}")
-    public DeleteThreadResDto deleteThreadResDto(@PathVariable("threadId") String threadId) {
-        return gptAssistantApiService.deleteThreadAPI(threadId);
-    }
-
-    @PostMapping("/v1/threads/{threadId}/messages")
-    public CreateMessageResDto createMessage(
-            @PathVariable("threadId")
-            String threadId,
-            @RequestBody
-            CreateMessageDto dto
-    ) {
-        return gptAssistantApiService.createMessageAPI(dto.getRole(), dto.getContent(), threadId);
-    }
-
-    @GetMapping("/v1/threads/{threadId}/messages/{messageId}")
-    public CreateMessageResDto getMessage(
-            @PathVariable("threadId")
-            String threadId,
-            @PathVariable("messageId")
-            String messageId
-    ) {
-        return gptAssistantApiService.getMessageAPI(threadId, messageId);
-    }
-
-    @GetMapping("/v1/threads/{threadId}/messages")
-    public GetMessagesResDto getMessages(
-            @PathVariable("threadId")
-            String threadId
-    ) {
-        return gptAssistantApiService.getMessagesAPI(threadId);
-    }
-
-    @PostMapping("/v1/threads/{threadId}/runs")
-    public CreateRunResDto createRun(
-            @PathVariable("threadId")
-            String threadId,
-            @RequestBody
-            CreateRunReqDto dto
-    ) {
-        return gptAssistantApiService.run(threadId, dto.getAssistantId());
-    }
-
-    @GetMapping("/v1/threads/{threadId}/runs/{runId}")
-    public CreateRunResDto getRun(
-            @PathVariable("threadId")
-            String threadId,
-            @PathVariable("runId")
-            String runId
-    ) {
-        return gptAssistantApiService.getRun(threadId, runId);
-    }
-
-    @PostMapping("/v1/threads/runs")
-    public CreateRunResDto onStepRun(
-            @RequestBody
-            OneStepRunParamDto dto
-
-    ) {
-        return gptAssistantApiService.oneStepRun(dto.getRole(), dto.getMessage(), dto.getAssistantId());
-    }
-
+    private final GptAssistantApiService gptAssistantApiService;
     @PostMapping("/v1/daily-cody")
     public void dailyCody(
             @RequestBody
-            OneStepRunParamDto dto
+            CreateThreadAndRunRequest dto
     ) {
 
         List<FcstItem> fcstItemList = new ArrayList<>();
@@ -159,13 +44,48 @@ public class GptAssistantTestController {
             );
         }
 
-        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
-        for (String item:dailyCodyResDto.getCategories()
-             ) {
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(dto,fcstItemList);
+        for (String item : dailyCodyResDto.getCategories()
+        ) {
             System.out.println(item + "카테고리");
         }
     }
+
+    @PostMapping("/v2/assistants")
+    public Assistant createAssistant(
+            @RequestBody
+            AssistantCreateRequest dto
+    ) {
+
+        dto.getTools().forEach(item -> System.out.println(item.getType() + "type"));
+
+        return gptAssistantApiService.createAssistantAPI(dto,"fashion","0.0.1");
+    }
+
+
+    @PostMapping("/v2/threads/runs")
+    public Run createThreadAndRun(
+            @RequestBody
+            CreateThreadAndRunRequest dto
+
+    ) {
+        return gptAssistantApiService.createThreadAndRun(dto);
+    }
+
+    @GetMapping("/v2/threads/{threadId}/messages")
+    public MessageList getMessages(
+            @PathVariable("threadId")
+            String threadId
+    ){
+        return gptAssistantApiService.getMessagesAPI(threadId);
+    }
 }
+
+// TODO: 파일 업로드
+// TODO: 백터스토어 생성
+// TODO: 업로드한 파일 백터스토어에 추가
+// TODO: 실행시 해당 백터 스토어 id 추가하여 전송 혹은 어시스턴트 생성시 백터스토어 아이디 추가하여 생성
+
 
 /**
  * thread_8EZ9Fm2oxQI0iBuEiK9SX1CG
@@ -174,3 +94,5 @@ public class GptAssistantTestController {
  * thread_BnhYznQAq8HoQclYjTpABCDN
  * thread_hxgakXQdvkcb9PS5WVkZE5xN
  */
+
+

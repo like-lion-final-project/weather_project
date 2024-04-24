@@ -1,31 +1,30 @@
-package com.example.demo.ai.dto.message;
+package com.example.demo.ai.dto.messages;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class GetMessagesResDto {
+public class MessageList {
+    private String id;
     private String object;
 
-
     @JsonProperty("data")
-    private List<CreateMessageResDto> data;
-
-    @JsonProperty("has_more")
-    private boolean hasMore;
+    private List<Message> messages;
 
     @JsonProperty("first_id")
     private String firstId;
 
     @JsonProperty("last_id")
     private String lastId;
+
+    @JsonProperty("has_more")
+    private boolean hasMore;
+
 }

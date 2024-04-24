@@ -1,15 +1,14 @@
-package com.example.demo.ai.dto.thread;
+package com.example.demo.ai.dto.file;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class DeleteThreadResDto {
+public class FileDelete {
     private String id;
     private String object;
     private boolean deleted;

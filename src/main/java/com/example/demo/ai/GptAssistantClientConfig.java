@@ -16,7 +16,7 @@ public class GptAssistantClientConfig {
     /**
      * OpenAI assistant api 버전.
      */
-    public static final String ASSISTANTS_V1 = "assistants=v1";
+    public static final String ASSISTANTS_V1 = "assistants=v2";
     private static final String BASE_URL = "https://api.openai.com";
 
 
