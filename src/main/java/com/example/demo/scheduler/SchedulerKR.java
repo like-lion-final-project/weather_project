@@ -7,9 +7,8 @@ import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.weather.dto.WeatherForecast;
-import com.example.demo.weather.dto.fcst.FcstItem;
-import com.example.demo.weather.service.VilageFcstApiService;
-import com.example.demo.weather.service.VilageSrtFcstService;
+import com.example.demo.weather.dto.srt_fcst.FcstItem;
+import com.example.demo.weather.service.fcst.SrtFcstService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +24,7 @@ import java.util.Optional;
 public class SchedulerKR {
     private final GptService gptService;
     private final AssistantRepo assistantRepo;
-    private final VilageSrtFcstService vilageFcstApiService;
+    private final SrtFcstService srtFcstService;
 
 
 /**
@@ -47,11 +46,11 @@ public class SchedulerKR {
 //@Scheduled(fixedDelay = 9000)
     public void dailyCodyScheduler(){
      log.info("cron - start");
-     Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion","0.0.1");
+     Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion","0.0.2");
      if(assistant.isEmpty()){
          return;
      }
-      List<WeatherForecast> weatherForecasts = vilageFcstApiService.getUltraSrtFcst(63,120);
+      List<WeatherForecast> weatherForecasts = srtFcstService.getUltraSrtFcst(63,120);
 
      List<FcstItem> fcstItems = new ArrayList<>();
      for (WeatherForecast item: weatherForecasts
