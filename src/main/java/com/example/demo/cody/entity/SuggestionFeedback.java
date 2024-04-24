@@ -1,23 +1,26 @@
 package com.example.demo.cody.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SuggestionFeedback {
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private int rating;
-    private LocalDateTime create_at;
-    private LocalDateTime update_at;
+    private String image;
+    private String query;
+    private LocalDateTime createAt;
+    private LocalDateTime updateAt;
+    @ManyToOne
+    @JoinColumn(name = "category_Id", referencedColumnName = "id")
+    private ClothsCategory category;
 }

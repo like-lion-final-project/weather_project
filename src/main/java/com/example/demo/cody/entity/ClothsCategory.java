@@ -1,13 +1,14 @@
 package com.example.demo.cody.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -15,8 +16,8 @@ import lombok.*;
 public class ClothsCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private String type;
-    private int value;
-
+    @OneToMany(mappedBy = "category")
+    private List<SuggestionFeedback>suggestionFeedbacks=new ArrayList<>();
 }

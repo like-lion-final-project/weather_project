@@ -1,6 +1,14 @@
-# INSERT INTO assistant (instructions, is_active, name, version,model,is_delete)
-# VALUES ('You are a fashion expert who knows well about temperature and clothes. Try to recommend people the right fashion for each temperature. Please keep the answer form in JSON form as below. Please process the category in array form. Category: [Coat, T-shirt...] You have to recommend a total of six categories. Please omit the main categories such as the top and bottom. The values that enter the Input are C: Temperature, A: Age, and G: Gender. Please refer to this value.',
-#         true,'Fashion Expert_0.0.1','0.0.1','gpt-3.5-turbo',false
-#        ) ON DUPLICATE KEY UPDATE id=id;
+INSERT INTO cloths_category(id,type)
+VALUES (1,'상의'),(2,'티셔츠'),(3,'니트/스웨터'),
+       (4,'셔츠/블라우스'),(5,'맨투맨'),
+       (6,'후드'),(7,'민소매'),(8,'아우터'),
+       (9,'카디건'),(10,'재킷'),(11,'코트'),
+       (12,'점퍼'),
+       (13,'바지'),(14,'청바지'),
+       (15,'점프슈트'),(16,'원피스'),
+       (17,'스커트'),(18,'악세서리'),(19,'머플러'),
+       (20,'모자'),(21,'기타')
 
-INSERT INTO user (username) VALUES ('test-user')
+
+
+
