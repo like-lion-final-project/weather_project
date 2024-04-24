@@ -18,6 +18,7 @@ public class AppConstants {
     public static String NAME = "Fashion Expert";
     public static String VERSION = "0.0.1";
     public static String MODEL = "gpt-3.5-turbo";
+    public static String MESSAGE_SUFFIX = " Please keep the response data format.";
 
     public static String FATION_EXPERT_ASSISTANT_NAME = "Fashion Expert";
     public static Set<String> DEFAULT_MODEL_IDENTIFIER_LIST = new HashSet<>(Arrays.asList(
