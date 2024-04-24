@@ -21,14 +21,14 @@ public class MidAreaCodeService {
     private final MidTaAreaCodeRepo midTaAreaCodeRepo;
 
     public MidLandDto readLandAreaCode(String area) {
-        Optional<MidLandAreaCode> midLandAreaCodeOptional = midLandAreaCodeRepo.findByArea(area);
+        Optional<MidLandAreaCode> midLandAreaCodeOptional = midLandAreaCodeRepo.findByAreaContaining(area);
         if (midLandAreaCodeOptional.isPresent()) {
             return MidLandDto.fromEntity(midLandAreaCodeOptional.get());
         } else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    public MidTaDto readTaAreaCode(String areaName) {
-        Optional<MidTaAreaCode> midTaAreaCodeOptional = midTaAreaCodeRepo.findByArea(areaName);
+    public MidTaDto readTaAreaCode(String area) {
+        Optional<MidTaAreaCode> midTaAreaCodeOptional = midTaAreaCodeRepo.findByArea(area);
         if (midTaAreaCodeOptional.isPresent()) {
             return MidTaDto.fromEntity(midTaAreaCodeOptional.get());
         } else {
