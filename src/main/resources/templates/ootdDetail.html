@@ -22,6 +22,9 @@
         <label for="postTitle">제목</label>
         <input type="text" id="postTitle" name="postTitle" class="form-control"
                value="제목" th:value="${posts.title}" readonly>
+    </div><br>
+    <div>
+        <img class ="img-fluid" id="postImg" th:src="@{${posts.getImgPath()}}"></img>
     </div>
     <div>
         <label for="postContent">내용</label>
@@ -31,12 +34,11 @@
     </div>
     <div>
         <label for="postCategory">카테고리</label>
-        <textarea class="form-control" rows="5"
+        <textarea class="form-control" rows="3"
                   id="postCategory" name="postCategory"
                   th:value="${posts.category}" th:text="${posts.category}" readonly></textarea>
     </div>
     <hr class="my-4">
-
     <form th:action="@{/ootd/update/{postId}(postId=${posts.id})}" th:method="get">
         <input type="hidden" name="_method" value="update">
         <input type="submit" class="btn btn-danger" value="수정하기">

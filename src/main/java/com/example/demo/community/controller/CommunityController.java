@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("ootd")
@@ -36,9 +38,11 @@ public class CommunityController {
             String content,
             @RequestParam("category")
             String category,
+            MultipartFile imgFile,
             RedirectAttributes redirectAttributes
-    ) {
-        PostDto dto =postService.createOOTD(title, content, category);
+    ) throws IOException
+    {
+        PostDto dto =postService.createOOTD(title, content, category, imgFile);
 
         if (dto == null) {
             redirectAttributes.addFlashAttribute("message",

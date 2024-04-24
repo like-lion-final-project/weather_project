@@ -32,9 +32,12 @@ public class Post {
     // 아래의 어노테이션을 붙이면 자동으로 저장된다
     @CreationTimestamp
     private LocalDateTime createdDate;
-    // 댓글
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Comment> comments;
+    @Setter
+    private String imgName;
+    @Setter
+    private String imgPath;
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     private User userEntity;
