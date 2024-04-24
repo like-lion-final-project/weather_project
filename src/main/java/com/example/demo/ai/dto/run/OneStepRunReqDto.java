@@ -1,6 +1,8 @@
 package com.example.demo.ai.dto.run;
 
-import com.example.demo.ai.dto.message.CreateMessageDto;
+import com.example.demo.ai.dto.Tool;
+import com.example.demo.ai.dto.ToolsResources;
+import com.example.demo.ai.dto.messages.v2.messages.Message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,12 +20,16 @@ public class OneStepRunReqDto {
     @JsonProperty("assistant_id")
     private String assistantId;
     private Thread thread;
+    private List<Tool> tools;
+
+    @JsonProperty("tool_resources")
+    private ToolsResources toolsResources;
 
     @Getter
     @Builder
     @RequiredArgsConstructor
     @AllArgsConstructor
     public static class Thread {
-        private List<CreateMessageDto> messages;
+        private List<Message> messages;
     }
 }

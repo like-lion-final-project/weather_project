@@ -1,5 +1,7 @@
 package com.example.demo.ai.service;
 
+import com.example.demo.ai.dto.Tool;
+import com.example.demo.ai.dto.ToolsResources;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.assistant.GptApiCreateAssistantReqDto;
@@ -7,11 +9,12 @@ import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
 import com.example.demo.ai.dto.file.FileData;
 import com.example.demo.ai.dto.file.FileDelete;
 import com.example.demo.ai.dto.file.FileList;
-import com.example.demo.ai.dto.message.CreateMessageDto;
-import com.example.demo.ai.dto.message.CreateMessageResDto;
-import com.example.demo.ai.dto.message.GetMessagesResDto;
-import com.example.demo.ai.dto.run.CreateRunReqDto;
-import com.example.demo.ai.dto.run.CreateRunResDto;
+import com.example.demo.ai.dto.messages.v2.messages.Message;
+import com.example.demo.ai.dto.messages.CreateMessageResDto;
+import com.example.demo.ai.dto.messages.GetMessagesResDto;
+import com.example.demo.ai.dto.messages.v2.messages.MessageRequest;
+import com.example.demo.ai.dto.run.RunCreateRequest;
+import com.example.demo.ai.dto.run.Run;
 import com.example.demo.ai.dto.run.OneStepRunReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
@@ -39,10 +42,8 @@ import org.springframework.util.MultiValueMap;
 
 import org.springframework.web.client.RestClient;
 
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -385,7 +386,7 @@ public class GptAssistantApiService {
      *
      * @param message 전송할 단일 메시지 입니다.
      */
-    public CreateMessageResDto createMessageAPI(String role, String message, String threadId) {
+    public Message createMessageAPI(String role, String message, String threadId) {
         String uri = "/v1/threads/" + threadId + "/messages";
         AssistantThread assistantThread = assistantThreadRepo.findThreadByThreadId(threadId).orElseThrow(() -> new RuntimeException("스레드가 데이터베이스에 존재하지 않습니다."));
 
@@ -393,7 +394,7 @@ public class GptAssistantApiService {
                 .post()
                 .uri(uri)
                 .body(
-                        CreateMessageDto.builder()
+                        MessageRequest.builder()
                                 .content(message)
                                 .role(role)
                                 .build()
@@ -406,7 +407,7 @@ public class GptAssistantApiService {
                 .toEntity(String.class);
 
         try {
-            CreateMessageResDto response = objectMapper.readValue(json.getBody(), CreateMessageResDto.class);
+            Message response = objectMapper.readValue(json.getBody(), Message.class);
             if (response.getContent().stream().findFirst().isEmpty()) throw new RuntimeException("메시지 생성 에러");
             AssistantThreadMessage.builder()
                     .assistantThread(assistantThread)
@@ -490,12 +491,12 @@ public class GptAssistantApiService {
      * @param threadId    실행 객체에 포함할 스레드 아이디 입니다. 해당 스레드 내에 있는 모든 메시지를 포함합니다.
      * @param assistantId 실행시 어떤 어시스턴트가 해당 작업을 수행할지 결정하는 어시스턴트 아이디 입니다.
      */
-    public CreateRunResDto run(String threadId, String assistantId) {
+    public Run run(String threadId, String assistantId) {
         String uri = "/v1/threads/" + threadId + "/runs";
         ResponseEntity<String> json = restClient
                 .post()
                 .uri(uri)
-                .body(CreateRunReqDto.builder()
+                .body(RunCreateRequest.builder()
                         .assistantId(assistantId)
                         .build())
                 .retrieve()
@@ -507,7 +508,7 @@ public class GptAssistantApiService {
                 .toEntity(String.class);
 
         try {
-            return objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+            return objectMapper.readValue(json.getBody(), Run.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (Exception e) {
@@ -522,7 +523,7 @@ public class GptAssistantApiService {
      * @param threadId 실행 객체에 포함된 스레드 아이디 입니다.
      * @param runId    실행객체의 아이디 입니다.
      */
-    public CreateRunResDto getRun(String threadId, String runId) {
+    public Run getRun(String threadId, String runId) {
         String uri = "/v1/threads/" + threadId + "/runs/" + runId;
         ResponseEntity<String> json = restClient
                 .get()
@@ -535,7 +536,7 @@ public class GptAssistantApiService {
                         })
                 .toEntity(String.class);
         try {
-            return objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+            return objectMapper.readValue(json.getBody(), Run.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (Exception e) {
@@ -551,15 +552,20 @@ public class GptAssistantApiService {
      * @param message     생성된 스레드에 포함할 단일 메시지
      * @param role        'user', 'assistant' 등 권한을 의미함. 기본 값은 user
      */
-    public CreateRunResDto oneStepRun(String role, String message, String assistantId) {
+    public Run oneStepRun(String role, String message, String assistantId, List<Tool> tools, ToolsResources toolsResouces) {
         if (!role.equals("user") && !role.equals("assistant")) {
             role = "user";
         }
-        List<CreateMessageDto> messages = new ArrayList<>();
-        messages.add(CreateMessageDto.builder().role(role).content(message).build());
+        List<Message> messages = new ArrayList<>();
+        messages.add(Message.builder().role(role).content(message).build());
 
         OneStepRunReqDto.Thread reqThread = OneStepRunReqDto.Thread.builder().messages(messages).build();
-        OneStepRunReqDto oneStepRunReqDto = OneStepRunReqDto.builder().assistantId(assistantId).thread(reqThread).build();
+        OneStepRunReqDto oneStepRunReqDto = OneStepRunReqDto.builder()
+                .assistantId(assistantId)
+                .thread(reqThread)
+                .tools(tools)
+                .toolsResources(toolsResouces)
+                .build();
 
         String uri = "/v1/threads/runs";
         ResponseEntity<String> json = restClient
@@ -580,7 +586,7 @@ public class GptAssistantApiService {
 
 
         try {
-            CreateRunResDto response = objectMapper.readValue(json.getBody(), CreateRunResDto.class);
+            Run response = objectMapper.readValue(json.getBody(), Run.class);
 
             AssistantThreadMessage.builder().build();
             AssistantThread thread = AssistantThread.builder()

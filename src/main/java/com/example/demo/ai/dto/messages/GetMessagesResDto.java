@@ -1,7 +1,6 @@
-package com.example.demo.ai.dto.message;
+package com.example.demo.ai.dto.messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

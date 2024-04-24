@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class CreateRunReqDto {
+public class RunCreateRequest {
     @JsonProperty("assistant_id")
     String assistantId;
 }

@@ -1,7 +1,7 @@
-package com.example.demo.ai.dto.message;
+package com.example.demo.ai.dto.messages;
 
+import com.example.demo.ai.dto.messages.v2.messages.Message;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jdk.jfr.SettingDefinition;
 import lombok.*;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class CreateThreadAndRunReqDto {
     @AllArgsConstructor
     public static class Thread {
         @JsonProperty("messages")
-        private List<CreateMessageDto> messages;
+        private List<Message> messages;
     }
 
 }

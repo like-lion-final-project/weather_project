@@ -7,12 +7,12 @@ import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
 import com.example.demo.ai.dto.file.FileData;
 import com.example.demo.ai.dto.file.FileDelete;
 import com.example.demo.ai.dto.file.FileList;
-import com.example.demo.ai.dto.message.CreateMessageDto;
-import com.example.demo.ai.dto.message.CreateMessageResDto;
-import com.example.demo.ai.dto.message.GetMessagesResDto;
-import com.example.demo.ai.dto.run.CreateRunReqDto;
-import com.example.demo.ai.dto.run.CreateRunResDto;
-import com.example.demo.ai.dto.run.OneStepRunParamDto;
+import com.example.demo.ai.dto.messages.v2.messages.Message;
+import com.example.demo.ai.dto.messages.CreateMessageResDto;
+import com.example.demo.ai.dto.messages.GetMessagesResDto;
+import com.example.demo.ai.dto.run.RunCreateRequest;
+import com.example.demo.ai.dto.run.Run;
+import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
@@ -75,7 +75,7 @@ public class GptAssistantTestController {
     @PostMapping("/v1/threads")
     public CreateThreadResDto createThread(
             @RequestBody
-            CreateRunReqDto dto
+            RunCreateRequest dto
     ) {
         return gptAssistantApiService.createThreadAPI(dto.getAssistantId());
     }
@@ -90,7 +90,7 @@ public class GptAssistantTestController {
             @PathVariable("threadId")
             String threadId,
             @RequestBody
-            CreateMessageDto dto
+            Message dto
     ) {
         return gptAssistantApiService.createMessageAPI(dto.getRole(), dto.getContent(), threadId);
     }
@@ -114,17 +114,17 @@ public class GptAssistantTestController {
     }
 
     @PostMapping("/v1/threads/{threadId}/runs")
-    public CreateRunResDto createRun(
+    public Run createRun(
             @PathVariable("threadId")
             String threadId,
             @RequestBody
-            CreateRunReqDto dto
+            RunCreateRequest dto
     ) {
         return gptAssistantApiService.run(threadId, dto.getAssistantId());
     }
 
     @GetMapping("/v1/threads/{threadId}/runs/{runId}")
-    public CreateRunResDto getRun(
+    public Run getRun(
             @PathVariable("threadId")
             String threadId,
             @PathVariable("runId")
@@ -134,18 +134,20 @@ public class GptAssistantTestController {
     }
 
     @PostMapping("/v1/threads/runs")
-    public CreateRunResDto onStepRun(
+    public Run onStepRun(
             @RequestBody
-            OneStepRunParamDto dto
+            CreateThreadAndRunRequest dto
 
     ) {
-        return gptAssistantApiService.oneStepRun(dto.getRole(), dto.getMessage(), dto.getAssistantId());
+        List<String> vectorStroeIds = new ArrayList<>();
+        vectorStroeIds.add("file-9iyf0ykNAidZl6CzJWXF0QpC");
+        return gptAssistantApiService.oneStepRun(dto.getRole(), dto.getMessage(), dto.getAssistantId(), dto.getTools(), dto.getToolsResources());
     }
 
     @PostMapping("/v1/daily-cody")
     public void dailyCody(
             @RequestBody
-            OneStepRunParamDto dto
+            CreateThreadAndRunRequest dto
     ) {
 
         List<FcstItem> fcstItemList = new ArrayList<>();
@@ -164,9 +166,9 @@ public class GptAssistantTestController {
             );
         }
 
-        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
-        for (String item:dailyCodyResDto.getCategories()
-             ) {
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList, dto.getTools(),dto.getToolsResources());
+        for (String item : dailyCodyResDto.getCategories()
+        ) {
             System.out.println(item + "카테고리");
         }
     }
@@ -174,17 +176,17 @@ public class GptAssistantTestController {
     @PostMapping("/v1/files")
     public FileData uploadFile(
             @RequestParam("uploadFile")
-                               MultipartFile uploadFile,
-                           HttpServletRequest req
+            MultipartFile uploadFile,
+            HttpServletRequest req
 
-    ){
+    ) {
 
         return gptAssistantApiService.fileUploadAPI(uploadFile);
 
     }
 
     @GetMapping("/v1/files")
-    public Optional<FileList> getFiles(){
+    public Optional<FileList> getFiles() {
         return gptAssistantApiService.getfiles();
     }
 
@@ -192,7 +194,7 @@ public class GptAssistantTestController {
     public Optional<FileDelete> deleteFile(
             @PathVariable("fileId")
             String fileId
-    ){
+    ) {
         return gptAssistantApiService.deleteFile(fileId);
     }
 }
