@@ -11,69 +11,39 @@
     <title>네이버 지도 테스트</title>
     <script type="text/javascript"
             th:src="@{https://oapi.map.naver.com/openapi/v3/maps.js(ncpClientId=${clientId})}"></script>
-
-    <style>
-        #six-hour-weather-list {
-            display: flex;
-            flex-wrap: nowrap; /* 가로로 넘치는 경우에도 줄 바꿈 없이 유지 */
-            overflow-x: auto; /* 가로 스크롤을 추가하고 넘치는 경우에 스크롤을 표시 */
-            overflow-y: hidden; /* 세로 스크롤이 나타나지 않도록 함 */
-        }
-
-        #six-hour-weather-list li {
-            flex: 0 0 auto; /* 자식 요소의 크기가 자동으로 조정되지 않도록 고정 */
-            margin-right: 10px; /* 각 요소 사이의 간격 조정 */
-        }
-        #weather-info {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            margin-left: 140px; /* 좌측 여백 추가 */
-            margin-right: 140px; /* 우측 여백 추가 */
-        }
-
-        #location, #base-time {
-            float: right;
-        }
-
-        #search-region {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            margin-left: 140px; /* 좌측 여백 추가 */
-            margin-right: 140px; /* 우측 여백 추가 */
-        }
-
-        #weather-news {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            margin-left: 140px; /* 좌측 여백 추가 */
-            margin-right: 140px; /* 우측 여백 추가 */
-        }
-
-        #weather-news h3 {
-            text-align: center;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="/css/home.css">
 </head>
 <body>
 
 <div class="container">
     <h4 class="mt-3 mb-3 text-center">오늘의 날씨</h4>
     <div id="weather-info" class="mb-3">
-        <div class="row">
-            <h5 id="location"></h5>
+        <div class="row" style="display: flex; justify-content: space-between;">
+            <span style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 id="location" style="margin: 0;"></h4>
+                <span>
+                    <p id="base-date" class="text-end" style="margin: 0;"></p>
+                    <a href="#" id="current-location-link">내위치</a>
+                </span>
+            </span>
         </div>
-        <div class="row">
-           <p id="base-date" class="text-end"></p>
+
+        <span>
+            <h1 id="t1h-value"></h1>
+            <ul id="weather-list"></ul>
+        </span>
+        시간대별 날씨
+        <div id="six-hour-weather-list" class="box">
+            <!-- 시간대 별로 날씨 정보 동적으로 생성되도록 -->
         </div>
-        <ul id="weather-list" class="list-unstyled"></ul>
-        <ul id="six-hour-weather-list" class="list-unstyled"></ul>
+        주간 강수확률, 하늘상태
+        <div id="weekly-land-weather" class="box">
+        <!-- 시간대 별로 날씨 정보 동적으로 생성되도록 -->
+        </div>
+        주간 기온
+        <div id="weekly-ta-weather" class="box">
+            <!-- 시간대 별로 날씨 정보 동적으로 생성되도록 -->
+        </div>
     </div>
     <h4 class="mt-3 mb-3 text-center">지역 검색</h4>
     <div id="search-region" class="mb-3">
@@ -81,412 +51,19 @@
             <input type="text" id="search-location" class="form-control" placeholder="주소를 입력하세요">
             <button id="search-weather" class="btn btn-primary">검색</button>
         </div>
-        <p id="search-result"></p>
-        <!-- 지도 -->
+        <div id="search-result" class="list-group mb-3">
+            <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
+        </div>
         <div id="map" style="width:100%;height: 30vh;" class="mb-3"></div>
     </div>
     <h4 class="mt-3 mb-3 text-center">날씨 뉴스</h4>
-    <div id="weather-news" class="mb-3">
+    <div id="news-container" class="container mt-4 mb-3">
+        <ul id="weather-news" class="list-group">
+        </ul>
     </div>
 </div>
-
-<script>
-    let position = new naver.maps.LatLng(37.3595704, 127.105399)
-    let mapOptions = {
-        center: position,
-        zoom: 6,
-        zoomControl: true,
-        zoomControlOptions: {
-            position: naver.maps.Position.TOP_RIGHT
-        }
-    };
-    let map = new naver.maps.Map('map', mapOptions);
-
-    // 각 카테고리에 대한 값 대체 함수
-    function replaceCategoryValue(category, value) {
-        switch (category) {
-            case 'SKY':
-                return {
-                    1: '맑음',
-                    3: '구름많음',
-                    4: '흐림'
-                }[value] || '알 수 없음';
-            case 'PTY':
-                return {
-                    0: '강수없음',
-                    1: '비',
-                    2: '비/눈',
-                    3: '눈',
-                    5: '빗방울',
-                    6: '빗방울눈날림',
-                    7: '눈날림'
-                }[value] || '알 수 없음';
-            case 'RN1':
-                return value === 0 ? '강수없음' : `${value}mm`;
-            case 'REH':
-                return `${value}%`;
-            case 'T1H':
-                return `${value}°C`;
-            case 'UUU':
-            case 'VVV':
-                return `${value}m/s`;
-            case 'VEC':
-                return `${value}°`;
-            case 'WSD':
-                return `${value}m/s`;
-            case 'LGT':
-                return value === 0 ? '없음' : '있음';
-            default:
-                return value;
-        }
-    }
-
-    // 날씨 카테고리를 한글로 대체하는 함수
-    function replaceCategory(category) {
-        switch (category) {
-            case 'SKY':
-                return '하늘상태';
-            case 'PTY':
-                return '강수 형태';
-            case 'RN1':
-                return '1시간 강수량';
-            case 'REH':
-                return '습도';
-            case 'UUU':
-                return '동서방향 풍속';
-            case 'VEC':
-                return '풍향';
-            case 'VVV':
-                return '남북방향 풍속';
-            case 'LGT':
-                return '낙뢰';
-            case 'WSD':
-                return '풍속';
-            case 'T1H':
-                return '기온';
-            default:
-                return category;
-        }
-    }
-
-    // 사용자의 현재 위치 정보를 얻어와서 날씨 정보를 조회하는 함수
-    function getCurrentWeather() {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-
-            // 지역명 표시
-            fetch(`http://localhost:8080/api/v1/weather/rgeocode?lat=${latitude}&lng=${longitude}`)
-                .then(response => response.json())
-                .then(data => {
-                    const address = data.address.replace(/^kr\s*/, ''); // "kr" 제거
-                    document.getElementById('location').textContent = `${address}`;
-
-                    // 격자 XY 변환
-                    fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${latitude}&lng=${longitude}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const nx = data.nx;
-                            const ny = data.ny;
-
-                            // 초단기 실황
-                            fetch(`http://localhost:8080/api/v1/weather/by-current?nx=${nx}&ny=${ny}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    // 기준 날짜와 시간 정보 추출
-                                    const baseDate = data.response.body.items.item[0].baseDate;
-                                    const baseTime = data.response.body.items.item[0].baseTime;
-
-                                    // 기준 시간을 시, 분으로 분할
-                                    const baseHour = parseInt(baseTime.substring(0, 2));
-                                    const ampm = baseHour >= 12 ? '오후' : '오전';
-                                    const displayHour = baseHour % 12 || 12;
-
-                                    // 기준 날짜를 형식에 맞게 변환 (YYYY. MM. DD)
-                                    const formattedDate = `${baseDate.slice(0, 4)}. ${baseDate.slice(4, 6)}. ${baseDate.slice(6, 8)}`;
-
-                                    // 결과를 HTML에 적용
-                                    document.getElementById('base-date').textContent = `${formattedDate} ${ampm} ${displayHour}시 기준`;
-
-                                    const weatherList = document.getElementById('weather-list');
-                                    weatherList.innerHTML = ''; // 이전에 표시된 날씨 정보 지우기
-
-                                    data.response.body.items.item.forEach(item => {
-                                        const listItem = document.createElement('li');
-                                        const category = replaceCategory(item.category);
-                                        const value = replaceCategoryValue(item.category, item.obsrValue); // 각 카테고리에 대한 값 대체
-                                        listItem.textContent = `${category}: ${value}`;
-                                        weatherList.appendChild(listItem);
-                                    });
-
-
-                                    // 날씨 정보 요청
-                                    fetch(`http://localhost:8080/api/v1/weather/by-hour?nx=${nx}&ny=${ny}`)
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            const weatherList = document.getElementById('six-hour-weather-list');
-                                            weatherList.innerHTML = ''; // 이전에 표시된 날씨 정보 지우기
-
-                                            // 날씨 정보를 화면에 동적으로 표시하기
-                                            data.forEach(item => {
-                                                const listItem = document.createElement('li');
-                                                const fcstTime = item.fcstTime;
-                                                const forecastValues = item.forecastValues;
-
-                                                // 시간대 별로 묶어서 화면에 표시하기
-                                                let htmlContent = `<h5>${fcstTime.slice(0, 2)}:${fcstTime.slice(2)}</h5>`;
-                                                htmlContent += '<ul>';
-
-                                                // forecastValues에 대한 정보 표시
-                                                for (const [key, value] of Object.entries(forecastValues)) {
-                                                    const replacedCategory = replaceCategory(key); // 카테고리 한글로 대체
-                                                    const replacedValue = replaceCategoryValue(key, value); // 값 대체
-                                                    htmlContent += `<li>${replacedCategory}: ${replacedValue}</li>`;
-                                                }
-
-                                                htmlContent += '</ul>';
-                                                listItem.innerHTML = htmlContent;
-
-                                                weatherList.appendChild(listItem);
-                                            });
-                                        })
-                                        .catch(error => console.error('날씨 정보를 가져오는 중 오류 발생:', error));
-                                })
-                                .catch(error => console.error('날씨 데이터를 가져오는 중 오류 발생:', error));
-                        })
-                        .catch(error => console.error('격자 좌표를 가져오는 중 오류 발생:', error));
-                }, function (error) {
-                    console.error("날씨 데이터를 가져오는 중 오류 발생:", error);
-                });
-        });
-    }
-
-    // 페이지 로드 시 사용자의 현재 위치 정보를 이용하여 날씨 정보 조회
-    document.addEventListener('DOMContentLoaded', getCurrentWeather);
-
-
-    // 날씨 검색 버튼 생성
-    function createWeatherButton(point) {
-        const button = document.createElement('button');
-        button.textContent = '날씨 조회';
-
-        button.addEventListener('click', function () {
-            // 좌표 정보 가져오기
-            const lat = point.lat;
-            const lng = point.lng;
-
-            // 날씨 정보 조회 함수 호출
-            getWeatherByCoordinates(lat, lng);
-        });
-
-        return button;
-    }
-
-    // 좌표를 이용하여 날씨 정보를 조회하는 함수
-    function getWeatherByCoordinates(lat, lng, address) {
-        // 지역명 표시
-        document.getElementById('location').textContent = `${address}`;
-
-        // 격자 좌표 변환 요청
-        fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${lat}&lng=${lng}`)
-            .then(response => response.json())
-            .then(data => {
-                const nx = data.nx;
-                const ny = data.ny;
-
-                // 날씨 정보 조회 요청
-                fetch(`http://localhost:8080/api/v1/weather/by-current?nx=${nx}&ny=${ny}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // 기준 날짜와 시간 정보 추출
-                        const baseDate = data.response.body.items.item[0].baseDate;
-                        const baseTime = data.response.body.items.item[0].baseTime;
-
-                        // 기준 시간을 시, 분으로 분할
-                        const baseHour = parseInt(baseTime.substring(0, 2));
-                        const ampm = baseHour >= 12 ? '오후' : '오전';
-                        const displayHour = baseHour % 12 || 12;
-
-                        // 기준 날짜를 형식에 맞게 변환 (YYYY. MM. DD)
-                        const formattedDate = `${baseDate.slice(0, 4)}. ${baseDate.slice(4, 6)}. ${baseDate.slice(6, 8)}`;
-
-                        // 결과를 HTML에 적용
-                        document.getElementById('base-date').textContent = `${formattedDate} ${ampm} ${displayHour}시 기준`;
-
-                        const weatherList = document.getElementById('weather-list');
-                        weatherList.innerHTML = ''; // 이전에 표시된 날씨 정보 지우기
-
-                        data.response.body.items.item.forEach(item => {
-                            const listItem = document.createElement('li');
-                            const category = replaceCategory(item.category);
-                            const value = replaceCategoryValue(item.category, item.obsrValue); // 각 카테고리에 대한 값 대체
-                            listItem.textContent = `${category}: ${value}`;
-                            weatherList.appendChild(listItem);
-                        });
-
-                        // 향후 6시간 동안의 날씨 예보 조회 요청
-                        fetch(`http://localhost:8080/api/v1/weather/by-hour?nx=${nx}&ny=${ny}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                const weatherList = document.getElementById('six-hour-weather-list');
-                                weatherList.innerHTML = ''; // 이전에 표시된 날씨 정보 지우기
-
-                                // 날씨 정보를 화면에 동적으로 표시하기
-                                data.forEach(item => {
-                                    const listItem = document.createElement('li');
-                                    const fcstTime = item.fcstTime;
-                                    const forecastValues = item.forecastValues;
-
-                                    // 시간대 별로 묶어서 화면에 표시하기
-                                    let htmlContent = `<h5>${fcstTime.slice(0, 2)}:${fcstTime.slice(2)}</h5>`;
-                                    htmlContent += '<ul>';
-
-                                    // forecastValues에 대한 정보 표시
-                                    for (const [key, value] of Object.entries(forecastValues)) {
-                                        const replacedCategory = replaceCategory(key); // 카테고리 한글로 대체
-                                        const replacedValue = replaceCategoryValue(key, value); // 값 대체
-                                        htmlContent += `<li>${replacedCategory}: ${replacedValue}</li>`;
-                                    }
-
-                                    htmlContent += '</ul>';
-                                    listItem.innerHTML = htmlContent;
-
-                                    weatherList.appendChild(listItem);
-                                });
-                            })
-                            .catch(error => console.error('날씨 정보를 가져오는 중 오류 발생:', error));
-                    })
-                    .catch(error => console.error('날씨 정보를 가져오는 중 오류 발생:', error));
-            })
-            .catch(error => console.error('격자 좌표를 가져오는 중 오류 발생:', error));
-    }
-
-
-    // markers 배열 초기화
-    let markers = [];
-
-    document.getElementById('search-weather').addEventListener('click', function () {
-        // 이전에 추가된 마커들 제거
-        removeMarkers();
-
-        // 입력된 주소 가져오기
-        const query = document.getElementById('search-location').value;
-
-        // 주소를 이용하여 좌표 정보 가져오기
-        fetch(`http://localhost:8080/api/v1/weather/geocode?query=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                const searchResult = document.getElementById('search-result');
-                searchResult.innerHTML = ''; // 이전 검색 결과 지우기
-
-                // 검색 결과를 화면에 표시하고 각 결과에 날씨 조회 버튼 생성하기
-                data.forEach(point => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `주소: ${point.roadAddress}, 위도: ${point.lat}, 경도: ${point.lng}`;
-
-                    // 날씨 조회 버튼 생성
-                    const weatherButton = document.createElement('button');
-                    weatherButton.textContent = '날씨 조회';
-
-                    weatherButton.addEventListener('click', function () {
-                        // 좌표 정보 가져오기
-                        const lat = point.lat;
-                        const lng = point.lng;
-
-                        // 날씨 조회 함수 호출
-                        getWeatherByCoordinates(lat, lng, point.roadAddress);
-                    });
-
-                    listItem.appendChild(weatherButton);
-                    searchResult.appendChild(listItem);
-
-                    // 마커 추가하기
-                    const marker = new naver.maps.Marker({
-                        position: new naver.maps.LatLng(point.lat, point.lng),
-                        map: map
-                    });
-
-                    // 마커 클릭 이벤트 처리
-                    naver.maps.Event.addListener(marker, 'click', function () {
-                        getWeatherByCoordinates(point.lat, point.lng, point.roadAddress);
-                    });
-
-                    // markers 배열에 마커 추가
-                    markers.push(marker);
-                });
-            })
-            .catch(error => console.error('주소를 이용하여 좌표 정보를 가져오는 중 오류 발생:', error));
-    });
-
-    // 지도에 표시된 마커들을 모두 제거하는 함수
-    function removeMarkers() {
-        markers.forEach(marker => {
-            marker.setMap(null); // 마커를 지도에서 제거
-        });
-        markers = []; // markers 배열 초기화
-    }
-
-
-
-
-
-    // 날씨 뉴스
-    let start = 1;
-    const newsList = document.getElementById('news-list');
-
-    const currentTime = new Date();
-
-    // 시간 차이를 계산하고 표시 형식을 설정
-    function getTimeDifference(pubDate) {
-        const articleTime = new Date(pubDate);
-        const timeDiffMinutes = Math.floor((currentTime - articleTime) / (1000 * 60));
-
-        if (timeDiffMinutes < 60) {
-            return `${timeDiffMinutes}분 전`;
-        } else {
-            const timeDiffHours = Math.floor(timeDiffMinutes / 60);
-            return `${timeDiffHours}시간 전`;
-        }
-    }
-    // 날씨 뉴스 가져오기
-    function fetchWeatherNews(start) {
-        fetch(`http://localhost:8080/api/v1/weather/news?start=${start}`)
-            .then(response => response.json())
-            .then(data => {
-                data.items.forEach(item => {
-                    const li = document.createElement('li');
-
-                    const title = document.createElement('h4');
-                    title.innerHTML = item.title;
-
-                    const description = document.createElement('p');
-                    description.innerHTML = item.description;
-
-                    const pubDate = new Date(item.pubDate);
-                    const timeDiff = Math.floor((currentTime - pubDate) / (1000 * 60));
-
-                    const timeDifferenceElement = document.createElement('span');
-                    timeDifferenceElement.innerText = getTimeDifference(item.pubDate);
-
-                    li.appendChild(title);
-                    li.appendChild(description);
-                    li.appendChild(timeDifferenceElement);
-
-                    newsList.appendChild(li);
-                });
-            })
-            .catch(error => console.error('날씨 뉴스를 가져오는 중 오류 발생:', error));
-    }
-
-    fetchWeatherNews(start);
-
-    function loadMoreNews() {
-        start += 1;
-        fetchWeatherNews(start);
-    }
-
-
-
-</script>
+<script th:src="@{/js/weather-info.js}"></script>
+<script th:src="@{/js/weather-news.js}"></script>
+<script th:src="@{/js/region-search.js}"></script>
 </body>
 </html>

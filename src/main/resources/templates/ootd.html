@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OOTD</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div>
+    <table class="table table-striped" id="postTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>TITLE</th>
+            <th>CONTENT</th>
+            <th>category</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:unless="${posts.isEmpty()}" th:each="post : ${posts}">
+            <td th:text="${post.id}"></td>
+            <td>
+                <a class="game-name" th:text="${post.title}" th:href="@{/ootd/view/{postId}(postId=${post.id})}"></a>
+            </td>
+            <td>
+                <span th:text="${post.content}"></span>
+            </td>
+            <td>
+                <span th:text="${post.category}"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${posts.isEmpty()}">
+        <p>글이 없어요!!</p>
+    </div>
+    <button onclick=location.href="/ootd/write" class="btn btn-primary">글쓰기</button>
+</div>
+</body>
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</html>

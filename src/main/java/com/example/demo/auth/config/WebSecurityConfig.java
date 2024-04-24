@@ -31,7 +31,8 @@ public class WebSecurityConfig {
                                 prependBaseUrl("users/login"),
                                 prependBaseUrl("users/signup"),
                                 // 테스트를 위해 임시로 permitAll()
-                                prependBaseUrl("weather/**")
+                                prependBaseUrl("weather/**"),
+                                prependBaseUrl("area-code/**")
                         )
                         .permitAll()
                         .requestMatchers(
