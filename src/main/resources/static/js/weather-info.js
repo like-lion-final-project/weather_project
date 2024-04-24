@@ -78,6 +78,43 @@ function getCurrentWeather() {
                 const address = data.address.replace(/^kr\s*/, ''); // "kr" 제거
                 document.getElementById('location').textContent = `${address}`;
 
+                const area = address.split(' ')[0]; // 지역명에서 앞의 두 단어 추출
+                const city = address.split(' ')[1].slice(0, 2); // 지역명에서 두 번째 단어의 앞 두 글자 추출
+
+                // 주간 육상 예보
+                fetch(`http://localhost:8080/api/v1/area-code/mid-land?area=${area}`)
+                    .then(response => response.json())
+                    .then(midLandData => {
+                        const landRegId = midLandData.code;
+
+                        // 중도 Land 코드를 사용하여 해당 지역의 날씨 정보를 가져오는 요청 보내기
+                        fetch(`http://localhost:8080/api/v1/weather/mid-land?regId=${landRegId}`)
+                            .then(response => response.json())
+                            .then(landWeatherData => {
+                                // 중도 지역의 날씨 정보를 바로 동적으로 추가
+                                createWeeklyLandWeather(landWeatherData);
+                            })
+                            .catch(error => console.error('Error fetching mid land weather:', error));
+                    })
+                    .catch(error => console.error('Error fetching mid land TA code:', error));
+
+
+                // 주간 기온 예보
+                fetch(`http://localhost:8080/api/v1/area-code/mid-ta?area=${city}`)
+                    .then(response => response.json())
+                    .then(midTaData => {
+                        const taRegId = midTaData.code;
+
+                        fetch(`http://localhost:8080/api/v1/weather/mid-ta?regId=${taRegId}`)
+                            .then(response => response.json())
+                            .then(taWeatherData => {
+                                // 중도 지역의 날씨 정보를 바로 동적으로 추가
+                                createWeeklyTaWeather(taWeatherData);
+                            })
+                            .catch(error => console.error('Error fetching mid land weather:', error));
+                    })
+                    .catch(error => console.error('Error fetching mid land TA code:', error));
+
                 // 격자 XY 변환
                 fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${latitude}&lng=${longitude}`)
                     .then(response => response.json())
@@ -184,3 +221,83 @@ document.addEventListener('DOMContentLoaded', getCurrentWeather);
 
 // "내위치" 링크를 클릭하면 getCurrentWeather 함수 호출
 document.getElementById('current-location-link').addEventListener('click', getCurrentWeather);
+
+
+
+function getDayName(dayIndex) {
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    return days[dayIndex];
+}
+
+function calculateDay(date, daysToAdd) {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + daysToAdd);
+    const dayIndex = newDate.getDay();
+    const dayName = getDayName(dayIndex);
+    return `${dayName}`;
+}
+
+function createWeeklyLandWeather(weatherData) {
+    const item = weatherData.response.body.items.item[0];
+    const weeklyWeatherList = document.getElementById('weekly-land-weather');
+    const currentDate = new Date();
+
+    for (let i = 3; i <= 10; i++) {
+        const dayName = calculateDay(currentDate, i - 1);
+        const date = `${i}일 후 (${dayName})`;
+        let rnSt, wf;
+
+        // 8일부터 10일까지는 오전/오후로 나누지 않음
+        if (i >= 8) {
+            rnSt = item[`rnSt${i}`];
+            wf = item[`wf${i}`];
+        } else {
+            const rnStAm = item[`rnSt${i}Am`] || '정보 없음';
+            const rnStPm = item[`rnSt${i}Pm`] || '정보 없음';
+            const wfAm = item[`wf${i}Am`] || '정보 없음';
+            const wfPm = item[`wf${i}Pm`] || '정보 없음';
+
+            // 오전과 오후의 강수확률과 날씨 예보를 결합하여 사용
+            rnSt = `오전: ${rnStAm}%, 오후: ${rnStPm}%`;
+            wf = `오전: ${wfAm}, 오후: ${wfPm}`;
+        }
+
+        const listItem = document.createElement('div');
+        listItem.classList.add('weather-item');
+        listItem.innerHTML = `
+            <p>${date}</p>
+            <p>강수확률: ${rnSt}</p>
+            <p>날씨 예보: ${wf}</p>
+        `;
+
+        weeklyWeatherList.appendChild(listItem);
+    }
+}
+
+function createWeeklyTaWeather(weatherData) {
+    const item = weatherData.response.body.items.item[0];
+    const weeklyWeatherList = document.getElementById('weekly-ta-weather');
+    const currentDate = new Date();
+
+    for (let i = 3; i <= 10; i++) {
+        const dayName = calculateDay(currentDate, i - 1);
+        const date = `${i}일 후 (${dayName})`;
+
+        // 최저 기온과 최고 기온 정보만 가져옴
+        const taMin = item[`taMin${i}`] || '정보 없음';
+        const taMax = item[`taMax${i}`] || '정보 없음';
+
+        const listItem = document.createElement('div');
+        listItem.classList.add('weather-item');
+        listItem.innerHTML = `
+            <p>${date}</p>
+            <p>최저 기온: ${taMin}°C</p>
+            <p>최고 기온: ${taMax}°C</p>
+        `;
+
+        weeklyWeatherList.appendChild(listItem);
+    }
+}
+
+
+

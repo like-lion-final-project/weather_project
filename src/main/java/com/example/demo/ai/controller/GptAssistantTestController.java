@@ -17,7 +17,7 @@ import com.example.demo.ai.service.GptAssistantApiService;
 import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
-import com.example.demo.weather.dto.fcst.FcstItem;
+import com.example.demo.weather.dto.srt_fcst.FcstItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

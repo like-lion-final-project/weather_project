@@ -2,19 +2,38 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>OOTD 수정</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>게시글</h2>
+    </div>
+    <form th:action="@{'/ootd/update/' + ${postForm.id}}" method="post">
+        <input type="hidden" name="_method" value="put"/>
+        <input type="hidden" name="id" th:value="${postForm.id}"/>
+        <div>
+            <label for="postTitle">제목</label>
+            <input type="text" id="postTitle" name="title" class="form-control" value="제목" th:value="${postForm.title}">
+        </div><br>
+        <div>
+            <label for="postContent">내용</label>
+            <input class="form-control" rows="5" id="postContent" name="content" th:value="${postForm.content}" >
+        </div>
+        <div>
+            <label for="postCategory">카테고리</label>
+            <input class="form-control" rows="3" id="postCategory" name="category" th:value="${postForm.category}">
+        </div>
+        <hr class="my-4">
+            <button type="submit"  class="btn btn-primary" >수정</button>
+    </form>
 
-<form th:action="@{'/ootd/update/' + ${postForm.id}}" method="post">
-    <input type="hidden" name="_method" value="put"/>
-    <input type="hidden" name="id" th:value="${postForm.id}"/>
-
-    제목 : <input type="text" name="title" th:value="${postForm.title}"> <br>
-    내용 : <input type="text" name="content" th:value="${postForm.content}"> <br>
-    카테고리 : <input type="text" name="category" th:value="${postForm.category}"><br>
-
-    <input type="submit" value="수정">
-</form>
+</div> <!-- /container -->
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
