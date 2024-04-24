@@ -79,7 +79,7 @@ public class GptService {
                                     .build())
                             .build()
             );
-            System.out.println(createAssistantResDto.getThreadId() + "스레드 아이디");
+            System.out.println(createAssistantResDto.getThreadId() + " 스레드 아이디");
 
             Integer count = 0;
             /**
@@ -98,10 +98,20 @@ public class GptService {
                 count += 1;
                 Run runs = gptAssistantApiService.getRun(createAssistantResDto.getThreadId(), createAssistantResDto.getId());
                 System.out.println(runs.getStatus() + "상태 값");
+                System.out.println(createAssistantResDto.getId() + " : 실행 아이디");
+                System.out.println(createAssistantResDto.getThreadId() + " : 스레드 아이디");
                 switch (runs.getStatus()) {
                     case "completed":
                         MessageList getMessagesResDto = gptAssistantApiService.getMessagesAPI(runs.getThreadId());
                         Message getMessageResDto = gptAssistantApiService.getMessageAPI(runs.getThreadId(), getMessagesResDto.getFirstId());
+
+                        System.out.println(getMessagesResDto.getId() + " : getMessageResDto.getId");
+                        System.out.println(getMessagesResDto.getFirstId() + " : first id");
+                        System.out.println(getMessagesResDto.getLastId() + " : last id");
+                        System.out.println(runs.getId() + " : run id");
+
+                        gptAssistantApiService.updateMessage(runs.getId(),getMessagesResDto.getLastId());
+
                         if (getMessageResDto.getContent().stream().findFirst().isPresent()) {
                             MessageContent item = getMessageResDto.getContent().stream().findFirst().get();
                             try {
