@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto.messages;
+package com.example.demo.ai.dto.messages.content;
 
 import com.example.demo.ai.dto.messages.content.Text;
 import lombok.AllArgsConstructor;

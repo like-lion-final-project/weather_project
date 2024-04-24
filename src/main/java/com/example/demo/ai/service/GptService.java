@@ -1,10 +1,8 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
-import com.example.demo.ai.dto.assistant.Tool;
-import com.example.demo.ai.dto.assistant.ToolTypeEnum;
 import com.example.demo.ai.dto.messages.Message;
-import com.example.demo.ai.dto.messages.MessageContent;
+import com.example.demo.ai.dto.messages.content.MessageContent;
 import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.messages.MessageRequest;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
@@ -54,15 +52,20 @@ public class GptService {
             );
         }
 
-        try {
 
-            String fcstItemsToString = objectMapper.writeValueAsString(dailyCodyReqDtos);
-            String prompt = fcstItemsToString + AppConstants.MESSAGE_SUFFIX;
-            String role = "user";
-            List<Tool> tools = new ArrayList<>();
-            tools.add(Tool.builder()
-                            .type(ToolTypeEnum.FILESEARCH)
-                    .build());
+
+
+        try {
+            List<MessageRequest> messages =  new ArrayList<>();
+            messages.add(
+                    MessageRequest.builder()
+                            .role("user")
+                            .content(objectMapper.writeValueAsString(dailyCodyReqDtos)  + AppConstants.MESSAGE_SUFFIX)
+                            .build()
+            );
+
+            System.out.println(messages.stream().findFirst().get().getContent() + "CONTENT");
+            System.out.println();
 
             AssistantEntity assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 어시스턴트 입니다."));
@@ -72,15 +75,7 @@ public class GptService {
                             .model(assistant.getModel())
                             .thread(CreateThreadAndRunRequestThread.
                                     builder()
-                                    .messages(
-                                            dto.getThread().getMessages().stream().map(item ->
-                                                    MessageRequest.builder()
-                                                            .content(item.getContent() + AppConstants.MESSAGE_SUFFIX)
-                                                            .attachments(item.getAttachments())
-                                                            .metadata(item.getMetadata())
-                                                            .build()
-                                            ).toList()
-                                    )
+                                    .messages(messages)
                                     .build())
                             .build()
             );
@@ -131,9 +126,6 @@ public class GptService {
                     throw new RuntimeException("Thread Interrupted Exception");
                 }
             }
-        } catch (JsonProcessingException e) {
-            System.out.println("에러메시지: "+ e.getMessage());
-            throw new RuntimeException("Json Processing Exception");
         } catch (Exception e){
             System.out.println("에러메시지: "+ e.getMessage());
             throw new RuntimeException("Exception");
