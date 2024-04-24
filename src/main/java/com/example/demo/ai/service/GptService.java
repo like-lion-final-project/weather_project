@@ -37,7 +37,7 @@ public class GptService {
      *
      * @param fcstItems 당일 혹은 예상 일기예보 n개를 인자로 받습니다.
      */
-    public DailyCodyResDto generateDailyCodyCategory(CreateThreadAndRunRequest dto, List<FcstItem> fcstItems) {
+    public DailyCodyResDto generateDailyCodyCategory(List<FcstItem> fcstItems) {
         if (fcstItems.size() > 10) {
             fcstItems = fcstItems.subList(fcstItems.size() - 10, fcstItems.size());
         }
