@@ -39,13 +39,13 @@ public class NaverSearchService {
 
     public void saveFeedback(FeedbackDto feedbackDto) {
 
-        // 피드백의 카테고리를 찾습니다.
+        // 피드백의 카테고리를 찾기
         Optional<ClothsCategory> optionalCategory = clothsCategoryRepository.findByType(feedbackDto.getCategory());
         ClothsCategory category = optionalCategory.orElseGet(() -> {
             feedbackDto.setCategory("기타");
             return clothsCategoryRepository.findByType("기타").orElse(null);
         });
-// 피드백 엔티티를 생성하여 저장합니다.
+// 피드백 엔티티를 생성하여 저장.
         SuggestionFeedback suggestionFeedback = SuggestionFeedback.builder()
                 .rating(feedbackDto.getRating())
                 .image(feedbackDto.getImage())

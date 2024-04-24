@@ -24,9 +24,7 @@ public class SearchController {
     @GetMapping("/ser")
         public String naverSearch(@RequestParam String query, Model model) {
             String resultString = naverShopSearch.search(query);
-//            List<ImageDto> images = naverSearchService.fromJSONtoImage(resultString);
             List<ItemDto> items=naverSearchService.fromJSONtoItems(resultString);
-//            model.addAttribute("images", images);
             model.addAttribute("items" ,items);
             return "naversearch";
         }

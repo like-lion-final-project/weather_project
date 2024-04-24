@@ -8,9 +8,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class TrendDto {
+@NoArgsConstructor
+public class CategoryFeedbackCountDto {
     private String category;
-    private Double averageRating;
+    private Long feedbackCount;
 }
