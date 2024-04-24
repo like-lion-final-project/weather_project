@@ -6,15 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Builder
+@SuperBuilder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class AssistantThread {
+public class AssistantThread extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -34,8 +35,6 @@ public class AssistantThread {
     @Column(name = "is_delete_from_open_ai")
     private boolean isDeleteFromOpenAi;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
 
 }

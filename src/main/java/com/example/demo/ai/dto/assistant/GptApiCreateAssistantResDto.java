@@ -1,19 +1,18 @@
 package com.example.demo.ai.dto.assistant;
 
 
+import com.example.demo.ai.dto.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class CreateAssistantResDto {
+public class GptApiCreateAssistantResDto {
     @JsonProperty("id")
     private  String id;
 
@@ -36,7 +35,7 @@ public class CreateAssistantResDto {
     private String instructions;
 
     @JsonProperty("tools")
-    private  List<String> tools;
+    private  List<Tool> tools;
 
     @JsonProperty("top_p")
     private Long topP;

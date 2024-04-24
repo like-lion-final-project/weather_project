@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface AssistantRepo extends JpaRepository<Assistant, Long> {
   Optional<Assistant> findAssistantByName(String assistantName);
   Optional<Assistant> findAssistantByAssistantId(String assistantId);
+  Optional<Assistant> findAssistantByAssistantTypeAndVersion(String type, String version);
 }

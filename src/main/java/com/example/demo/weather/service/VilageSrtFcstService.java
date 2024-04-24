@@ -1,9 +1,11 @@
 package com.example.demo.weather.service;
 
 import com.example.demo.weather.dto.WeatherForecast;
+import com.example.demo.weather.dto.WeatherNowcast;
 import com.example.demo.weather.dto.fcst.FcstApiResponse;
 import com.example.demo.weather.dto.fcst.FcstItem;
 import com.example.demo.weather.dto.ncst.NcstApiResponse;
+import com.example.demo.weather.dto.ncst.NcstItem;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -75,7 +77,7 @@ public class VilageSrtFcstService {
 
 
     // 초단기 실황 (Short-Term Nowcast)
-    public NcstApiResponse getUltraSrtNcst(
+    public WeatherNowcast getUltraSrtNcst(
             Integer nx,
             Integer ny
     ) {
@@ -101,6 +103,19 @@ public class VilageSrtFcstService {
         params.put("nx", nx);                                            // 예보지점 x좌표 값
         params.put("ny", ny);                                            // 예보지점 y좌표 값
 
-        return vilageFcstApiService.UltraSrtNcst(params);
+        // API 응답 받기
+        NcstApiResponse response = vilageFcstApiService.UltraSrtNcst(params);
+
+        String baseDate = response.getResponse().getBody().getItems().getItem().get(0).getBaseDate();
+        String baseTime = response.getResponse().getBody().getItems().getItem().get(0).getBaseTime();
+        Integer ncstNx = response.getResponse().getBody().getItems().getItem().get(0).getNx();
+        Integer ncstNy = response.getResponse().getBody().getItems().getItem().get(0).getNy();
+
+        WeatherNowcast weatherNowcast = new WeatherNowcast(baseDate, baseTime, ncstNx, ncstNy);
+        for (NcstItem item : response.getResponse().getBody().getItems().getItem()) {
+            weatherNowcast.addNowcastValue(item.getCategory(), item.getObsrValue());
+        }
+
+        return weatherNowcast;
     }
 }
