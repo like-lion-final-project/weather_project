@@ -11,7 +11,7 @@ import com.example.demo.ai.dto.messages.v2.messages.Message;
 import com.example.demo.ai.dto.messages.CreateMessageResDto;
 import com.example.demo.ai.dto.messages.GetMessagesResDto;
 import com.example.demo.ai.dto.run.RunCreateRequest;
-import com.example.demo.ai.dto.run.Run;
+import com.example.demo.ai.dto.run.v2.Run;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
@@ -133,45 +133,8 @@ public class GptAssistantTestController {
         return gptAssistantApiService.getRun(threadId, runId);
     }
 
-    @PostMapping("/v1/threads/runs")
-    public Run onStepRun(
-            @RequestBody
-            CreateThreadAndRunRequest dto
 
-    ) {
-        List<String> vectorStroeIds = new ArrayList<>();
-        vectorStroeIds.add("file-9iyf0ykNAidZl6CzJWXF0QpC");
-        return gptAssistantApiService.oneStepRun(dto.getRole(), dto.getMessage(), dto.getAssistantId(), dto.getTools(), dto.getToolsResources());
-    }
 
-    @PostMapping("/v1/daily-cody")
-    public void dailyCody(
-            @RequestBody
-            CreateThreadAndRunRequest dto
-    ) {
-
-        List<FcstItem> fcstItemList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            FcstItem fcstItem = new FcstItem();
-            fcstItem.setBaseDate("20220423");
-            fcstItem.setBaseTime("0500");
-            fcstItem.setCategory("none");
-            fcstItem.setFcstDate("20220423");
-            fcstItem.setFcstTime(i + ":00");
-            fcstItem.setFcstValue(i + 1 + "");
-            fcstItem.setNx(i);
-            fcstItem.setNy(i);
-            fcstItemList.add(
-                    fcstItem
-            );
-        }
-
-        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList, dto.getTools(),dto.getToolsResources());
-        for (String item : dailyCodyResDto.getCategories()
-        ) {
-            System.out.println(item + "카테고리");
-        }
-    }
 
     @PostMapping("/v1/files")
     public FileData uploadFile(
@@ -180,9 +143,7 @@ public class GptAssistantTestController {
             HttpServletRequest req
 
     ) {
-
         return gptAssistantApiService.fileUploadAPI(uploadFile);
-
     }
 
     @GetMapping("/v1/files")

@@ -1,6 +1,5 @@
-package com.example.demo.ai.dto.file;
+package com.example.demo.ai.dto.assistant.v2;
 
-import com.example.demo.ai.dto.assistant.v2.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +10,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Attachments {
-
-    @JsonProperty("file_id")
-    private String fileId;
-    private List<Tool> tools;
+public class CodeInterpreter {
+    @JsonProperty("file_ids")
+    private List<String> fileIds;
 }

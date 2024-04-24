@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto;
+package com.example.demo.ai.dto.assistant.v2;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,11 +17,5 @@ public class ToolsResources {
     private FileSearch fileSearch;
 
 
-    @Getter
-    @AllArgsConstructor
-    @RequiredArgsConstructor
-    public static class FileSearch{
-        @JsonProperty("vector_store_ids")
-        private List<String> vectorStoreIds;
-    }
+
 }

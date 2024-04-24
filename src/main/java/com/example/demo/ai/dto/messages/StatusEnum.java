@@ -10,5 +10,8 @@ public enum StatusEnum {
         IN_COMPLETE,
 
         @JsonProperty("completed")
-        COMPLETED
+        COMPLETED,
+
+        @JsonProperty("expired")
+        EXPIRED
 }

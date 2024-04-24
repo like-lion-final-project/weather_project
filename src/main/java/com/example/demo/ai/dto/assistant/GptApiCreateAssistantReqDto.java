@@ -1,6 +1,6 @@
 package com.example.demo.ai.dto.assistant;
 
-import com.example.demo.ai.dto.Tool;
+import com.example.demo.ai.dto.assistant.v2.Tool;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,8 +1,5 @@
-package com.example.demo.ai.dto;
+package com.example.demo.ai.dto.run.v2;
 
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +10,10 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-
-@JsonInclude(Include.NON_NULL)
-public class Tool{
-    @JsonProperty("type")
+public static class TruncationStrategy {
     private String type;
+    @JsonProperty("last_messages")
+    private String lastMessages;
+
+    // Getters and Setters
 }

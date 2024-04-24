@@ -1,6 +1,6 @@
-package com.example.demo.ai.dto.run;
+package com.example.demo.ai.dto.run.v2;
 
-import com.example.demo.ai.dto.Tool;
+import com.example.demo.ai.dto.assistant.v2.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -77,16 +77,4 @@ public class Run {
 
     @JsonProperty("tool_choice")
     private String toolChoice;
-
-    @Getter
-    @Setter
-    @RequiredArgsConstructor
-    @AllArgsConstructor
-    public static class TruncationStrategy {
-        private String type;
-        @JsonProperty("last_messages")
-        private String lastMessages;
-
-        // Getters and Setters
-    }
 }

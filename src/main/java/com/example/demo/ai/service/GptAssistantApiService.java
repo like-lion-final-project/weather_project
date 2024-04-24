@@ -1,7 +1,7 @@
 package com.example.demo.ai.service;
 
-import com.example.demo.ai.dto.Tool;
-import com.example.demo.ai.dto.ToolsResources;
+import com.example.demo.ai.dto.assistant.v2.Tool;
+import com.example.demo.ai.dto.assistant.v2.ToolsResources;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.assistant.GptApiCreateAssistantReqDto;
@@ -14,7 +14,7 @@ import com.example.demo.ai.dto.messages.CreateMessageResDto;
 import com.example.demo.ai.dto.messages.GetMessagesResDto;
 import com.example.demo.ai.dto.messages.v2.messages.MessageRequest;
 import com.example.demo.ai.dto.run.RunCreateRequest;
-import com.example.demo.ai.dto.run.Run;
+import com.example.demo.ai.dto.run.v2.Run;
 import com.example.demo.ai.dto.run.OneStepRunReqDto;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;

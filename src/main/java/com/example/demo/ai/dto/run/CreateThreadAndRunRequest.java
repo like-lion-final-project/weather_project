@@ -1,7 +1,7 @@
 package com.example.demo.ai.dto.run;
 
-import com.example.demo.ai.dto.Tool;
-import com.example.demo.ai.dto.ToolsResources;
+import com.example.demo.ai.dto.assistant.v2.Tool;
+import com.example.demo.ai.dto.assistant.v2.ToolsResources;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
