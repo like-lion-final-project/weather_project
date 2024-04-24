@@ -6,9 +6,13 @@ import com.example.demo.community.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -17,12 +21,29 @@ public class PostService {
     private final PostRepository postRepository;
 
     // CREATE
-    public PostDto createOOTD(PostDto postDto) {
+    public PostDto createOOTD(String title, String content, String category, MultipartFile imgFile) throws IOException {
         Post post = new Post();
+        String oriImgName = imgFile.getOriginalFilename();
+        String imgName = "";
 
-        post.setTitle(postDto.getTitle());
-        post.setContent(postDto.getContent());
-        post.setCategory(postDto.getCategory());
+        String projectPath = System.getProperty("user.dir") + "/src/main/resources/static/files/";
+
+        post.setTitle(title);
+        post.setContent(content);
+        post.setCategory(category);
+
+        UUID uuid = UUID.randomUUID();
+
+        String savedFileName = uuid + "_" + oriImgName;
+
+        imgName = savedFileName;
+
+        File saveFile = new File(projectPath, imgName);
+
+        imgFile.transferTo(saveFile);
+
+        post.setImgName(imgName);
+        post.setImgPath("/files/" + imgName);
 
         return PostDto.fromEntity(postRepository.save(post));
 

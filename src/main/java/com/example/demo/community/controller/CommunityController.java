@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,19 +38,16 @@ public class CommunityController {
             String content,
             @RequestParam("category")
             String category,
+            MultipartFile imgFile,
             RedirectAttributes redirectAttributes
-    ) {
-        PostDto postDto = new PostDto();
-        postDto.setTitle(title);
-        postDto.setContent(content);
-        postDto.setCategory(category);
+    ) throws IOException
+    {
+        PostDto dto =postService.createOOTD(title, content, category, imgFile);
 
-
-        if (postService.createOOTD(postDto) == null) {
+        if (dto == null) {
             redirectAttributes.addFlashAttribute("message",
                     "새 글을 작성할 수 없습니다.");
         }
-        postService.createOOTD(postDto);
 
         return "redirect:/ootd";
     }
