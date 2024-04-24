@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto.messages.v2.messages;
+package com.example.demo.ai.dto.messages;
 
 import com.example.demo.ai.dto.file.Attachments;
 import com.fasterxml.jackson.annotation.JsonProperty;

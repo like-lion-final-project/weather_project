@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto.run.v2;
+package com.example.demo.ai.dto.run;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

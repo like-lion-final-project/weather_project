@@ -1,6 +1,6 @@
-package com.example.demo.ai.dto.messages.v2.messages;
+package com.example.demo.ai.dto.messages;
 
-import com.example.demo.ai.dto.messages.v2.messages.content.Text;
+import com.example.demo.ai.dto.messages.content.Text;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

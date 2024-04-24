@@ -1,16 +1,10 @@
-package com.example.demo.ai.dto.run.v2;
+package com.example.demo.ai.dto.run;
 
-import com.example.demo.ai.dto.assistant.v2.Tool;
-import com.example.demo.ai.dto.assistant.v2.ToolsResources;
-import com.example.demo.ai.dto.thread.v2.Thread;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Builder

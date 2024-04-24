@@ -1,8 +1,6 @@
-package com.example.demo.ai.dto.messages.v2.messages;
+package com.example.demo.ai.dto.messages;
 
 import com.example.demo.ai.dto.file.Attachments;
-import com.example.demo.ai.dto.messages.StatusEnum;
-import com.example.demo.ai.dto.messages.v2.messages.MessageContent;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

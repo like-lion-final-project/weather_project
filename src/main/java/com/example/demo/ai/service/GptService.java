@@ -3,12 +3,11 @@ package com.example.demo.ai.service;
 import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.assistant.v2.Tool;
 import com.example.demo.ai.dto.assistant.v2.ToolTypeEnum;
-import com.example.demo.ai.dto.assistant.v2.ToolsResources;
 import com.example.demo.ai.dto.messages.CreateMessageResDto;
 import com.example.demo.ai.dto.messages.GetMessagesResDto;
-import com.example.demo.ai.dto.run.v2.CreateThreadAndRunRequest;
-import com.example.demo.ai.dto.run.v2.Run;
-import com.example.demo.ai.entity.Assistant;
+import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
+import com.example.demo.ai.dto.run.Run;
+import com.example.demo.ai.entity.AssistantEntity;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.service.dto.DailyCodyReqDto;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
@@ -25,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GptService {
     private final GptAssistantApiService gptAssistantApiService;
-    private final GptAssistantApiServiceV2 gptAssistantApiServiceV2;
+    private final GptAssistantApiService gptAssistantApiServiceV2;
 
     private final AssistantRepo assistantRepo;
     private final ObjectMapper objectMapper;
@@ -63,7 +62,7 @@ public class GptService {
                             .type(ToolTypeEnum.FILESEARCH)
                     .build());
 
-            Assistant assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
+            AssistantEntity assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 어시스턴트 입니다."));
             Run createAssistantResDto = gptAssistantApiServiceV2.createThreadAndRun(
                     CreateThreadAndRunRequest.builder()

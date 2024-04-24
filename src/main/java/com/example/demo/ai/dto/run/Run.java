@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto.run.v2;
+package com.example.demo.ai.dto.run;
 
 import com.example.demo.ai.dto.assistant.v2.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
