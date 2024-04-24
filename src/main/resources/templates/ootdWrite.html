@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OOTD WRITE</title>
+</head>
+<body>
+<div class="container">
+    <form method="post" action="/ootd/write">
+        <div class="mb-3">
+            <label for="title-input" class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" id="title-input">
+        </div>
+        <div class="mb-3">
+            <label for="content-area" class="form-label">Content</label>
+            <textarea name="content" id="content-area" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="content-area" class="form-label">Category</label>
+            <input type="text" name="category" class="form-control" id="category-area">
+        </div>
+        <!--
+        <div class="mb-3">
+            <label for="board-select" class="form-label">게시판</label>
+            <select name="board-id" id="board-select" class="form-select">
+            </select>
+        </div>
+        -->
+        <div style="text-align: center;">
+            <input type="submit" value="글 작성">
+        </div>
+    </form>
+</div>
+</body>
+</html>

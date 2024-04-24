@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form th:action="@{'/ootd/update/' + ${postForm.id}}" method="post">
+    <input type="hidden" name="_method" value="put"/>
+    <input type="hidden" name="id" th:value="${postForm.id}"/>
+
+    제목 : <input type="text" name="title" th:value="${postForm.title}"> <br>
+    내용 : <input type="text" name="content" th:value="${postForm.content}"> <br>
+    카테고리 : <input type="text" name="category" th:value="${postForm.category}"><br>
+
+    <input type="submit" value="수정">
+</form>
+</body>
+</html>
