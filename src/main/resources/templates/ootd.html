@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>OOTD</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div>
@@ -13,7 +15,6 @@
             <th>TITLE</th>
             <th>CONTENT</th>
             <th>category</th>
-            <th>작성일자</th>
         </tr>
         </thead>
         <tbody>
@@ -28,9 +29,6 @@
             <td>
                 <span th:text="${post.category}"></span>
             </td>
-            <td>
-                <span th:text="${post.getCreatedDate}"></span>
-            </td>
         </tr>
         </tbody>
     </table>
@@ -40,15 +38,8 @@
     <button onclick=location.href="/ootd/write" class="btn btn-primary">글쓰기</button>
 </div>
 </body>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var table = document.getElementById('postTable');
-        table.addEventListener('click', function (event) {
-            var target = event.target;
-            if (!target) return;
-            var postId = target.cells[0].innerText;
-            window.location.href = '/ootd/view/' + postId;
-        });
-    });
-</script>
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </html>
