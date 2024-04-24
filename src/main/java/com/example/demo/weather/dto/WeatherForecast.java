@@ -3,7 +3,6 @@ package com.example.demo.weather.dto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
 public class WeatherForecast {
