@@ -1,11 +1,8 @@
 package com.example.demo.ai.service;
 
-import com.example.demo.ai.dto.assistant.v2.Tool;
-import com.example.demo.ai.dto.assistant.v2.ToolsResources;
-import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
+
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
-import com.example.demo.ai.dto.assistant.GptApiCreateAssistantReqDto;
-import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
+
 import com.example.demo.ai.dto.file.FileData;
 import com.example.demo.ai.dto.file.FileDelete;
 import com.example.demo.ai.dto.file.FileList;
@@ -155,62 +152,6 @@ public class GptAssistantApiService {
     }
 
 
-    /**
-     * <p>어시스턴트 생성 메서드 입니다.</p>
-     */
-    public GptApiCreateAssistantResDto createAssistantAPI(CreateAssistantReqDto dto) {
-        if (!dto.getAssistantType().equals("fashion")) {
-            throw new RuntimeException("생성 불가능한 타입 입니다.");
-        }
-
-
-        // TODO: 어시스턴트 생성시 DB에 해당 어시스턴트가 이미 있는지 조회해봄 버전, type으로 검색
-
-        Optional<Assistant> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion(dto.getAssistantType(), dto.getVersion());
-        if (assistant.isPresent()) {
-            throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
-        }
-
-
-        String uri = "/v1/assistants";
-        ResponseEntity<String> json = restClient
-                .post()
-                .uri(uri)
-                .body(GptApiCreateAssistantReqDto.builder()
-                        .instructions(dto.getInstructions())
-                        .name(dto.getName())
-                        .model(dto.getModel())
-                        .tools(dto.getTools())
-                        .build())
-                .retrieve()
-                .toEntity(String.class);
-
-
-        try {
-            GptApiCreateAssistantResDto response = objectMapper.readValue(json.getBody(), GptApiCreateAssistantResDto.class);
-
-            assistantRepo.save(Assistant.builder()
-                    .instructions(response.getInstructions())
-                    .name(response.getName())
-                    .version(response.getName().split("_")[1])
-                    .model(response.getModel())
-                    .assistantType(dto.getAssistantType())
-                    .assistantId(response.getId())
-                    .isDeleteFromOpenAi(false)
-                    .build());
-            return response;
-        } catch (JsonProcessingException e) {
-            log.warn(e.getMessage());
-            throw new RuntimeException("JsonProcessingException");
-        } catch (DataAccessException e) {
-            log.warn(e.getMessage());
-            throw new RuntimeException("DB Exception");
-        } catch (Exception e) {
-            log.warn(e + "메시지");
-            throw new RuntimeException("Exception");
-        }
-
-    }
 
 
     /**
@@ -544,79 +485,6 @@ public class GptAssistantApiService {
         }
     }
 
-
-    /**
-     * <p>스레드 생성과 메시지 추가 실행을 동시에 처리하는 메서드</p>
-     *
-     * @param assistantId 작업을 수행할 어시스턴트의 아이디
-     * @param message     생성된 스레드에 포함할 단일 메시지
-     * @param role        'user', 'assistant' 등 권한을 의미함. 기본 값은 user
-     */
-    public Run oneStepRun(String role, String message, String assistantId, List<Tool> tools, ToolsResources toolsResouces) {
-        if (!role.equals("user") && !role.equals("assistant")) {
-            role = "user";
-        }
-        List<Message> messages = new ArrayList<>();
-        messages.add(Message.builder().role(role).content(message).build());
-
-        OneStepRunReqDto.Thread reqThread = OneStepRunReqDto.Thread.builder().messages(messages).build();
-        OneStepRunReqDto oneStepRunReqDto = OneStepRunReqDto.builder()
-                .assistantId(assistantId)
-                .thread(reqThread)
-                .tools(tools)
-                .toolsResources(toolsResouces)
-                .build();
-
-        String uri = "/v1/threads/runs";
-        ResponseEntity<String> json = restClient
-                .post()
-                .uri(uri)
-                .body(oneStepRunReqDto)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,
-                        (request, response) -> {
-                            log.warn("에러내용: " + response.getStatusText());
-                            throw new RuntimeException("Is4xx Client Error");
-                        })
-                .toEntity(String.class);
-
-        Long tempUser = 1L;
-        User user = userRepo.findById(tempUser).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
-        Assistant assistant = assistantRepo.findAssistantByAssistantId(assistantId).orElseThrow(() -> new RuntimeException("어시스턴트가 존재하지 않습니다."));
-
-
-        try {
-            Run response = objectMapper.readValue(json.getBody(), Run.class);
-
-            AssistantThreadMessage.builder().build();
-            AssistantThread thread = AssistantThread.builder()
-                    .user(user)
-                    .assistant(assistant)
-                    .threadId(response.getThreadId())
-                    .isDeleteFromOpenAi(false)
-                    .build();
-            assistantThreadRepo.save(thread);
-
-            assistantThreadMessageRepo.save(AssistantThreadMessage.builder()
-                    .object(response.getObject())
-                    .assistantThread(thread)
-                    .runId(response.getId())
-                    .role(role)
-                    .value(message)
-                    .isDeleteFromOpenAi(false)
-                    .build());
-
-            return response;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JsonProcessingException");
-        } catch (DataAccessException e) {
-            System.out.println(e.getMessage() + "메시지");
-            throw new RuntimeException("DB Exception");
-        } catch (Exception e) {
-            throw new RuntimeException("Exception");
-        }
-
-    }
 
 
     // TODO: oneStepRun 메서드 실행시 스레드, 메시지 정보 DB에 기록

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public static class TruncationStrategy {
+public class TruncationStrategy {
     private String type;
     @JsonProperty("last_messages")
     private String lastMessages;

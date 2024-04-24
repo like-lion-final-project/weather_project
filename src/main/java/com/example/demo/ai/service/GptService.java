@@ -2,9 +2,11 @@ package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.assistant.v2.Tool;
+import com.example.demo.ai.dto.assistant.v2.ToolTypeEnum;
 import com.example.demo.ai.dto.assistant.v2.ToolsResources;
 import com.example.demo.ai.dto.messages.CreateMessageResDto;
 import com.example.demo.ai.dto.messages.GetMessagesResDto;
+import com.example.demo.ai.dto.run.v2.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.run.v2.Run;
 import com.example.demo.ai.entity.Assistant;
 import com.example.demo.ai.repo.AssistantRepo;
@@ -23,6 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GptService {
     private final GptAssistantApiService gptAssistantApiService;
+    private final GptAssistantApiServiceV2 gptAssistantApiServiceV2;
+
     private final AssistantRepo assistantRepo;
     private final ObjectMapper objectMapper;
 
@@ -33,7 +37,7 @@ public class GptService {
      *
      * @param fcstItems 당일 혹은 예상 일기예보 n개를 인자로 받습니다.
      */
-    public DailyCodyResDto generateDailyCodyCategory(List<FcstItem> fcstItems, List<Tool> tools, ToolsResources toolsResources) {
+    public DailyCodyResDto generateDailyCodyCategory(List<FcstItem> fcstItems) {
         if (fcstItems.size() > 10) {
             fcstItems = fcstItems.subList(fcstItems.size() - 10, fcstItems.size());
         }
@@ -54,9 +58,19 @@ public class GptService {
             String fcstItemsToString = objectMapper.writeValueAsString(dailyCodyReqDtos);
             String prompt = fcstItemsToString + AppConstants.MESSAGE_SUFFIX;
             String role = "user";
+            List<Tool> tools = new ArrayList<>();
+            tools.add(Tool.builder()
+                            .type(ToolTypeEnum.FILESEARCH)
+                    .build());
+
             Assistant assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 어시스턴트 입니다."));
-            Run createAssistantResDto = gptAssistantApiService.oneStepRun(role, prompt, assistant.getAssistantId(),tools,toolsResources);
+            Run createAssistantResDto = gptAssistantApiServiceV2.createThreadAndRun(
+                    CreateThreadAndRunRequest.builder()
+                            .assistantId(assistant.getAssistantId())
+                            .model(assistant.getModel())
+                            .build()
+            );
             System.out.println(createAssistantResDto.getThreadId() + "스레드 아이디");
 
             Integer count = 0;

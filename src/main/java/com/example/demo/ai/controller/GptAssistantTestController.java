@@ -1,9 +1,11 @@
 package com.example.demo.ai.controller;
 
 
-import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
+
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
+import com.example.demo.ai.dto.assistant.v2.Assistant;
+import com.example.demo.ai.dto.assistant.v2.AssistantCreateRequest;
 import com.example.demo.ai.dto.file.FileData;
 import com.example.demo.ai.dto.file.FileDelete;
 import com.example.demo.ai.dto.file.FileList;
@@ -12,22 +14,18 @@ import com.example.demo.ai.dto.messages.CreateMessageResDto;
 import com.example.demo.ai.dto.messages.GetMessagesResDto;
 import com.example.demo.ai.dto.run.RunCreateRequest;
 import com.example.demo.ai.dto.run.v2.Run;
-import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.thread.CreateThreadResDto;
 import com.example.demo.ai.dto.thread.DeleteThreadResDto;
 import com.example.demo.ai.service.GptAssistantApiService;
 
+import com.example.demo.ai.service.GptAssistantApiServiceV2;
 import com.example.demo.ai.service.GptService;
-import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
-import com.example.demo.weather.dto.fcst.FcstItem;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -35,18 +33,20 @@ import java.util.Optional;
 
 public class GptAssistantTestController {
     private final GptAssistantApiService gptAssistantApiService;
+    private final GptAssistantApiServiceV2 gptAssistantApiServiceV2;
+
     private final GptService gptService;
 
 
     @PostMapping("/v1/assistants")
-    public GptApiCreateAssistantResDto createAssistant(
+    public Assistant createAssistant(
             @RequestBody
-            CreateAssistantReqDto dto
+            AssistantCreateRequest dto
     ) {
 
         dto.getTools().forEach(item -> System.out.println(item.getType() + "type"));
 
-        return gptAssistantApiService.createAssistantAPI(dto);
+        return gptAssistantApiServiceV2.createAssistantAPI(dto,"fashion","0.0.1");
     }
 
     @GetMapping("/v1/assistants/{assistantId}")
@@ -86,13 +86,13 @@ public class GptAssistantTestController {
     }
 
     @PostMapping("/v1/threads/{threadId}/messages")
-    public CreateMessageResDto createMessage(
+    public Message createMessage(
             @PathVariable("threadId")
             String threadId,
             @RequestBody
             Message dto
     ) {
-        return gptAssistantApiService.createMessageAPI(dto.getRole(), dto.getContent(), threadId);
+        return gptAssistantApiService.createMessageAPI(dto.getRole(), dto.getContent().stream().findFirst().get().getText().getValue(), threadId);
     }
 
     @GetMapping("/v1/threads/{threadId}/messages/{messageId}")

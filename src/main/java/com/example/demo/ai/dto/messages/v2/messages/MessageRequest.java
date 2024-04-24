@@ -12,11 +12,8 @@ import java.util.Map;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class MessageRequest {
-    @NonNull
-    @Builder.Default
     String role = "user";
 
-    @NonNull
     String content;
 
     private Attachments attachments;

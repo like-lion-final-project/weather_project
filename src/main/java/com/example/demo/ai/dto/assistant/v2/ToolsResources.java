@@ -15,7 +15,4 @@ import java.util.List;
 public class ToolsResources {
     @JsonProperty("file_search")
     private FileSearch fileSearch;
-
-
-
 }

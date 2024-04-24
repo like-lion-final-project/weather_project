@@ -34,8 +34,7 @@ public class Annotation {
     /**
      * File path details, only present when type == file_path
      */
-    @JsonProperty("file_path")
-    FilePath filePath;
+
 
     @JsonProperty("start_index")
     int startIndex;
