@@ -99,7 +99,21 @@ function getCurrentWeather() {
                     .catch(error => console.error('Error fetching mid land TA code:', error));
 
 
+                // 주간 기온 예보
+                fetch(`http://localhost:8080/api/v1/area-code/mid-ta?area=${city}`)
+                    .then(response => response.json())
+                    .then(midTaData => {
+                        const taRegId = midTaData.code;
 
+                        fetch(`http://localhost:8080/api/v1/weather/mid-ta?regId=${taRegId}`)
+                            .then(response => response.json())
+                            .then(taWeatherData => {
+                                // 중도 지역의 날씨 정보를 바로 동적으로 추가
+                                createWeeklyTaWeather(taWeatherData);
+                            })
+                            .catch(error => console.error('Error fetching mid land weather:', error));
+                    })
+                    .catch(error => console.error('Error fetching mid land TA code:', error));
 
                 // 격자 XY 변환
                 fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${latitude}&lng=${longitude}`)
@@ -259,4 +273,31 @@ function createWeeklyLandWeather(weatherData) {
         weeklyWeatherList.appendChild(listItem);
     }
 }
+
+function createWeeklyTaWeather(weatherData) {
+    const item = weatherData.response.body.items.item[0];
+    const weeklyWeatherList = document.getElementById('weekly-ta-weather');
+    const currentDate = new Date();
+
+    for (let i = 3; i <= 10; i++) {
+        const dayName = calculateDay(currentDate, i - 1);
+        const date = `${i}일 후 (${dayName})`;
+
+        // 최저 기온과 최고 기온 정보만 가져옴
+        const taMin = item[`taMin${i}`] || '정보 없음';
+        const taMax = item[`taMax${i}`] || '정보 없음';
+
+        const listItem = document.createElement('div');
+        listItem.classList.add('weather-item');
+        listItem.innerHTML = `
+            <p>${date}</p>
+            <p>최저 기온: ${taMin}°C</p>
+            <p>최고 기온: ${taMax}°C</p>
+        `;
+
+        weeklyWeatherList.appendChild(listItem);
+    }
+}
+
+
 
