@@ -1,6 +1,6 @@
 package com.example.demo.weather.config;
 
-import com.example.demo.weather.service.NcpMapApiService;
+import com.example.demo.weather.service.ncp.NcpMapApiService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

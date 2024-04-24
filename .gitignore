@@ -35,10 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
-
 .DS_Store
+
+
 application.yaml
 application-prod.yaml
 application-dev.yaml
 
 data.sql
+db.sqlite
