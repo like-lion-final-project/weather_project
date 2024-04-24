@@ -17,12 +17,12 @@ public class PostService {
     private final PostRepository postRepository;
 
     // CREATE
-    public PostDto createOOTD(PostDto postDto) {
+    public PostDto createOOTD(String title, String content, String category) {
         Post post = new Post();
 
-        post.setTitle(postDto.getTitle());
-        post.setContent(postDto.getContent());
-        post.setCategory(postDto.getCategory());
+        post.setTitle(title);
+        post.setContent(content);
+        post.setCategory(category);
 
         return PostDto.fromEntity(postRepository.save(post));
 
