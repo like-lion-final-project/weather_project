@@ -44,7 +44,7 @@ public class GptAssistantTestController {
             );
         }
 
-        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(dto,fcstItemList);
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
         for (String item : dailyCodyResDto.getCategories()
         ) {
             System.out.println(item + "카테고리");
