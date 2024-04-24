@@ -24,7 +24,11 @@ public class PostDto {
     @Setter
     private LocalDateTime createdDate; // 생성일
     @Setter
-    private List<Comment> comments;
+    private List<Comment> comments; // 댓글
+    @Setter
+    private String imgName; // 이미지 파일명
+    @Setter
+    private String imgPath; // 이미지 조회 경로
     @Setter
     private User userEntity;
 
@@ -36,6 +40,8 @@ public class PostDto {
                 .category(entity.getCategory())
                 .createdDate(entity.getCreatedDate())
                 .comments(entity.getComments())
+                .imgName(entity.getImgName())
+                .imgPath(entity.getImgPath())
                 .userEntity(entity.getUserEntity());
 
         return builder.build();
