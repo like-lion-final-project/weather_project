@@ -4,6 +4,9 @@ package com.example.demo.ai.controller;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
+import com.example.demo.ai.dto.file.FileData;
+import com.example.demo.ai.dto.file.FileDelete;
+import com.example.demo.ai.dto.file.FileList;
 import com.example.demo.ai.dto.message.CreateMessageDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
@@ -18,8 +21,10 @@ import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.example.demo.weather.dto.fcst.FcstItem;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +170,31 @@ public class GptAssistantTestController {
             System.out.println(item + "카테고리");
         }
     }
+
+    @PostMapping("/v1/files")
+    public FileData uploadFile(
+            @RequestParam("uploadFile")
+                               MultipartFile uploadFile,
+                           HttpServletRequest req
+
+    ){
+
+        return gptAssistantApiService.fileUploadAPI(uploadFile);
+
+    }
+
+    @GetMapping("/v1/files")
+    public Optional<FileList> getFiles(){
+        return gptAssistantApiService.getfiles();
+    }
+
+    @DeleteMapping("/v1/files/{fileId}")
+    public Optional<FileDelete> deleteFile(
+            @PathVariable("fileId")
+            String fileId
+    ){
+        return gptAssistantApiService.deleteFile(fileId);
+    }
 }
 
 /**
@@ -174,3 +204,5 @@ public class GptAssistantTestController {
  * thread_BnhYznQAq8HoQclYjTpABCDN
  * thread_hxgakXQdvkcb9PS5WVkZE5xN
  */
+
+

@@ -1,10 +1,12 @@
 package com.example.demo.ai.service;
 
-import com.example.demo.ai.AppConstants;
 import com.example.demo.ai.dto.assistant.CreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.GetAssistantResDto;
 import com.example.demo.ai.dto.assistant.GptApiCreateAssistantReqDto;
 import com.example.demo.ai.dto.assistant.GptApiCreateAssistantResDto;
+import com.example.demo.ai.dto.file.FileData;
+import com.example.demo.ai.dto.file.FileDelete;
+import com.example.demo.ai.dto.file.FileList;
 import com.example.demo.ai.dto.message.CreateMessageDto;
 import com.example.demo.ai.dto.message.CreateMessageResDto;
 import com.example.demo.ai.dto.message.GetMessagesResDto;
@@ -28,13 +30,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import org.springframework.web.client.RestClient;
 
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +78,79 @@ public class GptAssistantApiService {
         this.authenticationFacade = authenticationFacade;
         this.userRepo = userRepo;
         this.assistantThreadMessageRepo = assistantThreadMessageRepo;
+    }
+
+    public FileData fileUploadAPI(MultipartFile multipartFile) {
+        try {
+            String uri = "/v1/files"; // Adjust to your endpoint
+
+            // Convert MultipartFile to java.io.File
+            java.io.File tempFile = java.io.File.createTempFile("upload-", multipartFile.getOriginalFilename());
+            multipartFile.transferTo(tempFile);
+            tempFile.deleteOnExit();
+
+            // Prepare the file and headers
+            FileSystemResource fileResource = new FileSystemResource(tempFile);
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", fileResource);
+            body.add("purpose","assistants");
+
+            ResponseEntity<FileData> response = restClient
+                    .post()
+                    .uri(uri)
+                    .body(body)
+                    .retrieve()
+                    .toEntity(FileData.class);
+
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println(response.getBody().getFileName());
+                return response.getBody();
+            } else {
+                throw new RuntimeException("Failed to upload file: " + response.getStatusCode().toString());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload file", e);
+        }
+    }
+
+    /**
+     * <p>파일을 리스트로 가져오는 메서드 입니다.</p>
+     * */
+    public Optional<FileList> getfiles(){
+        String uri = "/v1/files";
+
+        return restClient
+                .get()
+                .uri(uri)
+                .exchange((request,response) -> {
+                    if(response.getStatusCode().is4xxClientError()){
+                        return Optional.empty();
+                    }else{
+                        try{
+                            return Optional.of(objectMapper.readValue(response.getBody(), FileList.class));
+                        }catch  (JsonProcessingException e){
+                            log.warn("에러메시지: " + e.getMessage());
+                            return Optional.empty();
+                        }
+                    }
+                });
+
+    }
+
+    public Optional<FileDelete> deleteFile(String fileId){
+        String uri = "/v1/files/" + fileId;
+
+        return restClient.
+                delete()
+                .uri(uri)
+                .exchange((request,response) -> {
+                    if(response.getStatusCode().is4xxClientError()){
+                        throw new RuntimeException("존재하지 않는 파일");
+                    }else{
+                        return Optional.of(objectMapper.readValue(response.getBody(),FileDelete.class));
+                    }
+                });
     }
 
 
