@@ -1,5 +1,6 @@
 package com.example.demo.ai.dto.run;
 
+import com.example.demo.ai.dto.assistant.ResponseFormat;
 import com.example.demo.ai.dto.assistant.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -73,7 +74,7 @@ public class Run {
     private Object usage;
 
     @JsonProperty("response_format")
-    private String responseFormat;
+    private ResponseFormat responseFormat;
 
     @JsonProperty("tool_choice")
     private String toolChoice;

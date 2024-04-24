@@ -83,6 +83,7 @@ public class GptAssistantApiService {
                         .model(dto.getModel())
                         .tools(dto.getTools())
                         .toolsResources(dto.getToolsResources())
+                        .responseFormat(dto.getResponseFormat())
                         .build())
                 .retrieve()
                 .toEntity(String.class);

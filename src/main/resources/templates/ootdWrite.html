@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OOTD 생성</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <form method="post" action="/ootd/write" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title-input" class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" id="title-input">
+        </div>
+        <div class="mb-3">
+            <label for="content-area" class="form-label">Content</label>
+            <textarea name="content" id="content-area" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="content-area" class="form-label">Category</label>
+            <input type="text" name="category" class="form-control" id="category-area">
+        </div>
+        <div class="col-12">
+            <label class="form-label">상품 이미지 업로드</label>
+            <input type="file" class="form-control" id="imgFile" name="imgFile">
+        </div>
+        <button class="btn btn-primary" > 글 작성</button>
+    </form>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

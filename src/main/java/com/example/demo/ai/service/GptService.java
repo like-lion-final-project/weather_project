@@ -1,6 +1,7 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
+
 import com.example.demo.ai.dto.messages.Message;
 import com.example.demo.ai.dto.messages.content.MessageContent;
 import com.example.demo.ai.dto.messages.MessageList;
@@ -12,7 +13,7 @@ import com.example.demo.ai.entity.AssistantEntity;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.service.dto.DailyCodyReqDto;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
-import com.example.demo.weather.dto.fcst.FcstItem;
+import com.example.demo.weather.dto.srt_fcst.FcstItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
