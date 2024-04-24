@@ -1,11 +1,14 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
-import com.example.demo.ai.dto.assistant.v2.Tool;
-import com.example.demo.ai.dto.assistant.v2.ToolTypeEnum;
-import com.example.demo.ai.dto.messages.CreateMessageResDto;
-import com.example.demo.ai.dto.messages.GetMessagesResDto;
+import com.example.demo.ai.dto.assistant.Tool;
+import com.example.demo.ai.dto.assistant.ToolTypeEnum;
+import com.example.demo.ai.dto.messages.Message;
+import com.example.demo.ai.dto.messages.MessageContent;
+import com.example.demo.ai.dto.messages.MessageList;
+import com.example.demo.ai.dto.messages.MessageRequest;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
+import com.example.demo.ai.dto.run.CreateThreadAndRunRequestThread;
 import com.example.demo.ai.dto.run.Run;
 import com.example.demo.ai.entity.AssistantEntity;
 import com.example.demo.ai.repo.AssistantRepo;
@@ -24,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GptService {
     private final GptAssistantApiService gptAssistantApiService;
-    private final GptAssistantApiService gptAssistantApiServiceV2;
 
     private final AssistantRepo assistantRepo;
     private final ObjectMapper objectMapper;
@@ -36,7 +38,7 @@ public class GptService {
      *
      * @param fcstItems 당일 혹은 예상 일기예보 n개를 인자로 받습니다.
      */
-    public DailyCodyResDto generateDailyCodyCategory(List<FcstItem> fcstItems) {
+    public DailyCodyResDto generateDailyCodyCategory(CreateThreadAndRunRequest dto, List<FcstItem> fcstItems) {
         if (fcstItems.size() > 10) {
             fcstItems = fcstItems.subList(fcstItems.size() - 10, fcstItems.size());
         }
@@ -64,10 +66,22 @@ public class GptService {
 
             AssistantEntity assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 어시스턴트 입니다."));
-            Run createAssistantResDto = gptAssistantApiServiceV2.createThreadAndRun(
+            Run createAssistantResDto = gptAssistantApiService.createThreadAndRun(
                     CreateThreadAndRunRequest.builder()
                             .assistantId(assistant.getAssistantId())
                             .model(assistant.getModel())
+                            .thread(CreateThreadAndRunRequestThread.
+                                    builder()
+                                    .messages(
+                                            dto.getThread().getMessages().stream().map(item ->
+                                                    MessageRequest.builder()
+                                                            .content(item.getContent() + AppConstants.MESSAGE_SUFFIX)
+                                                            .attachments(item.getAttachments())
+                                                            .metadata(item.getMetadata())
+                                                            .build()
+                                            ).toList()
+                                    )
+                                    .build())
                             .build()
             );
             System.out.println(createAssistantResDto.getThreadId() + "스레드 아이디");
@@ -91,10 +105,10 @@ public class GptService {
                 System.out.println(runs.getStatus() + "상태 값");
                 switch (runs.getStatus()) {
                     case "completed":
-                        GetMessagesResDto getMessagesResDto = gptAssistantApiService.getMessagesAPI(runs.getThreadId());
-                        CreateMessageResDto getMessageResDto = gptAssistantApiService.getMessageAPI(runs.getThreadId(), getMessagesResDto.getFirstId());
+                        MessageList getMessagesResDto = gptAssistantApiService.getMessagesAPI(runs.getThreadId());
+                        Message getMessageResDto = gptAssistantApiService.getMessageAPI(runs.getThreadId(), getMessagesResDto.getFirstId());
                         if (getMessageResDto.getContent().stream().findFirst().isPresent()) {
-                            CreateMessageResDto.Content item = getMessageResDto.getContent().stream().findFirst().get();
+                            MessageContent item = getMessageResDto.getContent().stream().findFirst().get();
                             try {
                                 DailyCodyResDto response = objectMapper.readValue(item.getText().getValue(), DailyCodyResDto.class);
                                 return DailyCodyResDto.builder()

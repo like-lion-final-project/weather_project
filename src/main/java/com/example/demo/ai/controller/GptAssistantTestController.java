@@ -1,8 +1,9 @@
 package com.example.demo.ai.controller;
 
 
-import com.example.demo.ai.dto.assistant.v2.Assistant;
-import com.example.demo.ai.dto.assistant.v2.AssistantCreateRequest;
+import com.example.demo.ai.dto.assistant.Assistant;
+import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
+import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.run.Run;
 import com.example.demo.ai.service.GptAssistantApiService;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class GptAssistantTestController {
     private final GptService gptService;
-    private final GptAssistantApiService gptAssistantApiServiceV2;
+    private final GptAssistantApiService gptAssistantApiService;
     @PostMapping("/v1/daily-cody")
     public void dailyCody(
             @RequestBody
@@ -43,7 +44,7 @@ public class GptAssistantTestController {
             );
         }
 
-        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(dto,fcstItemList);
         for (String item : dailyCodyResDto.getCategories()
         ) {
             System.out.println(item + "카테고리");
@@ -58,7 +59,7 @@ public class GptAssistantTestController {
 
         dto.getTools().forEach(item -> System.out.println(item.getType() + "type"));
 
-        return gptAssistantApiServiceV2.createAssistantAPI(dto,"fashion","0.0.1");
+        return gptAssistantApiService.createAssistantAPI(dto,"fashion","0.0.1");
     }
 
 
@@ -68,7 +69,15 @@ public class GptAssistantTestController {
             CreateThreadAndRunRequest dto
 
     ) {
-        return gptAssistantApiServiceV2.createThreadAndRun(dto);
+        return gptAssistantApiService.createThreadAndRun(dto);
+    }
+
+    @GetMapping("/v2/threads/{threadId}/messages")
+    public MessageList getMessages(
+            @PathVariable("threadId")
+            String threadId
+    ){
+        return gptAssistantApiService.getMessagesAPI(threadId);
     }
 }
 

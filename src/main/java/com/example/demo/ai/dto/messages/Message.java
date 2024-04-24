@@ -1,6 +1,7 @@
 package com.example.demo.ai.dto.messages;
 
 import com.example.demo.ai.dto.file.Attachments;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,8 +46,9 @@ public class Message {
     @JsonProperty("run_id")
     private String runId;
 
-    @JsonProperty("attachments")
-    private Attachments attachments;
+
+//    @JsonProperty("attachments")
+//    private Attachments attachments;
 
     private Map<String, String> metadata;
 }

@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto.assistant.v2;
+package com.example.demo.ai.dto.assistant;
 
 import com.example.demo.ai.dto.messages.StatusEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;

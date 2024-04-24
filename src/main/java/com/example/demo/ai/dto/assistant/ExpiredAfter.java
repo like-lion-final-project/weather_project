@@ -1,4 +1,4 @@
-package com.example.demo.ai.dto.assistant.v2;
+package com.example.demo.ai.dto.assistant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

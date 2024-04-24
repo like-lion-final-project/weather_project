@@ -1,6 +1,6 @@
 package com.example.demo.ai.dto.thread;
 
-import com.example.demo.ai.dto.assistant.v2.ToolsResources;
+import com.example.demo.ai.dto.assistant.ToolsResources;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;

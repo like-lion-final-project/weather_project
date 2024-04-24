@@ -1,7 +1,9 @@
 package com.example.demo.ai.service;
 
-import com.example.demo.ai.dto.assistant.v2.Assistant;
-import com.example.demo.ai.dto.assistant.v2.AssistantCreateRequest;
+import com.example.demo.ai.dto.assistant.Assistant;
+import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
+import com.example.demo.ai.dto.messages.Message;
+import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.run.Run;
 import com.example.demo.ai.entity.AssistantEntity;
@@ -87,7 +89,7 @@ public class GptAssistantApiService {
 
 
         try {
-            Assistant response = objectMapper.readValue(json.getBody(), com.example.demo.ai.dto.assistant.v2.Assistant.class);
+            Assistant response = objectMapper.readValue(json.getBody(), Assistant.class);
 
             assistantRepo.save(AssistantEntity.builder()
                     .instructions(response.getInstructions())
@@ -172,6 +174,92 @@ public class GptAssistantApiService {
             throw new RuntimeException("Exception");
         }
 
+    }
+
+
+    /**
+     * <p>메시지 단일 조회 메서드 입니다.</p>
+     * <p>조회할 때 스레드 아이디가 필요합니다. 스레드가 이미 삭제되었다면 해당 스레드에 포함되어있는 모든 메시지를 조회할 수 없습니다.</p>
+     *
+     * @param messageId 조회할 메시지의 아이디 입니다.
+     */
+    public Message getMessageAPI(String threadId, String messageId) {
+        String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
+        ResponseEntity<String> json = restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+        try {
+            return objectMapper.readValue(json.getBody(), Message.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
+
+    /**
+     * <p>메시지 리스트 조회 메서드 입니다.</p>
+     * <p>조회할 때 스레드 아이디가 필요합니다. 스레드가 이미 삭제되었다면 해당 스레드에 포함되어있는 모든 메시지를 조회할 수 없습니다.</p>
+     *
+     * @param threadId 조회할 메시지들이 들어있는 스레드 아이디
+     */
+    public MessageList getMessagesAPI(String threadId) {
+        String uri = "/v1/threads/" + threadId + "/messages";
+        ResponseEntity<String> json = restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+        try {
+            return objectMapper.readValue(json.getBody(), MessageList.class);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
+
+
+    /**
+     * <p>실행 객체를 단일 조회 하는 메서드 입니다.</p>
+     *
+     * @param threadId 실행 객체에 포함된 스레드 아이디 입니다.
+     * @param runId    실행객체의 아이디 입니다.
+     */
+    public Run getRun(String threadId, String runId) {
+        String uri = "/v1/threads/" + threadId + "/runs/" + runId;
+        ResponseEntity<String> json = restClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (request, response) -> {
+                            log.warn("에러내용: " + response.getStatusText());
+                            throw new RuntimeException("Is4xx Client Error");
+                        })
+                .toEntity(String.class);
+        try {
+            return objectMapper.readValue(json.getBody(), Run.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JsonProcessingException");
+        } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
     }
 
 
