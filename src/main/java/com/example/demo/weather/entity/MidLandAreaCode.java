@@ -6,18 +6,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy;
+import lombok.Setter;
 
-@Data
+@Getter
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 public class MidLandAreaCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String areaName;
-    private String areaCode;
+    private String area;
+    private String code;
 }
