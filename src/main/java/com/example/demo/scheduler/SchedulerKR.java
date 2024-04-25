@@ -52,7 +52,7 @@ public class SchedulerKR {
      * </p>
      */
 // @Scheduled(cron = "10 * * * * *")
-//    @Scheduled(fixedDelay = 3000)
+    @Scheduled(fixedDelay = 3000)
     public void dailyCodyScheduler() {
         log.info("cron - start");
         Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion", "0.0.2");
@@ -79,6 +79,7 @@ public class SchedulerKR {
                 dailySuggestionRepo.save(
                         DailySuggestion.builder()
                                 .category(clothsCategory.get())
+                                .originalQuery(clothsCategory.get().getType())
                                 .build());
             } else {
                 // DB에 없는 카테고리라면 기타 카테고리로 저장 ( 임시 )
@@ -89,6 +90,7 @@ public class SchedulerKR {
                 dailySuggestionRepo.save(
                         DailySuggestion.builder()
                                 .category(otherItemsCategory.get())
+                                .originalQuery(category)
                                 .build());
             }
 
