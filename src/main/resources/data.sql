@@ -9,6 +9,37 @@ VALUES (1,'상의'),(2,'티셔츠'),(3,'니트/스웨터'),
        (17,'스커트'),(18,'악세서리'),(19,'머플러'),
        (20,'모자'),(21,'기타');
 
+INSERT INTO cloths_category (type)
+SELECT * FROM (SELECT '상의' AS type UNION ALL
+               SELECT '티셔츠' UNION ALL
+               SELECT '니트/스웨터' UNION ALL
+               SELECT '셔츠/블라우스' UNION ALL
+               SELECT '맨투맨' UNION ALL
+               SELECT '후드' UNION ALL
+               SELECT '민소매' UNION ALL
+               SELECT '아우터' UNION ALL
+               SELECT '카디건' UNION ALL
+               SELECT '재킷' UNION ALL
+               SELECT '코트' UNION ALL
+               SELECT '점퍼' UNION ALL
+               SELECT '바지' UNION ALL
+               SELECT '청바지' UNION ALL
+               SELECT '점프슈트' UNION ALL
+               SELECT '원피스' UNION ALL
+               SELECT '스커트' UNION ALL
+               SELECT '악세서리' UNION ALL
+               SELECT '머플러' UNION ALL
+               SELECT '모자' UNION ALL
+               SELECT '기타') AS tmp
+WHERE NOT EXISTS (
+    SELECT 1 FROM cloths_category WHERE type = tmp.type
+);
+
+
+INSERT INTO user (username)
+SELECT 'test-user' WHERE NOT EXISTS (
+    SELECT 1 FROM user WHERE username = 'test-user'
+);
 
 
 
@@ -235,8 +266,7 @@ insert into `cody_caster`.`mid_land_area_code`
  `code`)
 VALUES
 ('서울특별시, 인천광역시, 경기도', '11B00000'),
-('강원특별자치도', '11D10000'), -- 영서
--- ('강원특별자치도', '11D20000'), -- 영동
+('강원특별자치도', '11D10000'),
 ('대전광역시, 세종특별자치시, 충청남도', '11C20000'),
 ('충청북도', '11C10000'),
 ('광주광역시, 전라남도', '11F20000'),
@@ -244,3 +274,4 @@ VALUES
 ('대구광역시, 경상북도', '11H10000'),
 ('부산광역시, 울산광역시, 경상남도', '11H20000'),
 ('제주특별자치도', '11G00000');
+
