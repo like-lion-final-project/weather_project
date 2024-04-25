@@ -7,29 +7,31 @@
         /* 이미지 컨테이너의 스타일 */
         #image-container {
             position: fixed; /* 화면에 고정되도록 설정 */
-            bottom: 100px; /* 아래쪽 여백 설정 */
-            right: 1000px; /* 오른쪽 여백 설정 */
+            bottom: 25px; /* 아래쪽 여백 설정 */
+            right: 250px; /* 오른쪽 여백 설정 */
             display: grid; /* 그리드를 사용하여 이미지를 배열 */
             grid-template-columns: repeat(3, 1fr); /* 3개의 열로 구성 */
             gap: 5px; /* 이미지 사이의 간격 설정 */
         }
         /* 각 이미지의 스타일 */
         #image-container img {
-            width: 500px; /* 이미지의 너비를 축소하여 설정 */
+            width: 125px; /* 이미지의 너비를 축소하여 설정 */
             height: auto; /* 이미지의 높이는 비율에 맞게 자동 조정됩니다. */
         }
         /* 왼쪽 이미지 컨테이너의 스타일 */
         #copied-image-container {
             position: fixed; /* 화면에 고정되도록 설정 */
-            top: 1000px; /* 위쪽 여백 설정 */
-            left: 1000px; /* 왼쪽 여백 설정 */
+            top: 250px; /* 위쪽 여백 설정 */
+            left: 250px; /* 왼쪽 여백 설정 */
             text-align: center; /* 텍스트를 가운데 정렬 */
         }
         /* 왼쪽 이미지의 크기를 고정 */
         #copied-image-container img {
-            width: 1000px; /* 이미지의 너비를 고정 */
+            width: 250px; /* 이미지의 너비를 고정 */
             height: auto; /* 이미지의 높이는 비율에 맞게 자동 조정됩니다. */
         }
+
+
         /* 별점 스타일 */
         .rating {
             unicode-bidi: bidi-override;
@@ -41,8 +43,8 @@
         .rating > span {
             display: inline-block;
             width: 2em; /* 너비를 조정 */
-            height: 2em; /* 높이를 조정 */
-            font-size: 10em; /* 별점 크기 조절 */
+            height: 1em; /* 높이를 조정 */
+            font-size: 2em; /* 별점 크기 조절 */
             color: #ccc; /* 별점 기본 색상 설정 */
             cursor: pointer; /* 마우스 커서를 포인터로 변경 */
 
@@ -68,21 +70,27 @@
 <body>
 <div id="image-container">
     <!-- Thymeleaf를 사용하여 모델의 images를 동적으로 렌더링 -->
-    <div th:each="image, iterStat : ${images}">
-        <img th:src="${image.image}" alt="Image" onclick="copyImage(this)">
+    <div th:each="item, iterStat : ${items}">
+        <input type="hidden" class="category" th:value="${item.category}">
+        <img th:src="${item.image}" alt="Image" onclick="rateImage(this)">
         <!-- 3번째 이미지마다 줄 바꿈 -->
         <th:block th:if="${iterStat.index % 3 == 2}"><br></th:block>
     </div>
 </div>
-
 <!-- 왼쪽에 클릭한 이미지를 보여주는 컨테이너 -->
-<div id="copied-image-container"></div>
+<div id="copied-image-container">
+
+</div>
 
 <script>
-    // 이미지를 복사하여 왼쪽에 새 이미지로 보여주는 함수
-    function copyImage(clickedImage) {
+    // 이미지를 클릭하여 별점을 부여하는 함수
+    function rateImage(clickedImage) {
         // 클릭한 이미지의 src 속성값 가져오기
         var src = clickedImage.getAttribute('src');
+        // 카테고리 값 가져오기
+        var categoryInput = clickedImage.parentElement.querySelector('.category');
+        var category = categoryInput.value;
+
 
         // 이전에 보여준 이미지 모두 제거
         var copiedImageContainer = document.getElementById('copied-image-container');
@@ -114,8 +122,8 @@
             // 클로저를 사용하여 각 별점에 대한 정보를 전달
             star.onclick = function() { // 클로저를 사용하지 않고 직접 rateImage 함수 호출
                 var index = i + 1;
-                rateImage(index);
-                updateStarColor(index); // 별점 색상 업데이트
+                updateStarColor(index); // 클릭한 별점까지 색상 변경
+                submitRating(src, index, category); // 이미지 URL과 별점을 서버에 전달
             };
             rating.appendChild(star);
         }
@@ -123,25 +131,43 @@
         // 왼쪽 이미지 컨테이너에 새 이미지와 별점 추가
         copiedImageContainer.appendChild(copiedImage);
         copiedImageContainer.appendChild(rating);
+        copiedImageContainer.appendChild(category);
     }
-
-    // 별점을 설정하는 함수
-    function rateImage(rating) {
-        alert('이미지에 ' + rating + '점을 부여했습니다.');
-    }
-
-    // 클릭한 별점의 색상을 변경하는 함수
-    function updateStarColor(index) {
-        var stars = document.querySelectorAll('.rating > span');
-        for (var i = stars.length - 1; i >= 0; i--) {
-            var star = stars[i];
-            if (i >= stars.length - index) {
-                star.classList.add('active'); // 클릭한 별점까지의 색상을 변경
+    // 클릭한 별점까지의 색상을 변경하는 함수
+    function updateStarColor(clickedIndex) {
+        var stars = document.querySelectorAll('.rating span');
+        for (var i = 0; i < stars.length; i++) {
+            var starIndex = parseInt(stars[i].getAttribute('data-rating'));
+            if (starIndex <= clickedIndex) {
+                stars[i].classList.add('active'); // .active 클래스 추가
             } else {
-                star.classList.remove('active'); // 클릭하지 않은 별점은 기본 색상으로 변경
+                stars[i].classList.remove('active'); // .active 클래스 제거
             }
         }
     }
+
+    // 별점을 서버에 전송하는 함수
+    function submitRating(imageSrc, rating,category) {
+        // 현재 페이지 URL에서 쿼리 문자열 추출
+        var queryString = window.location.search;
+        // 쿼리 문자열을 객체로 변환
+        var queryParams = new URLSearchParams(queryString);
+        // query 매개변수 값 가져오기
+        var query = queryParams.get('query');
+        // AJAX 요청 보내기
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/submit-rating", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                console.log('Rating submitted successfully');
+                alert("이미지에"+rating+"점을 부여 했습니다");
+            }
+        };
+        var data = JSON.stringify({ image: imageSrc, rating: rating ,query: query,category:category });
+        xhr.send(data);
+    }
+
 </script>
 </body>
 </html>
