@@ -36,11 +36,10 @@ public class GptAssistantApiService {
     private final RestClient restClient;
     private final AssistantThreadRepo assistantThreadRepo;
     private final AssistantRepo assistantRepo;
-    private final AuthenticationFacade authenticationFacade;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public GptAssistantApiService(@Qualifier("gptAssistantRestClient") RestClient restClient,
+    public GptAssistantApiService(@Qualifier("gptAssistantClient") RestClient restClient,
                                   AssistantThreadRepo assistantThreadRepo,
                                   AssistantRepo assistantRepo,
                                   AuthenticationFacade authenticationFacade,
@@ -52,7 +51,6 @@ public class GptAssistantApiService {
         this.assistantThreadRepo = assistantThreadRepo;
         this.assistantRepo = assistantRepo;
         this.objectMapper = objectMapper;
-        this.authenticationFacade = authenticationFacade;
         this.userRepo = userRepo;
         this.assistantThreadMessageRepo = assistantThreadMessageRepo;
     }
@@ -115,67 +113,6 @@ public class GptAssistantApiService {
 
     }
 
-
-    /**
-     * <p>스레드 생성과 메시지 추가 실행을 동시에 처리하는 메서드</p>
-     *
-     * @param dto 요청 dto 입니다.
-     */
-    public Run createThreadAndRun(CreateThreadAndRunRequest dto) {
-
-
-        String uri = "/v1/threads/runs";
-        ResponseEntity<String> json = restClient
-                .post()
-                .uri(uri)
-                .body(dto)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,
-                        (request, response) -> {
-                            log.warn(response.toString());
-
-                            log.warn("에러내용: " + response.getStatusText());
-                            log.warn("에러내용: " + response.getBody());
-                            throw new RuntimeException("Is4xx Client Error");
-                        })
-                .toEntity(String.class);
-
-        Long tempUser = 1L;
-        User user = userRepo.findById(tempUser).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
-        AssistantEntity assistant = assistantRepo.findAssistantByAssistantId(dto.getAssistantId()).orElseThrow(() -> new RuntimeException("어시스턴트가 존재하지 않습니다."));
-
-
-        try {
-            Run response = objectMapper.readValue(json.getBody(), Run.class);
-
-            AssistantThreadMessage.builder().build();
-            AssistantThread thread = AssistantThread.builder()
-                    .user(user)
-                    .assistant(assistant)
-                    .threadId(response.getThreadId())
-                    .isDeleteFromOpenAi(false)
-                    .build();
-            assistantThreadRepo.save(thread);
-
-            assistantThreadMessageRepo.save(AssistantThreadMessage.builder()
-                    .object(response.getObject())
-                    .assistantThread(thread)
-                    .runId(response.getId())
-                    .value(dto.getThread().getMessages().stream().findFirst().get().getContent())
-                    .isDeleteFromOpenAi(false)
-                    .build());
-
-            return response;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JsonProcessingException");
-        } catch (DataAccessException e) {
-            System.out.println(e.getMessage() + "메시지");
-            throw new RuntimeException("DB Exception");
-        } catch (Exception e) {
-            throw new RuntimeException("Exception");
-        }
-
-    }
 
 
     /**
