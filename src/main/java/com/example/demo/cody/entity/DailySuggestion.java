@@ -3,7 +3,9 @@ package com.example.demo.cody.entity;
 import com.example.demo.ai.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 
@@ -11,6 +13,8 @@ import lombok.experimental.SuperBuilder;
  * <p>추천 코디 테이블</p>
  * */
 @Entity
+@Getter
+@Setter
 @SuperBuilder
 @RequiredArgsConstructor
 @AllArgsConstructor

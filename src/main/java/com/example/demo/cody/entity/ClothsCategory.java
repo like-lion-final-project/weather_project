@@ -20,4 +20,6 @@ public class ClothsCategory {
     private String type;
     @OneToMany(mappedBy = "category")
     private List<SuggestionFeedback>suggestionFeedbacks=new ArrayList<>();
+    @OneToMany(mappedBy = "category")
+    private List<DailySuggestion>dailySuggestions=new ArrayList<>();
 }
