@@ -1,4 +1,4 @@
-package com.example.demo.ai.v2;
+package com.example.demo.ai.service;
 
 import com.example.demo.ai.dto.assistant.Assistant;
 import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
@@ -12,7 +12,6 @@ import com.example.demo.ai.entity.AssistantThreadMessage;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadMessageRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
-import com.example.demo.ai.v2.GptAssistantApiServiceV2;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repo.UserRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,21 +19,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GptAssistantServiceV2 {
+public class GptAssistantService {
     private final UserRepo userRepo;
     private final AssistantThreadRepo assistantThreadRepo;
     private final AssistantThreadMessageRepo assistantThreadMessageRepo;
-    private final GptAssistantApiServiceV2 gptAssistantApiServiceV2;
+    private final GptAssistantApiService gptAssistantApiServiceV2;
     private final AssistantRepo assistantRepo;
     private final ObjectMapper objectMapper;
 
@@ -150,16 +147,7 @@ public class GptAssistantServiceV2 {
     public Message getMessage(String threadId, String messageId) {
         String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
         ResponseEntity<String> json = gptAssistantApiServiceV2.getMessage(threadId,messageId);
-//                restClient
-//                .get()
-//                .uri(uri)
-//                .retrieve()
-//                .onStatus(HttpStatusCode::is4xxClientError,
-//                        (request, response) -> {
-//                            log.warn("에러내용: " + response.getStatusText());
-//                            throw new RuntimeException("Is4xx Client Error");
-//                        })
-//                .toEntity(String.class);
+
         try {
             return objectMapper.readValue(json.getBody(), Message.class);
         } catch (JsonProcessingException e) {

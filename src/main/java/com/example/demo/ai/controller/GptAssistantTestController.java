@@ -6,8 +6,7 @@ import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
 import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.run.Run;
-import com.example.demo.ai.service.GptAssistantApiService;
-import com.example.demo.ai.v2.GptAssistantServiceV2;
+import com.example.demo.ai.service.GptAssistantService;
 import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.weather.dto.srt_fcst.FcstItem;
@@ -22,35 +21,35 @@ import java.util.List;
 
 public class GptAssistantTestController {
     private final GptService gptService;
-    private final GptAssistantServiceV2 gptAssistantService;
-//    @PostMapping("/v1/daily-cody")
-//    public void dailyCody(
-//            @RequestBody
-//            CreateThreadAndRunRequest dto
-//    ) {
-//
-//        List<FcstItem> fcstItemList = new ArrayList<>();
-//        for (int i = 0; i < 10; i++) {
-//            FcstItem fcstItem = new FcstItem();
-//            fcstItem.setBaseDate("20220423");
-//            fcstItem.setBaseTime("0500");
-//            fcstItem.setCategory("none");
-//            fcstItem.setFcstDate("20220423");
-//            fcstItem.setFcstTime(i + ":00");
-//            fcstItem.setFcstValue(i + 1 + "");
-//            fcstItem.setNx(i);
-//            fcstItem.setNy(i);
-//            fcstItemList.add(
-//                    fcstItem
-//            );
-//        }
-//
-//        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
-//        for (String item : dailyCodyResDto.getCategories()
-//        ) {
-//            System.out.println(item + "카테고리");
-//        }
-//    }
+    private final GptAssistantService gptAssistantService;
+    @PostMapping("/v1/daily-cody")
+    public void dailyCody(
+            @RequestBody
+            CreateThreadAndRunRequest dto
+    ) {
+
+        List<FcstItem> fcstItemList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            FcstItem fcstItem = new FcstItem();
+            fcstItem.setBaseDate("20220423");
+            fcstItem.setBaseTime("0500");
+            fcstItem.setCategory("none");
+            fcstItem.setFcstDate("20220423");
+            fcstItem.setFcstTime(i + ":00");
+            fcstItem.setFcstValue(i + 1 + "");
+            fcstItem.setNx(i);
+            fcstItem.setNy(i);
+            fcstItemList.add(
+                    fcstItem
+            );
+        }
+
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
+        for (String item : dailyCodyResDto.getCategories()
+        ) {
+            System.out.println(item + "카테고리");
+        }
+    }
 
     @PostMapping("/v2/assistants")
     public Assistant createAssistant(

@@ -1,7 +1,6 @@
-package com.example.demo.ai;
+package com.example.demo.ai.service;
 
 
-import com.example.demo.ai.service.GptAssistantApiService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +8,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-
-@Configuration
+@Configuration()
 public class GptAssistantClientConfig {
     /**
      * OpenAI assistant api 헤더에 추가할 베타 표시.
@@ -28,13 +26,21 @@ public class GptAssistantClientConfig {
     @Value("${open-ai.api-key}")
     private String OPEN_AI_API_KEY = "";
 
-
-    @Bean("gptAssistantClient")
-    public RestClient GptAssistantClient() {
+    @Bean
+    public RestClient GptAssistantClientV2() {
         return RestClient.builder()
                 .baseUrl(BASE_URL)
                 .defaultHeader(OPEN_AI_BETA,ASSISTANTS_V2)
                 .defaultHeader( "Authorization","Bearer " + OPEN_AI_API_KEY)
                 .build();
+    }
+
+
+    @Bean
+    public GptAssistantApiService gptAssistantApiServiceV2() {
+        return HttpServiceProxyFactory
+                .builderFor(RestClientAdapter.create(GptAssistantClientV2()))
+                .build()
+                .createClient(GptAssistantApiService.class);
     }
 }
