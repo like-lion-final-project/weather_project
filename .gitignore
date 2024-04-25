@@ -44,5 +44,5 @@ application-dev.yaml
 
 **/db.sqlite
 **/data.sql
-data.sql
+src/main/resources/data.sql
 db.sqlite

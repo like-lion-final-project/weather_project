@@ -1,24 +1,26 @@
 package com.example.demo.cody.entity;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.example.demo.ai.entity.BaseEntity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 
-@Getter
+/**
+ * <p>추천 코디 테이블</p>
+ * */
 @Entity
-@Builder
-@NoArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @AllArgsConstructor
-public class DailySuggestion {
+public class DailySuggestion extends BaseEntity {
     @Id
-    private int id;
-    private LocalDateTime created_at;
-    private LocalDateTime update_at;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ClothsCategory category;
 
 }
