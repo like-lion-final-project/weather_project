@@ -41,6 +41,6 @@ out/
 application.yaml
 application-prod.yaml
 application-dev.yaml
-
+src/main/resources/data.sql
 data.sql
 db.sqlite

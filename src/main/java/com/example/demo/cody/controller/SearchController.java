@@ -23,6 +23,7 @@ public class SearchController {
 
     @GetMapping("/ser")
         public String naverSearch(@RequestParam String query, Model model) {
+
             String resultString = naverShopSearch.search(query);
             List<ItemDto> items=naverSearchService.fromJSONtoItems(resultString);
             model.addAttribute("items" ,items);
