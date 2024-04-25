@@ -41,13 +41,11 @@ out/
 application.yaml
 application-prod.yaml
 application-dev.yaml
-<<<<<<< HEAD
+
 
 **/db.sqlite
 **/data.sql
 src/main/resources/data.sql
-=======
-src/main/resources/data.sql
+
 data.sql
->>>>>>> 498bf4f (trend)
 db.sqlite

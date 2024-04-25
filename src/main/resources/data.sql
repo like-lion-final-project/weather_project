@@ -9,6 +9,7 @@ VALUES (1,'상의'),(2,'티셔츠'),(3,'니트/스웨터'),
        (17,'스커트'),(18,'악세서리'),(19,'머플러'),
        (20,'모자'),(21,'기타');
 
+
 INSERT INTO cloths_category (type)
 SELECT * FROM (SELECT '상의' AS type UNION ALL
                SELECT '티셔츠' UNION ALL
