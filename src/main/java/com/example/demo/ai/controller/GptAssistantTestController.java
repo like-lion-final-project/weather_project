@@ -71,13 +71,13 @@ public class GptAssistantTestController {
         return gptAssistantService.createThreadAndRun(dto);
     }
 
-//    @GetMapping("/v2/threads/{threadId}/messages")
-//    public MessageList getMessages(
-//            @PathVariable("threadId")
-//            String threadId
-//    ){
-//        return gptAssistantService.getMessagesAPI(threadId);
-//    }
+    @GetMapping("/v2/threads/{threadId}/messages")
+    public MessageList getMessages(
+            @PathVariable("threadId")
+            String threadId
+    ){
+        return gptAssistantService.getMessages(threadId);
+    }
 }
 
 // TODO: 파일 업로드
