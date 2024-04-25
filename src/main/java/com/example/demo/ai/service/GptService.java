@@ -1,11 +1,10 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.AppConstants;
-
 import com.example.demo.ai.dto.messages.Message;
-import com.example.demo.ai.dto.messages.content.MessageContent;
 import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.messages.MessageRequest;
+import com.example.demo.ai.dto.messages.content.MessageContent;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequestThread;
 import com.example.demo.ai.dto.run.Run;
@@ -25,8 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GptService {
-    private final GptAssistantApiService gptAssistantApiService;
-
+    private final GptAssistantService gptAssistantService;
     private final AssistantRepo assistantRepo;
     private final ObjectMapper objectMapper;
 
@@ -66,7 +64,7 @@ public class GptService {
             System.out.println(messages.stream().findFirst().get().getContent() + "CONTENT");
             AssistantEntity assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 어시스턴트 입니다."));
-            Run createAssistantResDto = gptAssistantApiService.createThreadAndRun(
+            Run createAssistantResDto = gptAssistantService.createThreadAndRun(
                     CreateThreadAndRunRequest.builder()
                             .assistantId(assistant.getAssistantId())
                             .model(assistant.getModel())
@@ -92,13 +90,14 @@ public class GptService {
             label:
             while (count <= 30) {
                 count += 1;
-                Run runs = gptAssistantApiService.getRun(createAssistantResDto.getThreadId(), createAssistantResDto.getId());
+                Run runs = gptAssistantService.getRun(createAssistantResDto.getThreadId(), createAssistantResDto.getId());
                 System.out.println(runs.getStatus() + "상태 값");
 
                 switch (runs.getStatus()) {
                     case "completed":
-                        MessageList getMessagesResDto = gptAssistantApiService.getMessagesAPI(runs.getThreadId());
-                        Message getMessageResDto = gptAssistantApiService.getMessageAPI(runs.getThreadId(), getMessagesResDto.getFirstId());
+                        MessageList getMessagesResDto = gptAssistantService.getMessages(runs.getThreadId());
+                        System.out.println(getMessagesResDto.getFirstId() + "FIRST ID");
+                        Message getMessageResDto = gptAssistantService.getMessage(runs.getThreadId(), getMessagesResDto.getFirstId());
                         System.out.println("-------------------RUN INFO-------------------");
                         System.out.println(createAssistantResDto.getId() + " : 실행 아이디");
                         System.out.println(createAssistantResDto.getThreadId() + " : 스레드 아이디");
@@ -107,7 +106,7 @@ public class GptService {
                         System.out.println(getMessagesResDto.getLastId() + " : last id");
                         System.out.println(runs.getId() + " : run id");
                         System.out.println("-----------------------------------------------");
-                        gptAssistantApiService.updateMessage(runs.getId(),getMessagesResDto.getLastId());
+                        gptAssistantService.updateMessage(runs.getId(),getMessagesResDto.getLastId());
 
                         if (getMessageResDto.getContent().stream().findFirst().isPresent()) {
                             MessageContent item = getMessageResDto.getContent().stream().findFirst().get();
