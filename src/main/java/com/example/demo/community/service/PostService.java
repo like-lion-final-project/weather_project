@@ -26,26 +26,28 @@ public class PostService {
         String oriImgName = imgFile.getOriginalFilename();
         String imgName = "";
 
+        // 파일 저장 위치
         String projectPath = System.getProperty("user.dir") + "/src/main/resources/static/files/";
 
         post.setTitle(title);
         post.setContent(content);
         post.setCategory(category);
 
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUID.randomUUID(); // 식별자. 랜덤으로 이름 만들어줌
 
-        String savedFileName = uuid + "_" + oriImgName;
+        String savedFileName = uuid + "_" + oriImgName; // 저장될 파일 이름 지정 = 랜덤식별자_원래파일이름
 
         imgName = savedFileName;
 
-        File saveFile = new File(projectPath, imgName);
+        File saveFile = new File(projectPath, imgName); // 빈껍데기 생성 이름은 imgName, projectPath라는 경로에 담김
 
         imgFile.transferTo(saveFile);
 
-        post.setImgName(imgName);
-        post.setImgPath("/files/" + imgName);
+        post.setImgName(imgName); // 파일 이름
+        post.setImgPath("/files/" + imgName); // 저장경로 , 파일 이름
 
         return PostDto.fromEntity(postRepository.save(post));
+
 
     }
     // READ
