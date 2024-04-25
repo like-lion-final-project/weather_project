@@ -29,8 +29,18 @@ public class MidFcstService {
         // 일 2회(06:00,18:00)회 생성 되며 발표시각을 입력
         // 최근 24시간 자료만 제공
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        int currentHour = currentTime.getHour();
+        int targetHour = currentHour >= 18 ? 18 : 6; // 현재 시간이 18시보다 크거나 같으면 18시로, 아니면 6시로 설정
+
+        LocalDateTime targetDateTime = LocalDateTime.of(
+                currentTime.getYear(),
+                currentTime.getMonth(),
+                currentTime.getDayOfMonth(),
+                targetHour,
+                0
+        );
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        String tmFc = targetDateTime.format(dateTimeFormatter);
 
         Map<String, Object> params = new HashMap<>();
         params.put("serviceKey", serviceKey);
@@ -38,7 +48,7 @@ public class MidFcstService {
         params.put("pageNo", 1);
         params.put("dataType", "JSON");
         params.put("regId", regId);      // 예보구역코드
-        params.put("tmFc", "202404231800");   // 발표 시각
+        params.put("tmFc", tmFc);   // 발표 시각
 
         return midFcstApiService.MidLandFcst(params);
     }
@@ -52,8 +62,18 @@ public class MidFcstService {
         // 일 2회(06:00,18:00)회 생성 되며 발표시각을 입력
         // 최근 24시간 자료만 제공
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        int currentHour = currentTime.getHour();
+        int targetHour = currentHour >= 18 ? 18 : 6; // 현재 시간이 18시보다 크거나 같으면 18시로, 아니면 6시로 설정
+
+        LocalDateTime targetDateTime = LocalDateTime.of(
+                currentTime.getYear(),
+                currentTime.getMonth(),
+                currentTime.getDayOfMonth(),
+                targetHour,
+                0
+        );
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        String tmFc = targetDateTime.format(dateTimeFormatter);
 
         Map<String, Object> params = new HashMap<>();
         params.put("serviceKey", serviceKey);
@@ -61,7 +81,7 @@ public class MidFcstService {
         params.put("pageNo", 1);
         params.put("dataType", "JSON");
         params.put("regId", regId);      // 예보구역코드
-        params.put("tmFc", "202404231800");   // 발표 시각
+        params.put("tmFc", tmFc);   // 발표 시각
 
         return midFcstApiService.MidTa(params);
     }

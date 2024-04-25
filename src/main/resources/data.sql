@@ -7,7 +7,7 @@ VALUES (1,'상의'),(2,'티셔츠'),(3,'니트/스웨터'),
        (13,'바지'),(14,'청바지'),
        (15,'점프슈트'),(16,'원피스'),
        (17,'스커트'),(18,'악세서리'),(19,'머플러'),
-       (20,'모자'),(21,'기타')
+       (20,'모자'),(21,'기타');
 
 
 
@@ -18,7 +18,7 @@ VALUES (1,'상의'),(2,'티셔츠'),(3,'니트/스웨터'),
 -- #        ) ON DUPLICATE KEY UPDATE id=id;
 
 
-INSERT INTO user (username) VALUES ('test-user')
+-- INSERT INTO user (username) VALUES ('test-user')
 
 
 
