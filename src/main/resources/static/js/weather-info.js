@@ -85,6 +85,9 @@ function getCurrentWeather() {
                 fetch(`http://localhost:8080/api/v1/area-code/mid-land?area=${area}`)
                     .then(response => response.json())
                     .then(midLandData => {
+                        const weatherList = document.getElementById('weekly-land-weather');
+                        weatherList.innerHTML = '';
+
                         const landRegId = midLandData.code;
 
                         // 중도 Land 코드를 사용하여 해당 지역의 날씨 정보를 가져오는 요청 보내기
@@ -103,6 +106,9 @@ function getCurrentWeather() {
                 fetch(`http://localhost:8080/api/v1/area-code/mid-ta?area=${city}`)
                     .then(response => response.json())
                     .then(midTaData => {
+                        const weatherList = document.getElementById('weekly-ta-weather');
+                        weatherList.innerHTML = '';
+
                         const taRegId = midTaData.code;
 
                         fetch(`http://localhost:8080/api/v1/weather/mid-ta?regId=${taRegId}`)
@@ -249,7 +255,7 @@ function createWeeklyLandWeather(weatherData) {
 
         // 8일부터 10일까지는 오전/오후로 나누지 않음
         if (i >= 8) {
-            rnSt = item[`rnSt${i}`];
+            rnSt = item[`rnSt${i}`] + "%";
             wf = item[`wf${i}`];
         } else {
             const rnStAm = item[`rnSt${i}Am`] || '정보 없음';
