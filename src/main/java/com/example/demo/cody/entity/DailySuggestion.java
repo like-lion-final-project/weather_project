@@ -27,4 +27,7 @@ public class DailySuggestion extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ClothsCategory category;
 
+    @Column(name = "original_query")
+    private String originalQuery;
+
 }
