@@ -96,6 +96,7 @@ function getCurrentWeather() {
                             .then(landWeatherData => {
                                 // 중도 지역의 날씨 정보를 바로 동적으로 추가
                                 createWeeklyLandWeather(landWeatherData);
+
                             })
                             .catch(error => console.error('Error fetching mid land weather:', error));
                     })
@@ -163,7 +164,7 @@ function getCurrentWeather() {
                                 });
 
                                 // 강수 형태, 습도, 풍속 표시
-                                const categoriesToShow = ['REH', 'WSD', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
+                                const categoriesToShow = ['REH', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
                                 Object.entries(nowcastValue).forEach(([category, value]) => {
                                     // categoriesToShow 배열에 있는 카테고리에 해당하는 값만 처리
                                     if (categoriesToShow.includes(category)) {
@@ -249,32 +250,33 @@ function createWeeklyLandWeather(weatherData) {
     const currentDate = new Date();
 
     for (let i = 3; i <= 10; i++) {
-        const dayName = calculateDay(currentDate, i - 1);
-        const date = `${i}일 후 (${dayName})`;
-        let rnSt, wf;
+        const dayName = calculateDay(currentDate, i);
+        const date = `<h5>${dayName}</h5>`;
+        let wf;
+
+        const listItem = document.createElement('span');
 
         // 8일부터 10일까지는 오전/오후로 나누지 않음
         if (i >= 8) {
-            rnSt = item[`rnSt${i}`] + "%";
             wf = item[`wf${i}`];
+            listItem.classList.add('weather-item');
+            listItem.innerHTML = `
+            <p>${date}</p>
+            <p>오전 : ${wf}</p>
+            <p>오후 : ${wf}</p>
+        `;
+
         } else {
-            const rnStAm = item[`rnSt${i}Am`] || '정보 없음';
-            const rnStPm = item[`rnSt${i}Pm`] || '정보 없음';
             const wfAm = item[`wf${i}Am`] || '정보 없음';
             const wfPm = item[`wf${i}Pm`] || '정보 없음';
 
-            // 오전과 오후의 강수확률과 날씨 예보를 결합하여 사용
-            rnSt = `오전: ${rnStAm}%, 오후: ${rnStPm}%`;
-            wf = `오전: ${wfAm}, 오후: ${wfPm}`;
-        }
-
-        const listItem = document.createElement('div');
-        listItem.classList.add('weather-item');
-        listItem.innerHTML = `
+            listItem.classList.add('weather-item');
+            listItem.innerHTML = `
             <p>${date}</p>
-            <p>강수확률: ${rnSt}</p>
-            <p>날씨 예보: ${wf}</p>
+            <p>오전: ${wfAm}</p>
+            <p>오후: ${wfPm}</p>
         `;
+        }
 
         weeklyWeatherList.appendChild(listItem);
     }
@@ -286,19 +288,18 @@ function createWeeklyTaWeather(weatherData) {
     const currentDate = new Date();
 
     for (let i = 3; i <= 10; i++) {
-        const dayName = calculateDay(currentDate, i - 1);
-        const date = `${i}일 후 (${dayName})`;
+        const dayName = calculateDay(currentDate, i);
+        const date = `<h5>${dayName}</h5>`;
 
         // 최저 기온과 최고 기온 정보만 가져옴
         const taMin = item[`taMin${i}`] || '정보 없음';
         const taMax = item[`taMax${i}`] || '정보 없음';
 
-        const listItem = document.createElement('div');
+        const listItem = document.createElement('span');
         listItem.classList.add('weather-item');
         listItem.innerHTML = `
             <p>${date}</p>
-            <p>최저 기온: ${taMin}°C</p>
-            <p>최고 기온: ${taMax}°C</p>
+            <p>${taMin}°C / ${taMax}°C</p>
         `;
 
         weeklyWeatherList.appendChild(listItem);

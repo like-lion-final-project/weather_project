@@ -33,6 +33,7 @@ function getWeatherByCoordinates(lat, lng, address) {
                 .then(landWeatherData => {
                     // 중도 지역의 날씨 정보를 바로 동적으로 추가
                     createWeeklyLandWeather(landWeatherData);
+
                 })
                 .catch(error => console.error('Error fetching mid land weather:', error));
         })
