@@ -83,6 +83,7 @@ public class GptAssistantApiService {
                         .model(dto.getModel())
                         .tools(dto.getTools())
                         .toolsResources(dto.getToolsResources())
+                        .responseFormat(dto.getResponseFormat())
                         .build())
                 .retrieve()
                 .toEntity(String.class);
@@ -262,5 +263,24 @@ public class GptAssistantApiService {
         }
     }
 
+
+    public Optional<AssistantThreadMessage> updateMessage(String runId, String newMessageUniqueId){
+        Optional<AssistantThreadMessage> message = assistantThreadMessageRepo.findFirstByRunId(runId);
+        return message.map(assistantThreadMessage -> assistantThreadMessageRepo.save(
+                AssistantThreadMessage.builder()
+                        .id(assistantThreadMessage.getId())
+                        .messageId(newMessageUniqueId)
+                        .object(assistantThreadMessage.getObject())
+                        .assistantThread(assistantThreadMessage.getAssistantThread())
+                        .role(assistantThreadMessage.getRole())
+                        .runId(runId)
+                        .type(assistantThreadMessage.getType())
+                        .value(assistantThreadMessage.getValue())
+                        .file_ids(assistantThreadMessage.getFile_ids())
+                        .annotataions(assistantThreadMessage.getAnnotataions())
+                        .metadata(assistantThreadMessage.getMetadata())
+                        .isDeleteFromOpenAi(assistantThreadMessage.isDeleteFromOpenAi())
+                        .build()));
+    }
 
 }

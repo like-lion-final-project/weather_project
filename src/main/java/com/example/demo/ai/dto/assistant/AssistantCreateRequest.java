@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 
 import java.util.List;
 
@@ -22,4 +23,7 @@ public class AssistantCreateRequest {
 
     @JsonProperty("tool_resources")
     private ToolsResources toolsResources;
+
+    @JsonProperty("response_format")
+    private ResponseFormat responseFormat;
 }

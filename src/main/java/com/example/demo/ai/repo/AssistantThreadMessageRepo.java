@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface AssistantThreadMessageRepo extends JpaRepository<AssistantThreadMessage,Long> {
     @Query("SELECT atm FROM AssistantThreadMessage atm WHERE atm.assistantThread.user.id = :userId AND atm.isDeleteFromOpenAi = false ORDER BY atm.createdAt DESC")
     Optional<AssistantThreadMessage> findFirstByUserIdAndIsDeleteFromOpenAiFalseOrderByCreatedAtDesc(@Param("userId") Long userId);
-
+    Optional<AssistantThreadMessage> findFirstByRunId(String runId);
 }

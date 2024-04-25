@@ -9,7 +9,7 @@ import com.example.demo.ai.dto.run.Run;
 import com.example.demo.ai.service.GptAssistantApiService;
 import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
-import com.example.demo.weather.dto.fcst.FcstItem;
+import com.example.demo.weather.dto.srt_fcst.FcstItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +44,7 @@ public class GptAssistantTestController {
             );
         }
 
-        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(dto,fcstItemList);
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItemList);
         for (String item : dailyCodyResDto.getCategories()
         ) {
             System.out.println(item + "카테고리");
@@ -56,8 +56,6 @@ public class GptAssistantTestController {
             @RequestBody
             AssistantCreateRequest dto
     ) {
-
-        dto.getTools().forEach(item -> System.out.println(item.getType() + "type"));
 
         return gptAssistantApiService.createAssistantAPI(dto,"fashion","0.0.1");
     }
