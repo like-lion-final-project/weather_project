@@ -1,5 +1,4 @@
-package com.example.demo.ai.dto;
-
+package com.example.demo.ai.dto.run;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,10 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Tool{
-    @JsonProperty("type")
+public class TruncationStrategy {
     private String type;
+    @JsonProperty("last_messages")
+    private String lastMessages;
+
+    // Getters and Setters
 }

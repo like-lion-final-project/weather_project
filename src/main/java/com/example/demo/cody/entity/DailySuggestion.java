@@ -1,0 +1,26 @@
+package com.example.demo.cody.entity;
+
+import com.example.demo.ai.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+
+/**
+ * <p>추천 코디 테이블</p>
+ * */
+@Entity
+@SuperBuilder
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class DailySuggestion extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ClothsCategory category;
+
+}

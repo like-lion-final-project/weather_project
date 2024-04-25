@@ -3,12 +3,9 @@ package com.example.demo.ai.entity;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -24,7 +21,7 @@ public class AssistantThread extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
-    private Assistant assistant;
+    private AssistantEntity assistant;
 
     @Column(name = "thread_unique_id")
     private String threadId;

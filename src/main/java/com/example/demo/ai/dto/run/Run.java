@@ -1,43 +1,36 @@
-package com.example.demo.ai.dto.message;
+package com.example.demo.ai.dto.run;
 
-
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.example.demo.ai.dto.assistant.ResponseFormat;
+import com.example.demo.ai.dto.assistant.Tool;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @RequiredArgsConstructor
-public class CreateThreadAndRunResDto {
-    @JsonProperty("id")
+@AllArgsConstructor
+public class Run {
     private String id;
-
-    @JsonProperty("object")
     private String object;
 
     @JsonProperty("created_at")
-    private Long createdAt;
+    private long createdAt;
 
     @JsonProperty("assistant_id")
     private String assistantId;
 
     @JsonProperty("thread_id")
     private String threadId;
-
-    @JsonProperty("status")
     private String status;
 
     @JsonProperty("started_at")
     private Long startedAt;
 
     @JsonProperty("expires_at")
-    private Long expiresAt;
+    private long expiresAt;
 
     @JsonProperty("cancelled_at")
     private Long cancelledAt;
@@ -53,27 +46,19 @@ public class CreateThreadAndRunResDto {
 
     @JsonProperty("last_error")
     private String lastError;
-
-    @JsonProperty("model")
     private String model;
-
-    @JsonProperty("instructions")
     private String instructions;
 
     @JsonProperty("tools")
-    private List<String> tools;
+    private List<Tool> tools;
 
-    @JsonProperty("tool_resources")
-    private Map<String, Object> toolResources;
-
-    @JsonProperty("metadata")
-    private Map<String, Object> metadata;
-
-    @JsonProperty("temperature")
-    private Double temperature;
+    @JsonProperty("file_ids")
+    private List<String> fileIds;
+    private Object metadata;
+    private double temperature;
 
     @JsonProperty("top_p")
-    private Double topP;
+    private double topP;
 
     @JsonProperty("max_completion_tokens")
     private Integer maxCompletionTokens;
@@ -85,30 +70,12 @@ public class CreateThreadAndRunResDto {
     private TruncationStrategy truncationStrategy;
 
     @JsonProperty("incomplete_details")
-    private Object incompleteDetails;
-
-    @JsonProperty("usage")
+    private String incompleteDetails;
     private Object usage;
 
     @JsonProperty("response_format")
-    private String responseFormat;
+    private ResponseFormat responseFormat;
 
     @JsonProperty("tool_choice")
     private String toolChoice;
-
-    @JsonProperty("file_ids")
-    private List<String> fileIds = new ArrayList<>();  // 초기화
-
-    @Getter
-    @Setter
-    @Builder
-    @AllArgsConstructor
-    @RequiredArgsConstructor
-    public static class TruncationStrategy {
-        @JsonProperty("type")
-        private String type;
-
-        @JsonProperty("last_messages")
-        private Integer lastMessages = null;
-    }
 }
