@@ -66,8 +66,7 @@ public class NaverSearchService {
         if (suggestion == null) {
             throw new RuntimeException("추천이 없습니다");
         }
-        ClothsCategory category = suggestion.getCategory();
-        return category.getType();
+        return suggestion.getOriginalQuery();
     }
     }
 
