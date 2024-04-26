@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        /* 스타일링을 위한 CSS 코드 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin-top: 100px;
+        }
+        .form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .button-secondary {
+            background-color: #555;
+        }
+        .row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .input-group input[type="email"] {
+            margin-right: 5px; /* 추가된 공간 */
+        }
+        .input-group button {
+            width: auto;
+            padding: 10px 10px; /* 조정된 패딩 */
+            white-space: nowrap;
+        }
+        .verification-row {
+            display: none; /* 초기에는 숨김 */
+            flex-direction: column;
+        }
+        .confirm {
+            margin-top : 0px;
+            margin-bottom: 5px;
+            color:red;
+        }
+    </style>
+</head>
+<body>
+<div class="form">
+    <h2>회원가입</h2>
+
+    <div class="row">
+        <label for="username">사용자 아이디(닉네임)</label>
+        <div class="input-group">
+            <input type="text" id="username" name="username" required>
+            <button class="button-secondary" onclick="nickCheck();">중복체크</button>
+        </div>
+    </div>
+
+    <label for="password">비밀번호</label>
+    <input type="password" id="password" name="password" required>
+    <div class="confirm" id="pwCheckMessage"></div>
+
+    <label for="password-confirm">비밀번호 확인</label>
+    <input type="password" id="password-confirm" name="password-confirm" required>
+    <div class="confirm" id="pwConfirmMessage"></div>
+
+    <div class="row">
+        <label for="email">이메일</label>
+        <div class="input-group">
+            <input type="email" id="email" name="email" required>
+            <button class="button-secondary" onclick="showVerification()">인증</button>
+        </div>
+    </div>
+    <div class="verification-row">
+        <input type="number" id="verification-code" placeholder="인증 코드 입력">
+        <button onclick="verifyCode()">인증 확인</button>
+    </div>
+
+    <label for="gender">성별</label>
+    <select id="gender" name="gender" required>
+        <option value="1">남자</option>
+        <option value="0">여자</option>
+    </select>
+
+    <button onclick="signUp()">가입하기</button>
+</div>
+</body>
+<script>
+    let nickPass = false;
+    let passwordPass = false;
+    let emailPass = false;
+
+    function showVerification() {
+        // 이메일 인증 코드 입력란을 보여줌
+        document.querySelector('.verification-row').style.display = 'flex';
+    }
+
+    function verifyCode() {
+        // 인증 코드 검증 로직을 여기에 구현
+        alert('인증 코드가 제출되었습니다.');
+    }
+
+    async function nickCheck() {
+        const username = document.getElementById("username").value;
+        const RegXep = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$/;
+        console.log("유저 이름: " + username);
+        if(!RegXep.test(username) || username == "") {
+            alert("사용불가 2~16자 이하 영어, 숫자, 한글로 구성");
+            return;
+        } else {
+            try {
+                const result = await fetch('http://localhost:8080/api/v1/users/nickCheck', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username
+                    })
+                });
+                console.log(result.status);
+                if (result.status === 200) {
+                    alert("사용하실 수 있는 닉네임입니다.");
+                    nickPass = true;
+                    return;
+                }
+
+                if (result.status !== 200) {
+                    alert("중복된 닉네임입니다.");
+                }
+            } catch (error) {
+                alert("서버에 문제가 생겼습니다.");
+            }
+        }
+    }
+
+    const password = document.getElementById('password');
+    const pwCheckMessage = document.getElementById('pwCheckMessage')
+    const pwConfirmMessage = document.getElementById('pwConfirmMessage');
+    const passwordConfirm = document.getElementById('password-confirm');
+
+    password.oninput = function checkPassword() {
+        const RegExp = /^[a-zA-Z0-9]{4,12}$/;
+        if(!RegExp.test(password.value) || password.value == ""){
+            pwCheckMessage.innerHTML = '사용불가 4~12자의 영문 대소문자와 숫자로만 입력하세요.';
+        } else {
+            pwCheckMessage.innerHTML = '';
+        }
+    }
+
+    passwordConfirm.oninput = function matchPassword() {
+        if (password.value === passwordConfirm.value && password.value !== '') {
+            pwConfirmMessage.innerHTML = '';
+            pwConfirmMessage.innerHTML += '비밀번호가 일치합니다.';
+            passwordPass = true;
+        } else {
+            pwConfirmMessage.innerHTML = '';
+            pwConfirmMessage.innerHTML += '비밀번호가 일치하지 않습니다.';
+        }
+    }
+
+    async function signUp() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value;
+        const gender = document.getElementById("gender").value;
+
+        if (nickPass === false) {
+            document.getElementById('username').focus();
+            alert('닉네임이 올바르지 않습니다.');
+            return;
+        }
+
+        if (passwordPass === false) {
+            document.getElementById('password').focus();
+            alert('비밀번호가 올바르지 않습니다.');
+            return;
+        }
+
+        try {
+            await fetch('http://localhost:8080/api/v1/users/signUp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    email,
+                    gender
+                })
+            });
+            alert('가입 완료!');
+            location.href = '/api/v1/users/login';
+        } catch (error) {
+            alert('error');
+        }
+    }
+</script>
+</html>
