@@ -19,7 +19,12 @@
         </div>
         <div class="mb-3">
             <label for="content-area" class="form-label">Category</label>
-            <input type="text" name="category" class="form-control" id="category-area">
+            <select name="category" id="category" class="form-control">
+                <option value="">카테고리 선택</option>
+                <option th:each="cate : ${category}"
+                        th:value="${cate.type}"
+                        th:text="${cate.type}" />
+            </select>
         </div>
         <div class="col-12">
             <label class="form-label">상품 이미지 업로드</label>

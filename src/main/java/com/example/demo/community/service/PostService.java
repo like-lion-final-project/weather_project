@@ -1,5 +1,7 @@
 package com.example.demo.community.service;
 
+import com.example.demo.cody.entity.ClothsCategory;
+import com.example.demo.cody.repo.ClothsCategoryRepository;
 import com.example.demo.community.dto.PostDto;
 import com.example.demo.community.entity.Post;
 import com.example.demo.community.repository.PostRepository;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final ClothsCategoryRepository clothsCategoryRepository;
 
     // CREATE
     public PostDto createOOTD(String title, String content, String category, MultipartFile imgFile) throws IOException {
@@ -80,4 +83,5 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow();
         postRepository.delete(post);
     }
+
 }
