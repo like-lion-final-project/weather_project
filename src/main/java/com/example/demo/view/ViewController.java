@@ -25,7 +25,7 @@ public class ViewController {
         return "login";
     }
 
-    @GetMapping("/api/v1/users/signup")
+    @GetMapping("/api/v1/users/signUp")
     public String signUp() {
         return "signUp";
     }
