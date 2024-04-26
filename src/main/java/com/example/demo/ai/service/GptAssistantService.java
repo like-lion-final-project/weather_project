@@ -46,6 +46,8 @@ public class GptAssistantService {
         }
 
         Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion(assistantType, version);
+
+
         if (assistant.isPresent()) {
             throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
         }
@@ -89,6 +91,13 @@ public class GptAssistantService {
 
     }
 
+
+    public void updateAssistant(){
+
+    }
+    public void deleteAssistant(){
+
+    }
 
     /**
      * <p>스레드 생성과 메시지 추가 실행을 동시에 처리하는 메서드</p>
