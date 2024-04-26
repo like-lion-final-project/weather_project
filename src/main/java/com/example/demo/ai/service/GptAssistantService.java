@@ -1,6 +1,7 @@
 package com.example.demo.ai.service;
 
 import com.example.demo.ai.dto.assistant.Assistant;
+import com.example.demo.ai.dto.assistant.AssistantList;
 import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
 import com.example.demo.ai.dto.messages.Message;
 import com.example.demo.ai.dto.messages.MessageList;
@@ -31,7 +32,7 @@ public class GptAssistantService {
     private final UserRepo userRepo;
     private final AssistantThreadRepo assistantThreadRepo;
     private final AssistantThreadMessageRepo assistantThreadMessageRepo;
-    private final GptAssistantApiService gptAssistantApiServiceV2;
+    private final GptAssistantApiService gptAssistantApiService;
     private final AssistantRepo assistantRepo;
     private final ObjectMapper objectMapper;
 
@@ -39,19 +40,17 @@ public class GptAssistantService {
     /**
      * <p>어시스턴트 생성 메서드 입니다.</p>
      */
-    public Assistant createAssistantAPI(AssistantCreateRequest dto, String assistantType, String version) {
+    public Assistant createAssistant(AssistantCreateRequest dto, String assistantType, String version) {
         if (!assistantType.equals("fashion")) {
             throw new RuntimeException("생성 불가능한 타입 입니다.");
         }
-
 
         Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion(assistantType, version);
         if (assistant.isPresent()) {
             throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
         }
 
-
-        ResponseEntity<String> json = gptAssistantApiServiceV2.createAssistant(
+        ResponseEntity<String> json = gptAssistantApiService.createAssistant(
                 AssistantCreateRequest.builder()
                         .instructions(dto.getInstructions())
                         .name(dto.getName())
@@ -98,7 +97,7 @@ public class GptAssistantService {
      */
     public Run createThreadAndRun(CreateThreadAndRunRequest dto) {
 
-        ResponseEntity<String> json = gptAssistantApiServiceV2.createThreadAndRun(dto);
+        ResponseEntity<String> json = gptAssistantApiService.createThreadAndRun(dto);
 
         Long tempUser = 1L;
         User user = userRepo.findById(tempUser).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
@@ -146,7 +145,7 @@ public class GptAssistantService {
      */
     public Message getMessage(String threadId, String messageId) {
         String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
-        ResponseEntity<String> json = gptAssistantApiServiceV2.getMessage(threadId,messageId);
+        ResponseEntity<String> json = gptAssistantApiService.getMessage(threadId,messageId);
 
         try {
             return objectMapper.readValue(json.getBody(), Message.class);
@@ -166,7 +165,7 @@ public class GptAssistantService {
      */
     public MessageList getMessages(String threadId) {
         String uri = "/v1/threads/" + threadId + "/messages";
-        ResponseEntity<String> json = gptAssistantApiServiceV2.getMessages(threadId);
+        ResponseEntity<String> json = gptAssistantApiService.getMessages(threadId);
         try {
             return objectMapper.readValue(json.getBody(), MessageList.class);
         } catch (JsonProcessingException e) {
@@ -185,12 +184,27 @@ public class GptAssistantService {
      * @param runId    실행객체의 아이디 입니다.
      */
     public Run getRun(String threadId, String runId) {
-        ResponseEntity<String> json = gptAssistantApiServiceV2.getRuns(threadId,runId);
+        ResponseEntity<String> json = gptAssistantApiService.getRuns(threadId,runId);
         try {
             return objectMapper.readValue(json.getBody(), Run.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JsonProcessingException");
         } catch (Exception e) {
+            throw new RuntimeException("Exception");
+        }
+    }
+
+
+    /**
+     * <p>OpenAI에 저장된 어시스턴트를 불러오는 메서드 입니다.</p>
+     * */
+    public AssistantList getAssistants(){
+        ResponseEntity<String> json = gptAssistantApiService.getAssistants();
+        try {
+            return objectMapper.readValue(json.getBody(),AssistantList.class);
+        }catch (JsonProcessingException e){
+            throw new RuntimeException("JsonProcessingException");
+        }catch (Exception e){
             throw new RuntimeException("Exception");
         }
     }
