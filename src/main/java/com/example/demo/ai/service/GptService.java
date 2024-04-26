@@ -12,6 +12,8 @@ import com.example.demo.ai.entity.AssistantEntity;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.service.dto.DailyCodyReqDto;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
+import com.example.demo.exception.ErrorCode;
+import com.example.demo.exception.GlobalException;
 import com.example.demo.weather.dto.srt_fcst.FcstItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +38,9 @@ public class GptService {
      * @param fcstItems 당일 혹은 예상 일기예보 n개를 인자로 받습니다.
      */
     public DailyCodyResDto generateDailyCodyCategory(List<FcstItem> fcstItems) {
+        if(fcstItems.size() > 12){
+            throw new GlobalException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
         if (fcstItems.size() > 10) {
             fcstItems = fcstItems.subList(fcstItems.size() - 10, fcstItems.size());
         }
