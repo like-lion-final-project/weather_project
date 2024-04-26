@@ -20,7 +20,7 @@ public class TrendService {
 
     public List<CategoryFeedbackCountDto> countFeedbacksByCategory() {
 
-        // 현재 시간을 기준으로 5분 전의 별점 데이터를 조회
+        // 현재 시간을 기준으로 5분 전의 피대븍수 조회
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime fiveMinutesAgo = now.minusMinutes(5);
 
