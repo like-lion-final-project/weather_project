@@ -1,5 +1,6 @@
 package com.example.demo.oauth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
@@ -31,12 +33,13 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
             Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
             attributes.put("email", kakaoAccount.get("email"));
-
+            attributes.put("name", kakaoAccount.get("name"));
+            attributes.put("gender", kakaoAccount.get("gender"));
             Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
             attributes.put("nickname", kakaoProfile.get("nickname"));
-            attributes.put("profileImg", kakaoProfile.get("profile_image_url"));
             nameAttribute = "email";
         }
+        log.info(attributes.toString());
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
