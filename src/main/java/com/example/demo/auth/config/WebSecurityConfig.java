@@ -2,6 +2,9 @@ package com.example.demo.auth.config;
 
 import com.example.demo.jwt.JwtTokenFilter;
 import com.example.demo.jwt.JwtTokenUtils;
+import com.example.demo.oauth.OAuth2SuccessHandler;
+import com.example.demo.oauth.OAuth2UserService;
+import com.example.demo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +21,9 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenUtils jwtTokenUtils;
-    private final UserDetailsManager manager;
+    private final UserService userService;
+    private final OAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     private static final String baseUrl = "/api/v1/";
 
@@ -66,11 +71,16 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .loginPage(prependBaseUrl("users/login"))
+                        .successHandler(oAuth2SuccessHandler)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oAuth2UserService))
+                )
                 .addFilterBefore(
                         new JwtTokenFilter(
                                 jwtTokenUtils,
-                                manager
+                                userService
                         ),
                         AuthorizationFilter.class
                 );
