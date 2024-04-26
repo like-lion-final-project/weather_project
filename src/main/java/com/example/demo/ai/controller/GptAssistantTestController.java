@@ -6,7 +6,7 @@ import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
 import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
 import com.example.demo.ai.dto.run.Run;
-import com.example.demo.ai.service.GptAssistantApiService;
+import com.example.demo.ai.service.GptAssistantService;
 import com.example.demo.ai.service.GptService;
 import com.example.demo.ai.service.dto.DailyCodyResDto;
 import com.example.demo.weather.dto.srt_fcst.FcstItem;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class GptAssistantTestController {
     private final GptService gptService;
-    private final GptAssistantApiService gptAssistantApiService;
+    private final GptAssistantService gptAssistantService;
     @PostMapping("/v1/daily-cody")
     public void dailyCody(
             @RequestBody
@@ -57,7 +57,7 @@ public class GptAssistantTestController {
             AssistantCreateRequest dto
     ) {
 
-        return gptAssistantApiService.createAssistantAPI(dto,"fashion","0.0.1");
+        return gptAssistantService.createAssistantAPI(dto,"fashion","0.0.1");
     }
 
 
@@ -67,7 +67,7 @@ public class GptAssistantTestController {
             CreateThreadAndRunRequest dto
 
     ) {
-        return gptAssistantApiService.createThreadAndRun(dto);
+        return gptAssistantService.createThreadAndRun(dto);
     }
 
     @GetMapping("/v2/threads/{threadId}/messages")
@@ -75,7 +75,7 @@ public class GptAssistantTestController {
             @PathVariable("threadId")
             String threadId
     ){
-        return gptAssistantApiService.getMessagesAPI(threadId);
+        return gptAssistantService.getMessages(threadId);
     }
 }
 
