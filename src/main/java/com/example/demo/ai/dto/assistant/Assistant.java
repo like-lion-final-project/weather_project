@@ -1,16 +1,20 @@
 package com.example.demo.ai.dto.assistant;
 
+import com.example.demo.ai.dto.assistant.Tool;
+import com.example.demo.ai.dto.assistant.ToolsResources;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
 
 @Getter
-@AllArgsConstructor
+@Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class Assistant {
     private String id;
     private String object;
@@ -31,9 +35,11 @@ public class Assistant {
 
     private Map<String,String> metadata;
 
+    @JsonProperty("response_format")
+    private ResponseFormat responseFormat;
+
     private Integer temperature;
 
     @JsonProperty("top_p")
     private Integer topP;
-
 }
