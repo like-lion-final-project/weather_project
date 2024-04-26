@@ -39,4 +39,7 @@ public interface GptAssistantApiService {
             @PathVariable("threadId") String threadId,
             @PathVariable("runId") String runId
     );
+
+    @GetExchange("/v1/assistants")
+    ResponseEntity<String> getAssistants();
 }
