@@ -96,11 +96,11 @@
         <label for="email">이메일</label>
         <div class="input-group">
             <input type="email" id="email" name="email" required>
-            <button class="button-secondary" onclick="showVerification()">인증</button>
+            <button class="button-secondary" onclick="sendVerificationCode()">인증</button>
         </div>
     </div>
     <div class="verification-row">
-        <input type="number" id="verification-code" placeholder="인증 코드 입력">
+        <input type="number" id="confirmVerificationCode" placeholder="인증 코드 입력">
         <button onclick="verifyCode()">인증 확인</button>
     </div>
 
@@ -115,18 +115,6 @@
 </body>
 <script>
     let nickPass = false;
-    let passwordPass = false;
-    let emailPass = false;
-
-    function showVerification() {
-        // 이메일 인증 코드 입력란을 보여줌
-        document.querySelector('.verification-row').style.display = 'flex';
-    }
-
-    function verifyCode() {
-        // 인증 코드 검증 로직을 여기에 구현
-        alert('인증 코드가 제출되었습니다.');
-    }
 
     async function nickCheck() {
         const username = document.getElementById("username").value;
@@ -166,6 +154,7 @@
     const pwCheckMessage = document.getElementById('pwCheckMessage')
     const pwConfirmMessage = document.getElementById('pwConfirmMessage');
     const passwordConfirm = document.getElementById('password-confirm');
+    let passwordPass = false;
 
     password.oninput = function checkPassword() {
         const RegExp = /^[a-zA-Z0-9]{4,12}$/;
@@ -187,6 +176,57 @@
         }
     }
 
+
+    let emailPass = false;
+    let verificationcode = '';
+
+    async function sendVerificationCode() {
+        const RegExp = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+
+        const email = document.getElementById('email').value;
+        if (!RegExp.test(email) || email == ""){
+            alert('올바른 이메일을 입력해주세요')
+            return false;
+        }
+
+        alert('인증코드가 전송되었습니다.');
+        // 이메일 인증 코드 입력란을 보여줌
+        document.querySelector('.verification-row').style.display = 'flex';
+
+        try {
+            const result = await fetch('http://localhost:8080/mailSend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email
+                })
+            });
+
+            verificationcode = await result.text();
+
+        } catch (error) {
+            alert('서버에 문제가 발생하였습니다.');
+        }
+    }
+
+
+
+    function verifyCode() {
+        const confirmVerificationCode = document.getElementById('confirmVerificationCode').value;
+
+        if (confirmVerificationCode === verificationcode) {
+            alert('이메일 인증이 성공하였습니다.');
+            emailPass = true;
+            return;
+        }
+
+        alert('이메일 인증 실패하였습니다. 인증번호를 다시 입력해주세요');
+    }
+
+
+
     async function signUp() {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
@@ -202,6 +242,12 @@
         if (passwordPass === false) {
             document.getElementById('password').focus();
             alert('비밀번호가 올바르지 않습니다.');
+            return;
+        }
+
+        if (emailPass === false) {
+            document.getElementById('email').focus();
+            alert('이메일 인증을 다시 시도해주세요.');
             return;
         }
 
