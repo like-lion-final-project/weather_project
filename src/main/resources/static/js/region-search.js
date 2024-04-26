@@ -101,7 +101,7 @@ function getWeatherByCoordinates(lat, lng, address) {
                     });
 
                     // 강수 형태, 습도, 풍속 표시
-                    const categoriesToShow = ['REH', 'WSD', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
+                    const categoriesToShow = ['REH', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
                     Object.entries(nowcastValue).forEach(([category, value]) => {
                         // categoriesToShow 배열에 있는 카테고리에 해당하는 값만 처리
                         if (categoriesToShow.includes(category)) {

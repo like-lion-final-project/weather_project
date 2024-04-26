@@ -246,6 +246,7 @@ function calculateDay(date, daysToAdd) {
 
 function createWeeklyLandWeather(weatherData) {
     const item = weatherData.response.body.items.item[0];
+    const specialIcon = document.getElementById('t1h-icon');
     const weeklyWeatherList = document.getElementById('weekly-land-weather');
     const currentDate = new Date();
 
@@ -260,10 +261,15 @@ function createWeeklyLandWeather(weatherData) {
         if (i >= 8) {
             wf = item[`wf${i}`];
             listItem.classList.add('weather-item');
+
+            // SVG 파일 선택
+            const svg = getWeatherSVG(wf);
+
+            // HTML에 이미지 추가
             listItem.innerHTML = `
-            <p>${date}</p>
-            <p>오전 : ${wf}</p>
-            <p>오후 : ${wf}</p>
+            ${date}
+            <img src="${svg}" alt="${wf}" />
+            <img src="${svg}" alt="${wf}" />
         `;
 
         } else {
@@ -271,10 +277,23 @@ function createWeeklyLandWeather(weatherData) {
             const wfPm = item[`wf${i}Pm`] || '정보 없음';
 
             listItem.classList.add('weather-item');
+
+            // SVG 파일 선택
+            const amSvg = getWeatherSVG(wfAm);
+            const pmSvg = getWeatherSVG(wfPm);
+
+            if (i === 3) {
+                // listItem에 아이콘 추가
+                const amIcon = document.createElement('img');
+                amIcon.src = amSvg;
+                amIcon.alt = wfAm;
+                specialIcon.appendChild(amIcon);
+            }
+            // HTML에 이미지 추가
             listItem.innerHTML = `
-            <p>${date}</p>
-            <p>오전: ${wfAm}</p>
-            <p>오후: ${wfPm}</p>
+            ${date}
+            <img src="${amSvg}" alt="${wfAm}" />
+            <img src="${pmSvg}" alt="${wfPm}" />
         `;
         }
 
@@ -306,5 +325,33 @@ function createWeeklyTaWeather(weatherData) {
     }
 }
 
-
+// 날씨에 따라 해당하는 SVG 파일의 경로를 반환하는 함수
+function getWeatherSVG(weather) {
+    switch (weather) {
+        case '맑음':
+            return '/img/clear-day.svg';
+        case '구름많음':
+            return '/img/partly-cloudy-day.svg';
+        case '구름많고 비':
+            return '/img/partly-cloudy-rain-day.svg';
+        case '구름많고 눈':
+            return '/img/partly-cloudy-snow-day.svg';
+        case '구름많고 비/눈':
+            return '/img/partly-cloudy-sleet-day.svg';
+        case '구름많고 소나기':
+            return '/img/partly-cloudy-rain-day.svg';
+        case '흐림':
+            return '/img/overcast.svg';
+        case '흐리고 비':
+            return '/img/overcast-rain.svg';
+        case '흐리고 눈':
+            return '/img/overcast-snow.svg';
+        case '흐리고 비/눈':
+            return '/img/overcast-sleet.svg';
+        case '흐리고 소나기':
+            return '/img/overcast-rain.svg';
+        default:
+            return '/img/default.svg';
+    }
+}
 
