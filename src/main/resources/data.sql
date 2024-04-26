@@ -18,7 +18,7 @@ VALUES (1,'상의'),(2,'티셔츠'),(3,'니트/스웨터'),
 -- #        ) ON DUPLICATE KEY UPDATE id=id;
 
 
--- INSERT INTO user (username) VALUES ('test-user')
+INSERT INTO user (username) VALUES ('test-user')
 
 
 
