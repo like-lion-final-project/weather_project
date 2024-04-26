@@ -11,6 +11,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class CustomUserDetails implements UserDetails {
     private Long id;
     private String uuid;
@@ -20,7 +21,6 @@ public class CustomUserDetails implements UserDetails {
     private Integer gender;
     private Integer role_id;
     private String achievement;
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
