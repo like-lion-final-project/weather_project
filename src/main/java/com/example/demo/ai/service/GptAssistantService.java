@@ -63,6 +63,11 @@ public class GptAssistantService {
                         .responseFormat(dto.getResponseFormat())
                         .build()
         );
+
+        if(json.getStatusCode().is4xxClientError()){
+            log.warn(json.getBody() + "");
+            return null;
+        }
         try {
             Assistant assistant = objectMapper.readValue(json.getBody(), Assistant.class);
             assistantRepo.save(
@@ -102,6 +107,10 @@ public class GptAssistantService {
     public Run createThreadAndRun(CreateThreadAndRunRequest dto) {
 
         ResponseEntity<String> json = gptAssistantApiService.createThreadAndRun(dto);
+        if(json.getStatusCode().is4xxClientError()){
+            log.warn(json.getBody() + "");
+            return null;
+        }
 
         Long tempUser = 1L;
         User user = userRepo.findById(tempUser).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
@@ -151,6 +160,10 @@ public class GptAssistantService {
         String uri = "/v1/threads/" + threadId + "/messages/" + messageId;
         ResponseEntity<String> json = gptAssistantApiService.getMessage(threadId,messageId);
 
+        if(json.getStatusCode().is4xxClientError()){
+            log.warn(json.getBody() + "");
+            return null;
+        }
         try {
             return objectMapper.readValue(json.getBody(), Message.class);
         } catch (JsonProcessingException e) {
@@ -170,6 +183,10 @@ public class GptAssistantService {
     public MessageList getMessages(String threadId) {
         String uri = "/v1/threads/" + threadId + "/messages";
         ResponseEntity<String> json = gptAssistantApiService.getMessages(threadId);
+        if(json.getStatusCode().is4xxClientError()){
+            log.warn(json.getBody() + "");
+            return null;
+        }
         try {
             return objectMapper.readValue(json.getBody(), MessageList.class);
         } catch (JsonProcessingException e) {
@@ -189,6 +206,10 @@ public class GptAssistantService {
      */
     public Run getRun(String threadId, String runId) {
         ResponseEntity<String> json = gptAssistantApiService.getRuns(threadId,runId);
+        if(json.getStatusCode().is4xxClientError()){
+            log.warn(json.getBody() + "");
+            return null;
+        }
         try {
             return objectMapper.readValue(json.getBody(), Run.class);
         } catch (JsonProcessingException e) {
@@ -204,6 +225,10 @@ public class GptAssistantService {
      * */
     public AssistantList getAssistants(){
         ResponseEntity<String> json = gptAssistantApiService.getAssistants();
+        if(json.getStatusCode().is4xxClientError()){
+            log.warn(json.getBody() + "");
+            return null;
+        }
         try {
             return objectMapper.readValue(json.getBody(),AssistantList.class);
         }catch (JsonProcessingException e){
