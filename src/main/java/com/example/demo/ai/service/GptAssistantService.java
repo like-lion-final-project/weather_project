@@ -13,6 +13,7 @@ import com.example.demo.ai.entity.AssistantThreadMessage;
 import com.example.demo.ai.repo.AssistantRepo;
 import com.example.demo.ai.repo.AssistantThreadMessageRepo;
 import com.example.demo.ai.repo.AssistantThreadRepo;
+import com.example.demo.ai.service.dto.DeleteAssistantResDto;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repo.UserRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,6 +24,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -41,15 +45,12 @@ public class GptAssistantService {
      * <p>어시스턴트 생성 메서드 입니다.</p>
      */
     public Assistant createAssistant(AssistantCreateRequest dto, String assistantType, String version) {
-        if (!assistantType.equals("fashion")) {
-            throw new RuntimeException("생성 불가능한 타입 입니다.");
-        }
+        AssistantList assistantList = getAssistants();
 
-        Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion(assistantType, version);
-
-
-        if (assistant.isPresent()) {
-            throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
+        for ( Assistant item : assistantList.getAssistant() ) {
+            if( item.getName().equals(dto.getName()) ){
+                throw new RuntimeException("이미 존재하는 어시스턴트 입니다.");
+            }
         }
 
         ResponseEntity<String> json = gptAssistantApiService.createAssistant(
@@ -62,22 +63,21 @@ public class GptAssistantService {
                         .responseFormat(dto.getResponseFormat())
                         .build()
         );
-
-
-
         try {
-            Assistant response = objectMapper.readValue(json.getBody(), Assistant.class);
+            Assistant assistant = objectMapper.readValue(json.getBody(), Assistant.class);
+            assistantRepo.save(
+                    AssistantEntity.builder()
+                            .assistantType(assistantType)
+                            .name(dto.getName())
+                            .version(version)
+                            .versionLabel(version)
+                            .model(dto.getModel())
+                            .assistantId(assistant.getId())
+                            .isDeleteFromOpenAi(false)
+                            .build()
 
-            assistantRepo.save(AssistantEntity.builder()
-                    .instructions(response.getInstructions())
-                    .name(response.getName())
-                    .version(response.getName().split("_")[1])
-                    .model(response.getModel())
-                    .assistantType(assistantType)
-                    .assistantId(response.getId())
-                    .isDeleteFromOpenAi(false)
-                    .build());
-            return response;
+            );
+            return assistant;
         } catch (JsonProcessingException e) {
             log.warn(e.getMessage());
             throw new RuntimeException("JsonProcessingException");
@@ -88,16 +88,11 @@ public class GptAssistantService {
             log.warn(e + "메시지");
             throw new RuntimeException("Exception");
         }
+    };
 
-    }
 
 
-    public void updateAssistant(){
 
-    }
-    public void deleteAssistant(){
-
-    }
 
     /**
      * <p>스레드 생성과 메시지 추가 실행을 동시에 처리하는 메서드</p>
