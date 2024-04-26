@@ -1,5 +1,6 @@
 package com.example.demo.jwt;
 
+import com.example.demo.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -29,10 +30,10 @@ public class JwtTokenUtils {
                 .build();
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User user) {
         Instant now = Instant.now();
         Claims jwtClaims = Jwts.claims()
-                .setSubject(userDetails.getUsername())
+                .setSubject(user.getUsername())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(60 * 60 * 24)));
 

@@ -27,7 +27,7 @@ public class GptAssistantClientConfig {
     private String OPEN_AI_API_KEY = "";
 
     @Bean
-    public RestClient GptAssistantClientV2() {
+    public RestClient GptAssistantClient() {
         return RestClient.builder()
                 .baseUrl(BASE_URL)
                 .defaultHeader(OPEN_AI_BETA,ASSISTANTS_V2)
@@ -37,9 +37,9 @@ public class GptAssistantClientConfig {
 
 
     @Bean
-    public GptAssistantApiService gptAssistantApiServiceV2() {
+    public GptAssistantApiService gptAssistantApiService() {
         return HttpServiceProxyFactory
-                .builderFor(RestClientAdapter.create(GptAssistantClientV2()))
+                .builderFor(RestClientAdapter.create(GptAssistantClient()))
                 .build()
                 .createClient(GptAssistantApiService.class);
     }

@@ -20,4 +20,13 @@ public class ViewController {
         return "home";
     }
 
+    @GetMapping("/api/v1/users/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/api/v1/users/signUp")
+    public String signUp() {
+        return "signUp";
+    }
 }

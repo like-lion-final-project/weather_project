@@ -3,8 +3,10 @@ package com.example.demo.cody.service;
 import com.example.demo.cody.dto.FeedbackDto;
 import com.example.demo.cody.dto.ItemDto;
 import com.example.demo.cody.entity.ClothsCategory;
+import com.example.demo.cody.entity.DailySuggestion;
 import com.example.demo.cody.entity.SuggestionFeedback;
 import com.example.demo.cody.repo.ClothsCategoryRepository;
+import com.example.demo.cody.repo.DailySuggestionRepository;
 import com.example.demo.cody.repo.SuggestionFeedbackRepository;
 import lombok.AllArgsConstructor;
 import org.json.JSONArray;
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class NaverSearchService {
     private final SuggestionFeedbackRepository suggetionFeedbackRepository;
     private final ClothsCategoryRepository clothsCategoryRepository;
+    private final DailySuggestionRepository dailySuggestionRepository;
     public List<ItemDto> fromJSONtoItems(String result) {
         JSONObject rjson = new JSONObject(result);
         System.out.println(rjson);
@@ -33,9 +36,6 @@ public class NaverSearchService {
         }
         return itemDtoList;
     }
-
-
-
 
     public void saveFeedback(FeedbackDto feedbackDto) {
 
@@ -57,6 +57,17 @@ public class NaverSearchService {
 
         suggetionFeedbackRepository.save(suggestionFeedback);
         }
+
+    // DailySuggestionService에 DailySuggestionRepository 주입
+
+    public String getCategoryTypeOfLastSuggestion() {
+        // DailySuggestion 엔티티에서 마지막 추천의 카테고리 타입을 가져옴
+        DailySuggestion suggestion = dailySuggestionRepository.findFirstByOrderByIdDesc();
+        if (suggestion == null) {
+            throw new RuntimeException("추천이 없습니다");
+        }
+        return suggestion.getOriginalQuery();
+    }
     }
 
 
