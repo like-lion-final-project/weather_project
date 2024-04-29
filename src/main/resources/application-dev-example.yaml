@@ -1,19 +1,20 @@
 jwt:
   secret:
 Fcst:
-  serviceKey:
+  serviceKey: gpqienCNGo+nr2VfAyVCH30Cyxgjg7ARvd5Gtohwb8X09LhF9taiPQQqv2KrdhOrWfApKQAA/7uzrS1qXYmA5g==
+
 naver:
   ncp:
-    client-id:
-    client-secret:
+    client-id: cxuhltuyhr
+    client-secret: D64oYDheuazj35C6uN4ozwlkwMAn3GXZRQNbFnag
   developers:
     client-id:
     client-secret:
-    api-access:
-    api-secret:
+    api-access: PYZLhSVy2anyChtu2qND
+    api-secret: EIPu90VEL0CPbeOQ8e09spoUvZH2HAuv0QHfsQ6w
 open-ai:
-  assistant-id:
-  api-key:
+  assistant-id: asst_zzt6asioJBgxSjpMxI99hb3g
+  api-key: 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
 spring:
   config:
     activate:
