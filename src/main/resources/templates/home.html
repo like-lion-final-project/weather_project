@@ -15,6 +15,9 @@
 </head>
 <body>
 
+<!-- 헤더 -->
+<th:block th:replace="~{fragments/header :: header}"></th:block>
+
 <div class="container">
     <h4 class="mt-3 mb-3 text-center">오늘의 날씨</h4>
     <div id="weather-info" class="mb-3">
@@ -75,6 +78,12 @@
         </ul>
     </div>
 </div>
+
+<!-- 푸터 -->
+<th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+
+
 <script th:src="@{/js/weather-info.js}"></script>
 <script th:src="@{/js/weather-news.js}"></script>
 <script th:src="@{/js/region-search.js}"></script>
