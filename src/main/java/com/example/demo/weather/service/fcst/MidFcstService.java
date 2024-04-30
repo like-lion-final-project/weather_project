@@ -26,11 +26,21 @@ public class MidFcstService {
             String regId
     ) {
         LocalDateTime currentTime = LocalDateTime.now();
-        // 일 2회(06:00,18:00)회 생성 되며 발표시각을 입력
-        // 최근 24시간 자료만 제공
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        // 현재 시간에서 06:00 이전이라면 전날 18:00 으로 설정
+        if (currentTime.getHour() < 6) {
+            currentTime = currentTime.minusDays(1).withHour(18).withMinute(0);
+        }
+        // 현재 시간이 06:00 이후이고 18:00 이전이라면 오늘 06:00 으로 설정
+        else if (currentTime.getHour() < 18) {
+            currentTime = currentTime.withHour(6).withMinute(0);
+        }
+        // 현재 시간이 18:00 이후라면 오늘 18:00 으로 설정
+        else {
+            currentTime = currentTime.withHour(18).withMinute(0);
+        }
+
+        String tmFc = currentTime.format(DateTimeFormatter.ofPattern("yyyyMMddHH00"));
 
         Map<String, Object> params = new HashMap<>();
         params.put("serviceKey", serviceKey);
@@ -38,7 +48,7 @@ public class MidFcstService {
         params.put("pageNo", 1);
         params.put("dataType", "JSON");
         params.put("regId", regId);      // 예보구역코드
-        params.put("tmFc", "202404231800");   // 발표 시각
+        params.put("tmFc", tmFc);        // 발표 시각
 
         return midFcstApiService.MidLandFcst(params);
     }
@@ -49,11 +59,21 @@ public class MidFcstService {
             String regId
     ) {
         LocalDateTime currentTime = LocalDateTime.now();
-        // 일 2회(06:00,18:00)회 생성 되며 발표시각을 입력
-        // 최근 24시간 자료만 제공
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        // 현재 시간에서 06:00 이전이라면 전날 18:00 으로 설정
+        if (currentTime.getHour() < 6) {
+            currentTime = currentTime.minusDays(1).withHour(18).withMinute(0);
+        }
+        // 현재 시간이 06:00 이후이고 18:00 이전이라면 오늘 06:00 으로 설정
+        else if (currentTime.getHour() < 18) {
+            currentTime = currentTime.withHour(6).withMinute(0);
+        }
+        // 현재 시간이 18:00 이후라면 오늘 18:00 으로 설정
+        else {
+            currentTime = currentTime.withHour(18).withMinute(0);
+        }
+
+        String tmFc = currentTime.format(DateTimeFormatter.ofPattern("yyyyMMddHH00"));
 
         Map<String, Object> params = new HashMap<>();
         params.put("serviceKey", serviceKey);
@@ -61,7 +81,7 @@ public class MidFcstService {
         params.put("pageNo", 1);
         params.put("dataType", "JSON");
         params.put("regId", regId);      // 예보구역코드
-        params.put("tmFc", "202404231800");   // 발표 시각
+        params.put("tmFc", tmFc);        // 발표 시각
 
         return midFcstApiService.MidTa(params);
     }
