@@ -15,6 +15,50 @@ function getWeatherByCoordinates(lat, lng, address) {
     // 지역명 표시
     document.getElementById('location').textContent = `${address}`;
 
+    const area = address.split(' ')[0]; // 지역명에서 앞의 두 단어 추출
+    const city = address.split(' ')[1].slice(0, 2); // 지역명에서 두 번째 단어의 앞 두 글자 추출
+
+    // 주간 육상 예보
+    fetch(`http://localhost:8080/api/v1/area-code/mid-land?area=${area}`)
+        .then(response => response.json())
+        .then(midLandData => {
+            const weatherList = document.getElementById('weekly-land-weather');
+            weatherList.innerHTML = '';
+
+            const landRegId = midLandData.code;
+
+            // 중도 Land 코드를 사용하여 해당 지역의 날씨 정보를 가져오는 요청 보내기
+            fetch(`http://localhost:8080/api/v1/weather/mid-land?regId=${landRegId}`)
+                .then(response => response.json())
+                .then(landWeatherData => {
+                    // 중도 지역의 날씨 정보를 바로 동적으로 추가
+                    createWeeklyLandWeather(landWeatherData);
+
+                })
+                .catch(error => console.error('Error fetching mid land weather:', error));
+        })
+        .catch(error => console.error('Error fetching mid land TA code:', error));
+
+
+    // 주간 기온 예보
+    fetch(`http://localhost:8080/api/v1/area-code/mid-ta?area=${city}`)
+        .then(response => response.json())
+        .then(midTaData => {
+            const weatherList = document.getElementById('weekly-ta-weather');
+            weatherList.innerHTML = '';
+
+            const taRegId = midTaData.code;
+
+            fetch(`http://localhost:8080/api/v1/weather/mid-ta?regId=${taRegId}`)
+                .then(response => response.json())
+                .then(taWeatherData => {
+                    // 중도 지역의 날씨 정보를 바로 동적으로 추가
+                    createWeeklyTaWeather(taWeatherData);
+                })
+                .catch(error => console.error('Error fetching mid land weather:', error));
+        })
+        .catch(error => console.error('Error fetching mid land TA code:', error));
+
     // 격자 좌표 변환 요청
     fetch(`http://localhost:8080/api/v1/weather/convert-grid?lat=${lat}&lng=${lng}`)
         .then(response => response.json())
@@ -57,7 +101,7 @@ function getWeatherByCoordinates(lat, lng, address) {
                     });
 
                     // 강수 형태, 습도, 풍속 표시
-                    const categoriesToShow = ['REH', 'WSD', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
+                    const categoriesToShow = ['REH', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
                     Object.entries(nowcastValue).forEach(([category, value]) => {
                         // categoriesToShow 배열에 있는 카테고리에 해당하는 값만 처리
                         if (categoriesToShow.includes(category)) {

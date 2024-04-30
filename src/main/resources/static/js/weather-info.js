@@ -85,6 +85,9 @@ function getCurrentWeather() {
                 fetch(`http://localhost:8080/api/v1/area-code/mid-land?area=${area}`)
                     .then(response => response.json())
                     .then(midLandData => {
+                        const weatherList = document.getElementById('weekly-land-weather');
+                        weatherList.innerHTML = '';
+
                         const landRegId = midLandData.code;
 
                         // 중도 Land 코드를 사용하여 해당 지역의 날씨 정보를 가져오는 요청 보내기
@@ -93,6 +96,7 @@ function getCurrentWeather() {
                             .then(landWeatherData => {
                                 // 중도 지역의 날씨 정보를 바로 동적으로 추가
                                 createWeeklyLandWeather(landWeatherData);
+
                             })
                             .catch(error => console.error('Error fetching mid land weather:', error));
                     })
@@ -103,6 +107,9 @@ function getCurrentWeather() {
                 fetch(`http://localhost:8080/api/v1/area-code/mid-ta?area=${city}`)
                     .then(response => response.json())
                     .then(midTaData => {
+                        const weatherList = document.getElementById('weekly-ta-weather');
+                        weatherList.innerHTML = '';
+
                         const taRegId = midTaData.code;
 
                         fetch(`http://localhost:8080/api/v1/weather/mid-ta?regId=${taRegId}`)
@@ -157,7 +164,7 @@ function getCurrentWeather() {
                                 });
 
                                 // 강수 형태, 습도, 풍속 표시
-                                const categoriesToShow = ['REH', 'WSD', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
+                                const categoriesToShow = ['REH', 'PTY']; // 습도, 풍속, 강수 형태 카테고리
                                 Object.entries(nowcastValue).forEach(([category, value]) => {
                                     // categoriesToShow 배열에 있는 카테고리에 해당하는 값만 처리
                                     if (categoriesToShow.includes(category)) {
@@ -239,36 +246,56 @@ function calculateDay(date, daysToAdd) {
 
 function createWeeklyLandWeather(weatherData) {
     const item = weatherData.response.body.items.item[0];
+    const specialIcon = document.getElementById('t1h-icon');
     const weeklyWeatherList = document.getElementById('weekly-land-weather');
     const currentDate = new Date();
 
     for (let i = 3; i <= 10; i++) {
-        const dayName = calculateDay(currentDate, i - 1);
-        const date = `${i}일 후 (${dayName})`;
-        let rnSt, wf;
+        const dayName = calculateDay(currentDate, i);
+        const date = `<h5>${dayName}</h5>`;
+        let wf;
+
+        const listItem = document.createElement('span');
 
         // 8일부터 10일까지는 오전/오후로 나누지 않음
         if (i >= 8) {
-            rnSt = item[`rnSt${i}`];
             wf = item[`wf${i}`];
+            listItem.classList.add('weather-item');
+
+            // SVG 파일 선택
+            const svg = getWeatherSVG(wf);
+
+            // HTML에 이미지 추가
+            listItem.innerHTML = `
+            ${date}
+            <img src="${svg}" alt="${wf}" />
+            <img src="${svg}" alt="${wf}" />
+        `;
+
         } else {
-            const rnStAm = item[`rnSt${i}Am`] || '정보 없음';
-            const rnStPm = item[`rnSt${i}Pm`] || '정보 없음';
             const wfAm = item[`wf${i}Am`] || '정보 없음';
             const wfPm = item[`wf${i}Pm`] || '정보 없음';
 
-            // 오전과 오후의 강수확률과 날씨 예보를 결합하여 사용
-            rnSt = `오전: ${rnStAm}%, 오후: ${rnStPm}%`;
-            wf = `오전: ${wfAm}, 오후: ${wfPm}`;
-        }
+            listItem.classList.add('weather-item');
 
-        const listItem = document.createElement('div');
-        listItem.classList.add('weather-item');
-        listItem.innerHTML = `
-            <p>${date}</p>
-            <p>강수확률: ${rnSt}</p>
-            <p>날씨 예보: ${wf}</p>
+            // SVG 파일 선택
+            const amSvg = getWeatherSVG(wfAm);
+            const pmSvg = getWeatherSVG(wfPm);
+
+            if (i === 3) {
+                // listItem에 아이콘 추가
+                const amIcon = document.createElement('img');
+                amIcon.src = amSvg;
+                amIcon.alt = wfAm;
+                specialIcon.appendChild(amIcon);
+            }
+            // HTML에 이미지 추가
+            listItem.innerHTML = `
+            ${date}
+            <img src="${amSvg}" alt="${wfAm}" />
+            <img src="${pmSvg}" alt="${wfPm}" />
         `;
+        }
 
         weeklyWeatherList.appendChild(listItem);
     }
@@ -280,24 +307,51 @@ function createWeeklyTaWeather(weatherData) {
     const currentDate = new Date();
 
     for (let i = 3; i <= 10; i++) {
-        const dayName = calculateDay(currentDate, i - 1);
-        const date = `${i}일 후 (${dayName})`;
+        const dayName = calculateDay(currentDate, i);
+        const date = `<h5>${dayName}</h5>`;
 
         // 최저 기온과 최고 기온 정보만 가져옴
         const taMin = item[`taMin${i}`] || '정보 없음';
         const taMax = item[`taMax${i}`] || '정보 없음';
 
-        const listItem = document.createElement('div');
+        const listItem = document.createElement('span');
         listItem.classList.add('weather-item');
         listItem.innerHTML = `
             <p>${date}</p>
-            <p>최저 기온: ${taMin}°C</p>
-            <p>최고 기온: ${taMax}°C</p>
+            <p>${taMin}°C / ${taMax}°C</p>
         `;
 
         weeklyWeatherList.appendChild(listItem);
     }
 }
 
-
+// 날씨에 따라 해당하는 SVG 파일의 경로를 반환하는 함수
+function getWeatherSVG(weather) {
+    switch (weather) {
+        case '맑음':
+            return '/img/clear-day.svg';
+        case '구름많음':
+            return '/img/partly-cloudy-day.svg';
+        case '구름많고 비':
+            return '/img/partly-cloudy-rain-day.svg';
+        case '구름많고 눈':
+            return '/img/partly-cloudy-snow-day.svg';
+        case '구름많고 비/눈':
+            return '/img/partly-cloudy-sleet-day.svg';
+        case '구름많고 소나기':
+            return '/img/partly-cloudy-rain-day.svg';
+        case '흐림':
+            return '/img/overcast.svg';
+        case '흐리고 비':
+            return '/img/overcast-rain.svg';
+        case '흐리고 눈':
+            return '/img/overcast-snow.svg';
+        case '흐리고 비/눈':
+            return '/img/overcast-sleet.svg';
+        case '흐리고 소나기':
+            return '/img/overcast-rain.svg';
+        default:
+            return '/img/default.svg';
+    }
+}
 
