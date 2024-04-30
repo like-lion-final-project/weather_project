@@ -21,7 +21,7 @@ public class SearchController {
     private final NaverSearchService naverSearchService;
 
 
-    @GetMapping("/ser")
+    @GetMapping("/search")
         public String naverSearch( Model model) {
 
             String query=naverSearchService.getCategoryTypeOfLastSuggestion();
@@ -31,17 +31,14 @@ public class SearchController {
             return "naversearch";
         }
 
-
     @PostMapping("/submit-rating")
     public ResponseEntity<FeedbackDto> submitRating(@RequestBody FeedbackDto feedbackDto) {
         String image = feedbackDto.getImage();
         int rating = feedbackDto.getRating();
-        String query=feedbackDto.getQuery();
         String category= feedbackDto.getCategory();
 
         System.out.println("Received image : " + image);
         System.out.println("Received rating: " + rating);
-        System.out.println("Received query:  " + query);
         System.out.println("Received category:  " + category);
 
         naverSearchService.saveFeedback(feedbackDto);

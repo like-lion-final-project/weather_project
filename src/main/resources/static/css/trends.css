@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.graph-container {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    max-width: 1000px;
+}
+
+.chart-container {
+    width: 50%; /* 그래프 컨테이너의 너비의 절반을 차지합니다. */
+}
+
+canvas {
+    width: 100%;
+    margin-top: 20px;
+}

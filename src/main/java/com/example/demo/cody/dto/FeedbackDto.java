@@ -12,7 +12,6 @@ public class FeedbackDto {
 
     private int rating;
     private String image;
-    private String query;
     private String category;
 
 }

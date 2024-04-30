@@ -49,12 +49,10 @@ public class NaverSearchService {
         SuggestionFeedback suggestionFeedback = SuggestionFeedback.builder()
                 .rating(feedbackDto.getRating())
                 .image(feedbackDto.getImage())
-                .query(feedbackDto.getQuery())
                 .category(category)
                 .createAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
                 .build();
-
         suggetionFeedbackRepository.save(suggestionFeedback);
         }
 

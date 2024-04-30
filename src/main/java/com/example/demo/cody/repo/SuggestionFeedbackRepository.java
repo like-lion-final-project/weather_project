@@ -9,6 +9,5 @@ import java.util.List;
 
 @Repository
 public interface SuggestionFeedbackRepository extends JpaRepository<SuggestionFeedback,Long> {
-    List<SuggestionFeedback> findByQuery(String query);
     List<SuggestionFeedback> findByCreateAtAfter(LocalDateTime time);
 }
