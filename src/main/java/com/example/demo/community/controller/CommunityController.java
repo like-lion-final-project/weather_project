@@ -1,5 +1,7 @@
 package com.example.demo.community.controller;
 
+import com.example.demo.cody.entity.ClothsCategory;
+import com.example.demo.cody.repo.ClothsCategoryRepository;
 import com.example.demo.community.dto.PostDto;
 import com.example.demo.community.entity.Post;
 import com.example.demo.community.service.CommentService;
@@ -12,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ import java.io.IOException;
 public class CommunityController {
     private final PostService postService;
     private final CommentService commentService;
+    private final ClothsCategoryRepository clothsCategoryRepository;
 
     @GetMapping("")
     public String ootdPage(Model model) {
@@ -27,6 +32,9 @@ public class CommunityController {
     }
     @GetMapping("/write")
     public String ootdWritePage(Model model) {
+        List<ClothsCategory> category = new ArrayList<>();
+        category = clothsCategoryRepository.findAll();
+        model.addAttribute("category", category);
         return "ootdWrite";
     }
 
@@ -39,6 +47,7 @@ public class CommunityController {
             @RequestParam("category")
             String category,
             MultipartFile imgFile,
+            Model model,
             RedirectAttributes redirectAttributes
     ) throws IOException
     {

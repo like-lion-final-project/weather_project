@@ -2,6 +2,7 @@ package com.example.demo.ai.controller;
 
 
 import com.example.demo.ai.dto.assistant.Assistant;
+import com.example.demo.ai.dto.assistant.AssistantList;
 import com.example.demo.ai.dto.assistant.AssistantCreateRequest;
 import com.example.demo.ai.dto.messages.MessageList;
 import com.example.demo.ai.dto.run.CreateThreadAndRunRequest;
@@ -56,8 +57,12 @@ public class GptAssistantTestController {
             @RequestBody
             AssistantCreateRequest dto
     ) {
+        return gptAssistantService.createAssistant(dto,"fashion","0.0.1");
+    }
 
-        return gptAssistantService.createAssistantAPI(dto,"fashion","0.0.1");
+    @GetMapping("/v2/assistants")
+    public AssistantList getAssistants() {
+        return gptAssistantService.getAssistants();
     }
 
 
