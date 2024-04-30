@@ -250,6 +250,9 @@ function createWeeklyLandWeather(weatherData) {
     const weeklyWeatherList = document.getElementById('weekly-land-weather');
     const currentDate = new Date();
 
+    specialIcon.innerHTML = '';
+    weeklyWeatherList.innerHTML = '';
+
     for (let i = 3; i <= 10; i++) {
         const dayName = calculateDay(currentDate, i);
         const date = `<h5>${dayName}</h5>`;
@@ -257,7 +260,7 @@ function createWeeklyLandWeather(weatherData) {
 
         const listItem = document.createElement('span');
 
-        // 8일부터 10일까지는 오전/오후로 나누지 않음
+        // JavaScript 함수 내 이미지 요소에 CSS 클래스 추가
         if (i >= 8) {
             wf = item[`wf${i}`];
             listItem.classList.add('weather-item');
@@ -268,9 +271,9 @@ function createWeeklyLandWeather(weatherData) {
             // HTML에 이미지 추가
             listItem.innerHTML = `
             ${date}
-            <img src="${svg}" alt="${wf}" />
-            <img src="${svg}" alt="${wf}" />
-        `;
+            <img src="${svg}" alt="${wf}" class="weather-image" />
+            <img src="${svg}" alt="${wf}" class="weather-image" />
+            `;
 
         } else {
             const wfAm = item[`wf${i}Am`] || '정보 없음';
@@ -287,15 +290,17 @@ function createWeeklyLandWeather(weatherData) {
                 const amIcon = document.createElement('img');
                 amIcon.src = amSvg;
                 amIcon.alt = wfAm;
+                amIcon.classList.add('weather-image'); // 클래스 추가
                 specialIcon.appendChild(amIcon);
             }
             // HTML에 이미지 추가
             listItem.innerHTML = `
             ${date}
-            <img src="${amSvg}" alt="${wfAm}" />
-            <img src="${pmSvg}" alt="${wfPm}" />
-        `;
+            <img src="${amSvg}" alt="${wfAm}" class="weather-image" />
+            <img src="${pmSvg}" alt="${wfPm}" class="weather-image" />
+            `;
         }
+
 
         weeklyWeatherList.appendChild(listItem);
     }
@@ -317,7 +322,7 @@ function createWeeklyTaWeather(weatherData) {
         const listItem = document.createElement('span');
         listItem.classList.add('weather-item');
         listItem.innerHTML = `
-            <p>${date}</p>
+            <!-- <p>${date}</p> -->
             <p>${taMin}°C / ${taMax}°C</p>
         `;
 

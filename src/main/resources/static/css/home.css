@@ -61,3 +61,9 @@
     flex-grow: 1;
     text-align: center; /* 텍스트를 가운데 정렬합니다. */
 }
+
+/* 이미지의 크기를 조절하는 CSS 클래스 */
+.weather-image {
+    width: 50px; /* 원하는 너비 값 */
+    height: 50px; /* 원하는 높이 값 */
+}
