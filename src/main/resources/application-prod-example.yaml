@@ -1,3 +1,6 @@
+open-ai:
+  assistant-id:
+  api-key:
 spring:
   config:
     activate:

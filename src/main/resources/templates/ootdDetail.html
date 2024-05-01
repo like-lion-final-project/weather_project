@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OOTD 상세정보</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>게시글</h2>
+    </div>
+    <div>
+        <label for="postId">게시판번호</label>
+        <input type="text" id="postId" name="postId" class="form-control"
+               value="1" th:value="${posts.id}" readonly>
+    </div>
+
+    <div>
+        <label for="postTitle">제목</label>
+        <input type="text" id="postTitle" name="postTitle" class="form-control"
+               value="제목" th:value="${posts.title}" readonly>
+    </div><br>
+    <div>
+        <img class ="img-fluid" id="postImg" th:src="@{${posts.getImgPath()}}"></img>
+    </div>
+    <div>
+        <label for="postContent">내용</label>
+        <textarea class="form-control" rows="5"
+                  id="postContent" name="postContent"
+                  th:value="${posts.content}" th:text="${posts.content}" readonly></textarea>
+    </div>
+    <div>
+        <label for="postCategory">카테고리</label>
+        <textarea class="form-control" rows="3"
+                  id="postCategory" name="postCategory"
+                  th:value="${posts.category}" th:text="${posts.category}" readonly></textarea>
+    </div>
+    <hr class="my-4">
+    <form th:action="@{/ootd/update/{postId}(postId=${posts.id})}" th:method="get">
+        <input type="hidden" name="_method" value="update">
+        <input type="submit" class="btn btn-danger" value="수정하기">
+    </form>
+
+    <form th:action="@{/ootd/delete/{postId}(postId=${posts.id})}" th:method="post">
+        <input type="hidden" name="_method" value="delete">
+        <input type="submit" class="btn btn-danger" value="삭제하기">
+    </form>
+    <button class="btn btn-dark pull-right"
+            onclick="location.href='board/postList.html'"
+            th:onclick="|location.href='@{/ootd}'|"
+            type="button">목록으로
+    </button>
+
+</div> <!-- /container -->
+</div>
+<!-- Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
