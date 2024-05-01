@@ -5,8 +5,6 @@ COPY . .
 
 # Gradle 실행 권한 부여
 RUN chmod +x ./gradlew
-# Gradle 빌드 실행
-RUN ./gradlew bootJar
 
 RUN <<EOF
 ./gradlew bootJar
