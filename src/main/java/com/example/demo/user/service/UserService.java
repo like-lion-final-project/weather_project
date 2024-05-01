@@ -31,14 +31,14 @@ public class UserService implements UserDetailsService {
 
     public UserDto createUser(UserDto dto) {
         return UserDto.fromEntity(userRepo.save(User.builder()
-                    .uuid(UUID.randomUUID().toString())
-                    .username(dto.getUsername())
-                    .password(passwordEncoder.encode(dto.getPassword()))
-                    .email(dto.getEmail())
-                    .gender(dto.getGender())
-                    .role_id(dto.getRole_id())
-                    .achievement(dto.getAchievement())
-                    .build())
+                .uuid(UUID.randomUUID().toString())
+                .username(dto.getUsername())
+                .password(dto.getPassword() != null ? passwordEncoder.encode(dto.getPassword()) : "")
+                .email(dto.getEmail())
+                .gender(dto.getGender())
+                .role_id(dto.getRole_id())
+                .achievement(dto.getAchievement())
+                .build())
         );
     }
 
