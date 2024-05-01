@@ -1,11 +1,38 @@
 // 이미지를 클릭하여 별점을 부여하는 함수
 function rateImage(clickedImage) {
-    // 클릭한 이미지의 src 속성값 가져오기
     var src = clickedImage.getAttribute('src');
-    // 카테고리 값 가져오기
-    var categoryInput = clickedImage.parentElement.querySelector('.category');
-    var category = categoryInput.value;
 
+    // 카테고리 값 가져오기
+    var category1Input = clickedImage.parentElement.querySelector('.category1');
+    var category2Input = clickedImage.parentElement.querySelector('.category2');
+    var category3Input = clickedImage.parentElement.querySelector('.category3');
+    var category4Input = clickedImage.parentElement.querySelector('.category4');
+
+    // 각 카테고리 값
+    var category1 = category1Input.value;
+    var category2 = category2Input.value;
+    var category3 = category3Input.value;
+    var category4 = category4Input.value;
+
+    // 쿼리 값 가져오기
+    var queryInput = clickedImage.parentElement.querySelector('.query');
+    var query = queryInput.value;
+
+    // 쿼리가 포함된 카테고리 찾기
+    var selectedCategory = null;
+
+    if (category1.includes(query)) {
+        selectedCategory = category1;
+    } else if (category2.includes(query)) {
+        selectedCategory = category2;
+    } else if (category3.includes(query)) {
+        selectedCategory = category3;
+    } else if (category4.includes(query)) {
+        selectedCategory = category4;
+    } else {
+        // 쿼리를 카테고리로 사용
+        selectedCategory = query;
+    }
 
     // 이전에 보여준 이미지 모두 제거
     var copiedImageContainer = document.getElementById('copied-image-container');
@@ -18,9 +45,11 @@ function rateImage(clickedImage) {
     // 별점 요소 생성
     var rating = document.createElement('div');
     rating.className = 'rating';
-    for (let i = 4; i >= 0; i--) { // 5점부터 1점까지 역순으로 생성
+
+    // 별점 생성
+    for (let i = 4; i >= 0; i--) {
         var star = document.createElement('span');
-        star.setAttribute('data-rating', i + 1); // 데이터 값 변경
+        star.setAttribute('data-rating', i + 1);
 
         var input = document.createElement('input');
         input.setAttribute('type', 'radio');
@@ -34,51 +63,53 @@ function rateImage(clickedImage) {
         star.appendChild(input);
         star.appendChild(label);
 
-        // 클로저를 사용하여 각 별점에 대한 정보를 전달
-        star.onclick = function() { // 클로저를 사용하지 않고 직접 rateImage 함수 호출
+        star.onclick = function() {
             var index = i + 1;
-            updateStarColor(index); // 클릭한 별점까지 색상 변경
-            submitRating(src, index, category); // 이미지 URL과 별점을 서버에 전달
+            updateStarColor(index);
+            submitRating(src, index, selectedCategory); // 선택된 카테고리 전달
         };
+
         rating.appendChild(star);
     }
 
     // 왼쪽 이미지 컨테이너에 새 이미지와 별점 추가
     copiedImageContainer.appendChild(copiedImage);
     copiedImageContainer.appendChild(rating);
-    copiedImageContainer.appendChild(category);
-}
-// 클릭한 별점까지의 색상을 변경하는 함수
-function updateStarColor(clickedIndex) {
-    var stars = document.querySelectorAll('.rating span');
-    for (var i = 0; i < stars.length; i++) {
-        var starIndex = parseInt(stars[i].getAttribute('data-rating'));
-        if (starIndex <= clickedIndex) {
-            stars[i].classList.add('active'); // .active 클래스 추가
-        } else {
-            stars[i].classList.remove('active'); // .active 클래스 제거
-        }
-    }
 }
 
 // 별점을 서버에 전송하는 함수
-function submitRating(imageSrc, rating,category) {
-    // 현재 페이지 URL에서 쿼리 문자열 추출
+function submitRating(imageSrc, rating, category) {
     var queryString = window.location.search;
-    // 쿼리 문자열을 객체로 변환
     var queryParams = new URLSearchParams(queryString);
-    // query 매개변수 값 가져오기
     var query = queryParams.get('query');
-    // AJAX 요청 보내기
+
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/submit-rating", true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
             console.log('Rating submitted successfully');
-            alert("이미지에"+rating+"점을 부여 했습니다");
+            alert("이미지에 " + rating + "점을 부여하였고, 카테고리는 " + category + "입니다.");
         }
     };
-    var data = JSON.stringify({ image: imageSrc, rating: rating ,query: query,category:category });
+
+    var data = JSON.stringify({
+        image: imageSrc,
+        rating: rating,
+        category: category
+    });
+
     xhr.send(data);
+}
+
+function updateStarColor(clickedIndex) {
+    var stars = document.querySelectorAll('.rating span');
+    for (var i = 0; i < stars.length; i++) {
+        var starIndex = parseInt(stars[i].getAttribute('data-rating'));
+        if (starIndex <= clickedIndex) {
+            stars[i].classList.add('active');
+        } else {
+            stars[i].classList.remove('active');
+        }
+    }
 }

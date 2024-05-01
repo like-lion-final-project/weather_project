@@ -1,72 +1,75 @@
 $(document).ready(function() {
-    // HTML 속성에서 Thymeleaf 데이터 가져오기
     var trendsDataString = $('#trendsData').attr('data-trends');
     var feedbackDataString = $('#feedbackData').attr('data-feedback');
 
-    // JSON 문자열을 JavaScript 객체로 변환
-    var trendsData = JSON.parse(trendsDataString);
-    var feedbackCountsByCategory = JSON.parse(feedbackDataString);
-    // 실시간 트렌드 그래프 생성
-    function createRealtimeTrendsChart() {
+    // 데이터가 있는지 확인하기 위해 콘솔 로그로 출력
+    console.log('trendsData:', trendsDataString);
+    console.log('feedbackData:', feedbackDataString);
+
+    try {
+        var trendsData = JSON.parse(trendsDataString);
+        var feedbackCountsByCategory = JSON.parse(feedbackDataString);
+
+        // 데이터가 비어있을 때도 그래프 생성
+        createRealtimeTrendsChart(trendsData);
+        createFeedbackCountsChart(feedbackCountsByCategory);
+    } catch (error) {
+        console.error('데이터 처리 오류:', error);
+    }
+
+    function createRealtimeTrendsChart(data) {
         var ctx = document.getElementById('realtime-trends-chart').getContext('2d');
+        var labels = data.map(function(trend) { return trend.category; });
+        var dataValues = data.map(function(trend) { return trend.averageRating; });
+
         var myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: trendsData.map(function(trend) { return trend.category }), // 트렌드 카테고리
+                labels: labels,
                 datasets: [{
                     label: '별점 그래프',
-                    data: trendsData.map(function(trend) { return trend.averageRating}), // 트렌드 평균 별점
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)', // 바 색상
-                    borderColor: 'rgba(255, 99, 132, 1)', // 바 테두리 색상
+                    data: dataValues,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
-                responsive: false, // 자동 크기조절 비활성화
+                responsive: false,
                 scales: {
                     y: {
-                        beginAtZero: true // y축이 0부터 시작하도록 설정
+                        beginAtZero: true
                     }
                 }
             }
         });
     }
 
-    // 카테고리별 피드백 수 그래프 생성
-    function createFeedbackCountsChart() {
+    function createFeedbackCountsChart(data) {
         var ctx = document.getElementById('feedback-counts-chart').getContext('2d');
-        var labels = [];
-        var data = [];
-
-        feedbackCountsByCategory.forEach(function(entry) {
-            labels.push(entry.category);
-            data.push(entry.feedbackCount);
-        });
+        var labels = data.map(function(entry) { return entry.category; });
+        var dataValues = data.map(function(entry) { return entry.feedbackCount; });
 
         var myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels, // 카테고리
+                labels: labels,
                 datasets: [{
                     label: '피드백 그래프',
-                    data: data, // 피드백 수
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)', // 바 색상
-                    borderColor: 'rgba(54, 162, 235, 1)', // 바 테두리 색상
+                    data: dataValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
-                responsive: false, // 자동 크기조절 비활성화
+                responsive: false,
                 scales: {
                     y: {
-                        beginAtZero: true // y축이 0부터 시작하도록 설정
+                        beginAtZero: true
                     }
                 }
             }
         });
     }
-
-    // 페이지 로드 시 초기 실행
-    createRealtimeTrendsChart();
-    createFeedbackCountsChart();
 });

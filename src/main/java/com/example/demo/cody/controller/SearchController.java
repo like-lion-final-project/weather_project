@@ -28,6 +28,7 @@ public class SearchController {
             String resultString = naverShopSearch.search(query);
             List<ItemDto> items=naverSearchService.fromJSONtoItems(resultString);
             model.addAttribute("items" ,items);
+            model.addAttribute("query",query);
             return "naversearch";
         }
 

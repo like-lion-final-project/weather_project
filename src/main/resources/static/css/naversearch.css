@@ -1,4 +1,5 @@
-    /* 이미지 컨테이너의 스타일 */
+
+/* 이미지 컨테이너의 스타일 */
 #image-container {
     position: fixed; /* 화면에 고정되도록 설정 */
     bottom: 25px; /* 아래쪽 여백 설정 */
@@ -58,4 +59,5 @@
     display: block;
     cursor: pointer;
 }
+
 

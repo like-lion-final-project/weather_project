@@ -5,20 +5,35 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    padding-top: 80px;
 }
 
 .graph-container {
     display: flex;
     justify-content: center;
-    width: 80%;
-    max-width: 1000px;
+    width: 100%;
+    max-width: 1500px;
 }
 
 .chart-container {
-    width: 50%; /* 그래프 컨테이너의 너비의 절반을 차지합니다. */
+    width: 45%; /* 각 그래프 컨테이너의 너비를 조정하여 간격을 주기 */
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-right: 40px; /* 각 그래프 컨테이너 사이의 간격을 늘리기 */
 }
 
 canvas {
     width: 100%;
     margin-top: 20px;
+}
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: white; /* 원하는 배경색으로 설정 */
+    z-index: 1000; /* 다른 요소 위에 표시하려면 z-index 값을 조정 */
+    /*padding: 10px 20px; !* 내용 여백 설정 *!*/
 }

@@ -4,6 +4,8 @@ package com.example.demo.cody.controller;
 import com.example.demo.cody.dto.CategoryFeedbackCountDto;
 import com.example.demo.cody.dto.TrendDto;
 import com.example.demo.cody.service.TrendService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,11 +27,14 @@ public class TrendController {
 
 
     @GetMapping("/trends")
-    public String showTrends(Model model) {
+    public String showTrends(Model model) throws JsonProcessingException {
         List<TrendDto> trends = trendService.calculateRealTimeTrends();
         List<CategoryFeedbackCountDto> feedbackCountsByCategory = trendService.countFeedbacksByCategory();
-        model.addAttribute("trends", trends);
-        model.addAttribute("feedback",feedbackCountsByCategory);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String trendsJson = objectMapper.writeValueAsString(trends);
+        String feedbackJson = objectMapper.writeValueAsString(feedbackCountsByCategory);
+        model.addAttribute("trends", trendsJson);
+        model.addAttribute("feedback",feedbackJson);
         return "trends";
     }
 
