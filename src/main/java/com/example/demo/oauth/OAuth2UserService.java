@@ -39,7 +39,18 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             attributes.put("nickname", kakaoProfile.get("nickname"));
             nameAttribute = "email";
         }
-        log.info(attributes.toString());
+
+        if (registrationId.equals("naver")) {
+            attributes.put("provider", "naver");
+            attributes.put("id", oAuth2User.getAttribute("id"));
+
+            Map<String, Object> naverAccount = oAuth2User.getAttribute("response");
+            attributes.put("id", naverAccount.get("id"));
+            attributes.put("email", naverAccount.get("email"));
+            attributes.put("nickname", naverAccount.get("nickname"));
+            attributes.put("gender", naverAccount.get("gender"));
+            nameAttribute = "email";
+        }
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),

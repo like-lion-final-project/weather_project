@@ -40,6 +40,5 @@ public class UserController {
         if (!userService.nickCheck(username)) return ResponseEntity.ok("사용하실 수 있는 닉네임입니다.");
 
         return ResponseEntity.status(400).body("중복된 닉네임입니다.");
-
     }
 }
