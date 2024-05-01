@@ -5,17 +5,21 @@ import org.json.JSONObject;
 
 @Getter
 public class ItemDto {
-    private String title;
-    private String link;
+
     private String image;
-    private int lprice;
-    private String category;
+    private String category1;
+    private String category2;
+    private String category3;
+    private String category4;
 
     public ItemDto(JSONObject itemJson) {
-        this.title = itemJson.getString("title");
-        this.link = itemJson.getString("link");
+
         this.image = itemJson.getString("image");
-        this.lprice = itemJson.getInt("lprice");
-        this.category=itemJson.getString("category3");
+        this.category1=itemJson.getString("category1");
+        this.category2=itemJson.getString("category2");
+        this.category3=itemJson.getString("category3");
+        this.category4=itemJson.getString("category4");
+
+
     }
 }

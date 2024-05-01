@@ -23,10 +23,8 @@ public class DailySuggestion extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private ClothsCategory category;
-
     @Column(name = "original_query")
     private String originalQuery;
 

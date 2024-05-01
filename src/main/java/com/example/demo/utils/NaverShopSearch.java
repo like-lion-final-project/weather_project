@@ -14,9 +14,10 @@ public class NaverShopSearch {
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Naver-Client-Id", "7kVb7VwufaixEK7Uyg78");
         headers.add("X-Naver-Client-Secret", "0Ag2nYo1Xv");
+
         String body = "";
         HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
-        ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/shop.json?query="+query, HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/shop.json?query="+query+"&display=9", HttpMethod.GET, requestEntity, String.class);
         HttpStatus httpStatus = (HttpStatus) responseEntity.getStatusCode();
         int status = httpStatus.value();
         String response = responseEntity.getBody();

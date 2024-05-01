@@ -17,7 +17,6 @@ public class SuggestionFeedback {
     private Long id;
     private int rating;
     private String image;
-    private String query;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     @ManyToOne
