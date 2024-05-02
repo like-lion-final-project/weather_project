@@ -1,12 +1,22 @@
 package com.example.demo.community.service;
 
+import com.example.demo.auth.AuthenticationFacade;
 import com.example.demo.cody.entity.ClothsCategory;
 import com.example.demo.cody.repo.ClothsCategoryRepository;
 import com.example.demo.community.dto.PostDto;
+import com.example.demo.community.entity.Comment;
 import com.example.demo.community.entity.Post;
+import com.example.demo.community.entity.RecentViewPost;
 import com.example.demo.community.repository.PostRepository;
+import com.example.demo.community.repository.RecentViewPostRepository;
+import com.example.demo.user.entity.CustomUserDetails;
+import com.example.demo.user.entity.User;
+import com.example.demo.user.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,12 +25,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final RecentViewPostRepository recentViewPostRepository;
     private final ClothsCategoryRepository clothsCategoryRepository;
 
     // CREATE
@@ -65,6 +77,17 @@ public class PostService {
 
     // READ One
     public PostDto readOne(Long postId) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) principal;
+
+        Long userId = userDetails.getId();
+
+        recentViewPostRepository.save(RecentViewPost.builder()
+                .userId(userId)
+                .postId(postId)
+                .build()
+        );
+
         return PostDto.fromEntity(postRepository.findById(postId).orElseThrow());
     }
     // UPDATE
@@ -84,4 +107,27 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    public List<PostDto> readAllMyPost(User user, Integer offset) {
+        Pageable page = PageRequest.of(offset, 4);
+
+        return postRepository.findAllByUserEntity(user, page)
+                .stream()
+                .map(PostDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public Integer getMyPostListSize(User user) {
+        Integer listSize = postRepository.findAllByUserEntity(user).size();
+
+        return listSize == 0 ? 1 : listSize;
+    }
+
+    public List<PostDto> readRecentPost(List<Long> postIdList, Integer offset) {
+        Pageable page = PageRequest.of(offset, 4);
+
+        return postRepository.findAllByIdIn(postIdList, page)
+                .stream()
+                .map(PostDto::fromEntity)
+                .collect(Collectors.toList());
+    }
 }
