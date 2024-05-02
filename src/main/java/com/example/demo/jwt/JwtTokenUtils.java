@@ -58,4 +58,10 @@ public class JwtTokenUtils {
                 .parseClaimsJwt(token)
                 .getBody();
     }
+
+    public Claims parseClaimsJws(String token) {
+        return jwtParser
+                .parseClaimsJws(token)
+                .getBody();
+    }
 }
