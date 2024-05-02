@@ -69,7 +69,7 @@ public class CommunityController {
             RedirectAttributes redirectAttributes
     ) {
         PostDto postDto = postService.readOne(postId);
-        Long postUserId = postDto.getUserEntity().getId();
+        Long postUserId = postDto.getId();
         // postId 게시글 하나의 정보
         model.addAttribute("posts", postDto);
         System.out.println(postId);
