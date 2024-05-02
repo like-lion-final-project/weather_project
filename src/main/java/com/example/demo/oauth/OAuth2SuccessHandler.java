@@ -47,7 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = new User();
         String jwt = tokenUtils.generateToken(user);
 
-        String targetUrl = String.format("http://localhost:8080/api/v1/users/login?token=%s", jwt);
+        String targetUrl = String.format("http://localhost:8080/home?key=%s", jwt);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
