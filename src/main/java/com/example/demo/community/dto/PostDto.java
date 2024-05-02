@@ -41,8 +41,8 @@ public class PostDto {
                 .createdDate(entity.getCreatedDate())
                 .comments(entity.getComments())
                 .imgName(entity.getImgName())
-                .imgPath(entity.getImgPath())
-                .userEntity(entity.getUserEntity());
+                .imgPath(entity.getImgPath());
+                //.userEntity(entity.getUserEntity());
 
         return builder.build();
 
