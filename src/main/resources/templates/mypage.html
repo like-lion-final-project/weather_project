@@ -128,7 +128,7 @@
 
             <!-- 다음 페이지 버튼 -->
             <a th:if="${commentCurrentPage < commentTotalPage}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage + 1}, recentViewPage=${recentCurrentPage}, key=${key}))}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage + 1}, recentViewPage=${recentCurrentPage}, key=${key})}"
                rel="next">다음 &raquo;</a>
         </div>
     </section>
@@ -168,7 +168,7 @@
 
             <!-- 다음 페이지 버튼 -->
             <a th:if="${recentCurrentPage < recentTotalPage}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage + 1}, key=${key}))}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage + 1}, key=${key})}"
                rel="next">다음 &raquo;</a>
         </div>
     </section>
