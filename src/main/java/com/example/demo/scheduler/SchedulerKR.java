@@ -51,7 +51,7 @@ public class SchedulerKR {
      * 6. 요일(0-7)
      * </p>
      */
- @Scheduled(cron = "10 * * * * *")
+ // @Scheduled(cron = "10 * * * * *")
 //    @Scheduled(fixedDelay = 3000)
     public void dailyCodyScheduler() {
         log.info("cron - start");
