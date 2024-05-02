@@ -30,10 +30,12 @@ public class MyPageService {
     private final JwtTokenUtils jwtTokenUtils;
 
     public MyPageDto readMyPage(String token, Integer postPage, Integer commentPage, Integer recentViewPage) {
+        log.info("token: " + token);
         String username = jwtTokenUtils
                 .parseClaimsJws(token)
                 .getSubject();
 
+        log.info("유저이름: " + username);
         User user = userRepo.findUserByUsername(username).orElseThrow();
 
         Integer offset = 0;

@@ -43,8 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .build());
         }
 
-        UserDetails details = userDetailsManager.loadUserByUsername(username);
-        User user = new User();
+        User user = userService.findByUsername(username);
         String jwt = tokenUtils.generateToken(user);
 
         String targetUrl = String.format("http://localhost:8080/home?key=%s", jwt);
