@@ -51,8 +51,8 @@ public class SchedulerKR {
      * 6. 요일(0-7)
      * </p>
      */
- // @Scheduled(cron = "10 * * * * *")
-//    @Scheduled(fixedDelay = 3000)
+ // @Scheduled(cron = "0 1 * * * *")
+   @Scheduled(fixedDelay = 3000)
     public void dailyCodyScheduler() {
         log.info("cron - start");
         Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion", "0.0.1");
