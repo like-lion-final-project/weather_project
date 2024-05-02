@@ -1,21 +1,28 @@
 
-/* 이미지 컨테이너의 스타일 */
+/* #image-container의 그리드 설정 */
 #image-container {
-    position: fixed; /* 화면에 고정되도록 설정 */
-    bottom: 25px; /* 아래쪽 여백 설정 */
-    right: 250px; /* 오른쪽 여백 설정 */
-    display: grid; /* 그리드를 사용하여 이미지를 배열 */
-    grid-template-columns: repeat(3, 1fr); /* 3개의 열로 구성 */
-    gap: 5px; /* 이미지 사이의 간격 설정 */
+    display: flex; /* Flexbox 사용 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    margin-top: 10px; /* Add some space from the top */
+}
+/* 각 이미지의 컨테이너 */
+.image-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3개의 열, 각 열의 너비는 균등하게 분할 */
+    gap: 5px; /* 이미지 사이의 간격을 줄임 */
+    text-align: center;
 }
 /* 각 이미지의 스타일 */
-#image-container img {
-    width: 125px; /* 이미지의 너비를 축소하여 설정 */
+.image-container img {
+    max-width: 100%; /* 이미지의 최대 너비를 100%로 설정하여 부모 요소에 맞게 조정 */
     height: auto; /* 이미지의 높이는 비율에 맞게 자동 조정 */
+    width: 100%; /* 이미지의 너비를 100%로 설정하여 이미지 컨테이너에 꽉 차도록 함 */
+    max-height: 200px; /* 이미지의 최대 높이를 설정하여 이미지의 세로 길이가 너무 커지지 않도록 함 */
 }
 /* 왼쪽 이미지 컨테이너의 스타일 */
 #copied-image-container {
-    position: fixed; /* 화면에 고정되도록 설정 */
+    margin-top: 20px;
     top: 250px; /* 위쪽 여백 설정 */
     left: 250px; /* 왼쪽 여백 설정 */
     text-align: center; /* 텍스트를 가운데 정렬 */

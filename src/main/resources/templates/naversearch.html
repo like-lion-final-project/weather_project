@@ -100,19 +100,20 @@
     </div>
 </div>
 
-<h4 class="mt-3 mb-3 text-center">코디 추천</h4>
+<h4 class="mt-3 mb-3 text-center">코디 추천: 반팔 티셔츠</h4>
+
 
 <div id="image-container">
     <!-- Thymeleaf를 사용하여 모델의 images를 동적으로 렌더링 -->
-    <div th:each="item, iterStat : ${items}">
-        <input type="hidden" class="category1" th:value="${item.category1}">
-        <input type="hidden" class="category2" th:value="${item.category2}">
-        <input type="hidden" class="category3" th:value="${item.category3}">
-        <input type="hidden" class="category4" th:value="${item.category4}">
-        <input type="hidden" class="query" th:value="${query}">
-        <img th:src="${item.image}" alt="Image" onclick="rateImage(this)">
-        <!-- 3번째 이미지마다 줄 바꿈 -->
-        <th:block th:if="${iterStat.index % 3 == 2}"><br></th:block>
+    <div class="image-container">
+        <div th:each="item, iterStat : ${items}">
+            <input type="hidden" class="category1" th:value="${item.category1}">
+            <input type="hidden" class="category2" th:value="${item.category2}">
+            <input type="hidden" class="category3" th:value="${item.category3}">
+            <input type="hidden" class="category4" th:value="${item.category4}">
+            <input type="hidden" class="query" th:value="${query}">
+            <img th:src="${item.image}" alt="Image" onclick="rateImage(this)">
+        </div>
     </div>
 </div>
 <!-- 왼쪽에 클릭한 이미지를 보여주는 컨테이너 -->
