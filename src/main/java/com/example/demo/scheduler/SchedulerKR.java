@@ -51,54 +51,54 @@ public class SchedulerKR {
      * 6. 요일(0-7)
      * </p>
      */
-// @Scheduled(cron = "10 * * * * *")
+ @Scheduled(cron = "10 * * * * *")
 //    @Scheduled(fixedDelay = 3000)
-//    public void dailyCodyScheduler() {
-//        log.info("cron - start");
-//        Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion", "0.0.2");
-//        if (assistant.isEmpty()) {
-//            return;
-//        }
-//        List<WeatherForecast> weatherForecasts = srtFcstService.getUltraSrtFcst(63, 120);
-//
-//        // 날씨 정보 가져오기
-//        List<FcstItem> fcstItems = new ArrayList<>();
-//        for (WeatherForecast item : weatherForecasts) {
-//            FcstItem fcstItem = new FcstItem();
-//            fcstItem.setFcstTime(item.getFcstTime());
-//            fcstItem.setFcstValue(item.getForecastValues().get("T1H"));
-//        }
-//
-//        // 추천 코디 요청
-//        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItems);
-//        for (String category : dailyCodyResDto.getCategories() ) {
-//            Optional<ClothsCategory> clothsCategory = clothsCategoryRepo.findByType(category);
-//
-//            // 추천 받은 카테고리가 DB에 존재하는 카테고리라면 해당 카테고리로 저장
-//            if (clothsCategory.isPresent()) {
-//                dailySuggestionRepo.save(
-//                        DailySuggestion.builder()
-//                                .category(clothsCategory.get())
-//                                .originalQuery(clothsCategory.get().getType())
-//                                .build());
-//            } else {
-//                // DB에 없는 카테고리라면 기타 카테고리로 저장 ( 임시 )
-//                Optional<ClothsCategory> otherItemsCategory = clothsCategoryRepo.findByType("기타");
-//                if (otherItemsCategory.isEmpty()) throw new RuntimeException("데이터베이스에 -기타- 카테고리가 존재하지 않습니다.");
-//
-//
-//                dailySuggestionRepo.save(
-//                        DailySuggestion.builder()
-//                                .category(otherItemsCategory.get())
-//                                .originalQuery(category)
-//                                .build());
-//            }
-//
-//            System.out.println(category + " : 추천 카테고리");
-//
-//        }
-//        log.info("cron - end");
-//    }
-//
+    public void dailyCodyScheduler() {
+        log.info("cron - start");
+        Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion", "0.0.1");
+        if (assistant.isEmpty()) {
+            return;
+        }
+        List<WeatherForecast> weatherForecasts = srtFcstService.getUltraSrtFcst(63, 120);
+
+        // 날씨 정보 가져오기
+        List<FcstItem> fcstItems = new ArrayList<>();
+        for (WeatherForecast item : weatherForecasts) {
+            FcstItem fcstItem = new FcstItem();
+            fcstItem.setFcstTime(item.getFcstTime());
+            fcstItem.setFcstValue(item.getForecastValues().get("T1H"));
+        }
+
+        // 추천 코디 요청
+        DailyCodyResDto dailyCodyResDto = gptService.generateDailyCodyCategory(fcstItems);
+        for (String category : dailyCodyResDto.getCategories() ) {
+            Optional<ClothsCategory> clothsCategory = clothsCategoryRepo.findByType(category);
+
+            // 추천 받은 카테고리가 DB에 존재하는 카테고리라면 해당 카테고리로 저장
+            if (clothsCategory.isPresent()) {
+                dailySuggestionRepo.save(
+                        DailySuggestion.builder()
+                                .category(clothsCategory.get())
+                                .originalQuery(clothsCategory.get().getType())
+                                .build());
+            } else {
+                // DB에 없는 카테고리라면 기타 카테고리로 저장 ( 임시 )
+                Optional<ClothsCategory> otherItemsCategory = clothsCategoryRepo.findByType("기타");
+                if (otherItemsCategory.isEmpty()) throw new RuntimeException("데이터베이스에 -기타- 카테고리가 존재하지 않습니다.");
+
+
+                dailySuggestionRepo.save(
+                        DailySuggestion.builder()
+                                .category(otherItemsCategory.get())
+                                .originalQuery(category)
+                                .build());
+            }
+
+            System.out.println(category + " : 추천 카테고리");
+
+        }
+        log.info("cron - end");
+    }
+
 
 }
