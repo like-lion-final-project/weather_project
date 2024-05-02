@@ -1,7 +1,10 @@
 package com.example.demo.user.entity;
 
+import com.example.demo.community.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -25,4 +28,7 @@ public class User {
     private Integer role_id;
     @Setter
     private String achievement;
+    @Setter
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Post> post;
 }

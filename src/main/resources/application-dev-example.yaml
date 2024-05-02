@@ -27,6 +27,7 @@ spring:
     user:
       name: user
       password: password
+
     oauth2:
       client:
         provider:
@@ -73,7 +74,7 @@ spring:
               - nickname
               - email
               - gender
-         
+
   datasource:
     url: jdbc:mysql://localhost:3306/your-db-name
     username:
