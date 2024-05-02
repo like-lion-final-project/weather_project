@@ -55,7 +55,7 @@ public class SchedulerKR {
 //    @Scheduled(fixedDelay = 3000)
     public void dailyCodyScheduler() {
         log.info("cron - start");
-        Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion", "0.0.2");
+        Optional<AssistantEntity> assistant = assistantRepo.findAssistantByAssistantTypeAndVersion("fashion", "0.0.1");
         if (assistant.isEmpty()) {
             return;
         }
