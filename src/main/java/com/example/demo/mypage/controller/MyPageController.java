@@ -26,6 +26,7 @@ public class MyPageController {
             Model model
     ) {
         MyPageDto myPageDto = myPageService.readMyPage(token, postPage, commentPage, recentViewPage);
+        model.addAttribute("key", token);
         model.addAttribute("posts", myPageDto.getPostDtoList());
         model.addAttribute("postTotalPage", myPageDto.getPostTotalPages());
         model.addAttribute("postCurrentPage", myPageDto.getPostCurrentPage());
