@@ -88,7 +88,7 @@ public class CommunityController {
         return "/ootdUpdate";
     }
 
-    @PutMapping("/update/{postId}")
+    @PostMapping("/update/{postId}")
     public String updatePost(
             @PathVariable("postId")
             Long postId,
@@ -101,7 +101,7 @@ public class CommunityController {
         return "redirect:/ootd";
     }
 
-    @DeleteMapping("/delete/{postId}")
+    @PostMapping("/delete/{postId}")
     public String deletePost(
             @PathVariable("postId")
             Long postId
