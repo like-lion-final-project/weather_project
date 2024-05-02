@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -14,9 +15,12 @@ public class ViewController {
 
     @GetMapping("/home")
     public String home(
+            @RequestParam(value = "key", required = false)
+            String token,
             Model model
     ) {
         model.addAttribute("clientId", NCP_CLIENT_ID);
+        model.addAttribute("token", token);
         return "home";
     }
 
@@ -28,5 +32,10 @@ public class ViewController {
     @GetMapping("/api/v1/users/signUp")
     public String signUp() {
         return "signUp";
+    }
+
+    @GetMapping("/mypage")
+    public String mypage() {
+        return "mypage";
     }
 }
