@@ -76,19 +76,19 @@
         <div>
             <!-- 이전 페이지 버튼 -->
             <a th:if="${postCurrentPage > 1}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage - 1}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage})}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage - 1}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage}, key=${key})}"
                rel="prev">&laquo; 이전</a>
 
             <!-- 페이지 번호 -->
             <span th:each="pageNum : ${#numbers.sequence(1, postTotalPage)}">
-            <a th:href="@{/api/v1/mypage(postPage=${pageNum}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage})}"
+            <a th:href="@{/api/v1/mypage(postPage=${pageNum}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage}, key=${key})}"
                th:text="${pageNum}"
                th:class="${pageNum == postCurrentPage} ? 'active'"></a>
             </span>
 
             <!-- 다음 페이지 버튼 -->
             <a th:if="${postCurrentPage < postTotalPage}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage + 1}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage})}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage + 1}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage}, key=${key})}"
                rel="next">다음 &raquo;</a>
         </div>
     </section>
@@ -116,19 +116,19 @@
         <div>
             <!-- 이전 페이지 버튼 -->
             <a th:if="${commentCurrentPage > 1}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage - 1}, recentViewPage=${recentCurrentPage})}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage - 1}, recentViewPage=${recentCurrentPage}, key=${key})}"
                rel="prev">&laquo; 이전</a>
 
             <!-- 페이지 번호 -->
             <span th:each="pageNum : ${#numbers.sequence(1, commentTotalPage)}">
-            <a th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${pageNum}, recentViewPage=${recentCurrentPage})}"
+            <a th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${pageNum}, recentViewPage=${recentCurrentPage}, key=${key})}"
                th:text="${pageNum}"
                th:class="${pageNum == commentCurrentPage} ? 'active'"></a>
             </span>
 
             <!-- 다음 페이지 버튼 -->
             <a th:if="${commentCurrentPage < commentTotalPage}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage + 1}, recentViewPage=${recentCurrentPage})}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage + 1}, recentViewPage=${recentCurrentPage}, key=${key}))}"
                rel="next">다음 &raquo;</a>
         </div>
     </section>
@@ -156,19 +156,19 @@
         <div>
             <!-- 이전 페이지 버튼 -->
             <a th:if="${recentCurrentPage > 1}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage - 1})}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage - 1}, key=${key})}"
                rel="prev">&laquo; 이전</a>
 
             <!-- 페이지 번호 -->
             <span th:each="pageNum : ${#numbers.sequence(1, recentTotalPage)}">
-            <a th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${pageNum})}"
+            <a th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${pageNum}, key=${key})}"
                th:text="${pageNum}"
                th:class="${pageNum == recentTotalPage} ? 'active'"></a>
             </span>
 
             <!-- 다음 페이지 버튼 -->
             <a th:if="${recentCurrentPage < recentTotalPage}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage + 1})}"
+               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage}, recentViewPage=${recentCurrentPage + 1}, key=${key}))}"
                rel="next">다음 &raquo;</a>
         </div>
     </section>
