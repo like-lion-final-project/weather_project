@@ -67,7 +67,7 @@ public class GptService {
             );
 
             System.out.println(messages.stream().findFirst().get().getContent() + "CONTENT");
-            AssistantEntity assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + AppConstants.VERSION)
+            AssistantEntity assistant = assistantRepo.findAssistantByName(AppConstants.NAME + "_" + "fashion" + "_" + AppConstants.VERSION)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 어시스턴트 입니다."));
             Run createAssistantResDto = gptAssistantService.createThreadAndRun(
                     CreateThreadAndRunRequest.builder()
