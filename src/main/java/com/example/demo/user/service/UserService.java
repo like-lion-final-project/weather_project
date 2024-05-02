@@ -81,6 +81,10 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
+    public User findByUsername(String username) {
+        return userRepo.findUserByUsername(username).orElseThrow();
+    }
+
     public boolean userExists(String email) {
         return userRepo.existsByEmail(email);
     }

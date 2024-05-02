@@ -93,46 +93,6 @@
         </div>
     </section>
 
-    <section id="my-reviews">
-        <h2>내가 리뷰를 남긴 게시글 목록</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>제목</th>
-                <th>카테고리</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="comment : ${comments}">
-                <td th:text="${comment.post.id}"></td>
-                <td><a th:href="@{/ootd/view/{postId}(postId=${comment.post.id})}" th:text="${comment.post.title}">Post Title</a></td>
-                <td th:text="${comment.post.category}">Category</td>
-            </tr>
-            </tbody>
-        </table>
-
-        <!-- 페이지 네비게이션 -->
-        <div>
-            <!-- 이전 페이지 버튼 -->
-            <a th:if="${commentCurrentPage > 1}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage - 1}, recentViewPage=${recentCurrentPage}, key=${key})}"
-               rel="prev">&laquo; 이전</a>
-
-            <!-- 페이지 번호 -->
-            <span th:each="pageNum : ${#numbers.sequence(1, commentTotalPage)}">
-            <a th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${pageNum}, recentViewPage=${recentCurrentPage}, key=${key})}"
-               th:text="${pageNum}"
-               th:class="${pageNum == commentCurrentPage} ? 'active'"></a>
-            </span>
-
-            <!-- 다음 페이지 버튼 -->
-            <a th:if="${commentCurrentPage < commentTotalPage}"
-               th:href="@{/api/v1/mypage(postPage=${postCurrentPage}, commentPage=${commentCurrentPage + 1}, recentViewPage=${recentCurrentPage}, key=${key})}"
-               rel="next">다음 &raquo;</a>
-        </div>
-    </section>
-
     <section id="my-views">
         <h2>최근에 조회한 게시글 목록</h2>
         <table>
